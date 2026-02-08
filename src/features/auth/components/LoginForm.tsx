@@ -23,6 +23,7 @@ import { authClient } from "@/lib/auth-client"
 import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
 import { useAuth } from "@/features/auth/context"
+import { getRedirectPathByRole } from "@/features/auth/utils/getRedirectPath"
 
 export function LoginForm({
   className,
@@ -57,8 +58,15 @@ export function LoginForm({
       // Refrescar la sesión en el contexto
       await refetch()
       
+      // Obtener la sesión actualizada para determinar el rol
+      const { data: sessionData } = await authClient.getSession()
+      const userRole = sessionData?.user?.role
+      
+      // Determinar la ruta de redirección según el rol
+      const redirectPath = getRedirectPathByRole(userRole)
+      
       toast.success("Inicio de sesión exitoso")
-      navigate({ to: "/inbox" })
+      navigate({ to: redirectPath as any })
     } catch (error) {
       console.error("Error durante el inicio de sesión:", error)
       toast.error("Ocurrió un error inesperado. Intenta de nuevo.")
