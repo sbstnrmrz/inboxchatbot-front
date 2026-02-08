@@ -1,8 +1,16 @@
 import { LoginForm } from "@/features/auth/components/LoginForm"
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 import { Toaster } from "@/components/ui/sonner"
+import { authClient } from "@/lib/auth-client"
 
 export const Route = createFileRoute('/auth/login')({
+  beforeLoad: async () => {
+    const { data } = await authClient.getSession()
+    if (data) {
+      // Si ya está autenticado, redirigir al inbox
+      throw redirect({ to: '/inbox' })
+    }
+  },
   component: Login,
 })
 

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InboxIndexRouteImport } from './routes/inbox/index'
+import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const InboxIndexRoute = InboxIndexRouteImport.update({
   path: '/inbox/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthIndexRoute = AuthIndexRouteImport.update({
+  id: '/auth/',
+  path: '/auth/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
@@ -32,30 +38,34 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/': typeof AuthIndexRoute
   '/inbox/': typeof InboxIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth': typeof AuthIndexRoute
   '/inbox': typeof InboxIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/': typeof AuthIndexRoute
   '/inbox/': typeof InboxIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth/login' | '/inbox/'
+  fullPaths: '/' | '/auth/login' | '/auth/' | '/inbox/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth/login' | '/inbox'
-  id: '__root__' | '/' | '/auth/login' | '/inbox/'
+  to: '/' | '/auth/login' | '/auth' | '/inbox'
+  id: '__root__' | '/' | '/auth/login' | '/auth/' | '/inbox/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthLoginRoute: typeof AuthLoginRoute
+  AuthIndexRoute: typeof AuthIndexRoute
   InboxIndexRoute: typeof InboxIndexRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InboxIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/': {
+      id: '/auth/'
+      path: '/auth'
+      fullPath: '/auth/'
+      preLoaderRoute: typeof AuthIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/login': {
       id: '/auth/login'
       path: '/auth/login'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthLoginRoute: AuthLoginRoute,
+  AuthIndexRoute: AuthIndexRoute,
   InboxIndexRoute: InboxIndexRoute,
 }
 export const routeTree = rootRouteImport

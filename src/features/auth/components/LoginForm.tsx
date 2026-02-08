@@ -22,6 +22,7 @@ import { loginSchema, type LoginFormData } from "@/features/auth/schemas/login.s
 import { authClient } from "@/lib/auth-client"
 import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
+import { useAuth } from "@/features/auth/context"
 
 export function LoginForm({
   className,
@@ -30,6 +31,7 @@ export function LoginForm({
   const [showPassword, setShowPassword] = useState(false)
   const [isPending, setIsPending] = useState(false)
   const navigate = useNavigate()
+  const { refetch } = useAuth()
 
   const {
     register,
@@ -52,6 +54,9 @@ export function LoginForm({
         return
       }
 
+      // Refrescar la sesión en el contexto
+      await refetch()
+      
       toast.success("Inicio de sesión exitoso")
       navigate({ to: "/inbox" })
     } catch (error) {
