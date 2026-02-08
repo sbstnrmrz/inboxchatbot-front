@@ -1,5 +1,6 @@
 import { LoginForm } from "@/features/auth/components/LoginForm"
 import { createFileRoute } from "@tanstack/react-router"
+import { Toaster } from "@/components/ui/sonner"
 
 export const Route = createFileRoute('/auth/login')({
   component: Login,
@@ -11,6 +12,7 @@ function Login() {
       <div className="w-full max-w-sm">
         <LoginForm />
       </div>
+      <Toaster/>
     </div>
   )
 

@@ -19,12 +19,17 @@ import { Eye, EyeOff } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { loginSchema, type LoginFormData } from "@/features/auth/schemas/login.schema"
+import { authClient } from "@/lib/auth-client"
+import { useNavigate } from "@tanstack/react-router"
+import { toast } from "sonner"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const [showPassword, setShowPassword] = useState(false)
+  const [isPending, setIsPending] = useState(false)
+  const navigate = useNavigate()
 
   const {
     register,
@@ -34,10 +39,27 @@ export function LoginForm({
     resolver: zodResolver(loginSchema),
   })
 
-  const isPending = false;
-
   const onSubmit = async (data: LoginFormData) => {
+    setIsPending(true)
+    try {
+      const result = await authClient.signIn.email({
+        email: data.email,
+        password: data.password,
+      })
 
+      if (result.error) {
+        toast.error(result.error.message || "Error al iniciar sesión")
+        return
+      }
+
+      toast.success("Inicio de sesión exitoso")
+      navigate({ to: "/inbox" })
+    } catch (error) {
+      console.error("Error durante el inicio de sesión:", error)
+      toast.error("Ocurrió un error inesperado. Intenta de nuevo.")
+    } finally {
+      setIsPending(false)
+    }
   }
 
   return (
