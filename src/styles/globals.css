@@ -4,8 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --color-primary-white: #f5f5f5;
-  --color-secondary-white: #dcdcdc;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -77,6 +76,8 @@
 }
 
 @theme inline {
+  --color-primary-white: #f5f5f5;
+  --color-secondary-white: #dcdcdc;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
