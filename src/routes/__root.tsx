@@ -5,7 +5,7 @@ import { AuthProvider } from '@/features/auth/context'
 const RootLayout = () => (
   <AuthProvider>
     <Outlet />
-    <TanStackRouterDevtools />
+    <TanStackRouterDevtools position='top-right'/>
   </AuthProvider>
 )
 
