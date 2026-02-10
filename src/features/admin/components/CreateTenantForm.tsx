@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -23,19 +24,31 @@ import {
   createTenantSchema,
   type CreateTenantFormData,
 } from "@/features/admin/schemas/createTenant.schema"
+import { tenantsApi } from "@/features/admin/api/tenants.api"
+import { queryKeys } from "@/lib/query-keys"
 
 export function CreateTenantForm() {
+  const queryClient = useQueryClient()
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<CreateTenantFormData>({
     resolver: zodResolver(createTenantSchema),
   })
 
+  const mutation = useMutation({
+    mutationFn: tenantsApi.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all() })
+      reset()
+    },
+  })
+
   const onSubmit = (data: CreateTenantFormData) => {
-    // TODO: implementar mutación para crear tenant
-    console.log(data)
+    mutation.mutate(data)
   }
 
   return (
@@ -207,8 +220,19 @@ export function CreateTenantForm() {
 
             {/* ── Submit ───────────────────────────────────────────── */}
             <Field>
-              <Button type="submit" className="w-full">
-                Crear tenant
+              {mutation.isError && (
+                <p className="text-destructive text-sm">
+                  {mutation.error instanceof Error
+                    ? mutation.error.message
+                    : "Error al crear el tenant"}
+                </p>
+              )}
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={mutation.isPending}
+              >
+                {mutation.isPending ? "Creando..." : "Crear tenant"}
               </Button>
             </Field>
           </FieldGroup>
