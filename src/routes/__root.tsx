@@ -4,6 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AuthProvider } from '@/features/auth/context'
 import { queryClient } from '@/lib/query-client'
+import { Toaster } from 'sonner'
 
 const RootLayout = () => (
   <QueryClientProvider client={queryClient}>
@@ -11,6 +12,7 @@ const RootLayout = () => (
       <Outlet />
       <TanStackRouterDevtools position='top-right' />
       <ReactQueryDevtools initialIsOpen={false} />
+      <Toaster/>
     </AuthProvider>
   </QueryClientProvider>
 )

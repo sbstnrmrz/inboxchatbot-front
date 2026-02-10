@@ -1,19 +1,66 @@
 import { z } from "zod"
 
-const whatsappInfoSchema = z.object({
-  accessToken: z.string().min(1, "El access token de WhatsApp es requerido"),
-  whatsappBusinessId: z.string().min(1, "El WhatsApp Business ID es requerido"),
-  appSecret: z.string().min(1, "El app secret de WhatsApp es requerido"),
-  phoneNumberId: z.string().min(1, "El Phone Number ID es requerido"),
-  webhookVerifyToken: z.string().optional(),
-})
+// Si el usuario no llena ningún campo del bloque, RHF envía strings vacíos.
+// El .transform convierte ese objeto "vacío" en undefined para que la validación
+// interna no se dispare cuando el bloque es opcional.
 
-const instagramInfoSchema = z.object({
-  accessToken: z.string().min(1, "El access token de Instagram es requerido"),
-  pageId: z.string().min(1, "El Page ID es requerido"),
-  accountId: z.string().min(1, "El Account ID es requerido"),
-  appSecret: z.string().min(1, "El app secret de Instagram es requerido"),
-})
+const whatsappInfoSchema = z
+  .object({
+    accessToken: z.string(),
+    whatsappBusinessId: z.string(),
+    appSecret: z.string(),
+    phoneNumberId: z.string(),
+    webhookVerifyToken: z.string().optional(),
+  })
+  .transform((val, ctx) => {
+    const { webhookVerifyToken, ...required } = val
+    const hasAny = Object.values(required).some((v) => v.trim() !== "")
+
+    // Si no llenó nada, devolver undefined (bloque omitido)
+    if (!hasAny) return undefined
+
+    // Si llenó algo, validar que todos los campos requeridos estén completos
+    if (!val.accessToken.trim())
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["accessToken"], message: "El access token de WhatsApp es requerido" })
+    if (!val.whatsappBusinessId.trim())
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["whatsappBusinessId"], message: "El WhatsApp Business ID es requerido" })
+    if (!val.appSecret.trim())
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["appSecret"], message: "El app secret de WhatsApp es requerido" })
+    if (!val.phoneNumberId.trim())
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["phoneNumberId"], message: "El Phone Number ID es requerido" })
+
+    return {
+      accessToken: val.accessToken,
+      whatsappBusinessId: val.whatsappBusinessId,
+      appSecret: val.appSecret,
+      phoneNumberId: val.phoneNumberId,
+      webhookVerifyToken: val.webhookVerifyToken || undefined,
+    }
+  })
+
+const instagramInfoSchema = z
+  .object({
+    accessToken: z.string(),
+    pageId: z.string(),
+    accountId: z.string(),
+    appSecret: z.string(),
+  })
+  .transform((val, ctx) => {
+    const hasAny = Object.values(val).some((v) => v.trim() !== "")
+
+    if (!hasAny) return undefined
+
+    if (!val.accessToken.trim())
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["accessToken"], message: "El access token de Instagram es requerido" })
+    if (!val.pageId.trim())
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["pageId"], message: "El Page ID es requerido" })
+    if (!val.accountId.trim())
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["accountId"], message: "El Account ID es requerido" })
+    if (!val.appSecret.trim())
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["appSecret"], message: "El app secret de Instagram es requerido" })
+
+    return val
+  })
 
 export const createTenantSchema = z.object({
   name: z.string().min(1, "El nombre es requerido"),
@@ -28,4 +75,8 @@ export const createTenantSchema = z.object({
   instagramInfo: instagramInfoSchema.optional(),
 })
 
-export type CreateTenantFormData = z.infer<typeof createTenantSchema>
+// Tipo de entrada: lo que RHF maneja (strings crudos del form)
+export type CreateTenantFormInput = z.input<typeof createTenantSchema>
+
+// Tipo de salida: lo que llega al onSubmit tras pasar por .transform()
+export type CreateTenantFormData = z.output<typeof createTenantSchema>

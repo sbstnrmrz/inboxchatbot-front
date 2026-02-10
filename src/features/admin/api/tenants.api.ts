@@ -10,8 +10,8 @@ export interface Tenant {
 
 export const tenantsApi = {
   create: (data: CreateTenantFormData) =>
-    apiClient.post<Tenant>("/api/tenants", data),
+    apiClient.post<Tenant>("/tenants", data),
 
   list: () =>
-    apiClient.get<Tenant[]>("/api/tenants"),
+    apiClient.get<Tenant[]>("/tenants"),
 }

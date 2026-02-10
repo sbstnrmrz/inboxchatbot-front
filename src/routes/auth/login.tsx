@@ -20,7 +20,7 @@ function Login() {
       <div className="w-full max-w-sm">
         <LoginForm />
       </div>
-      <Toaster/>
+
     </div>
   )
 

@@ -22,10 +22,12 @@ import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
 import {
   createTenantSchema,
+  type CreateTenantFormInput,
   type CreateTenantFormData,
 } from "@/features/admin/schemas/createTenant.schema"
 import { tenantsApi } from "@/features/admin/api/tenants.api"
 import { queryKeys } from "@/lib/query-keys"
+import { toast } from "sonner"
 
 export function CreateTenantForm() {
   const queryClient = useQueryClient()
@@ -35,20 +37,21 @@ export function CreateTenantForm() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<CreateTenantFormData>({
-    resolver: zodResolver(createTenantSchema),
+  } = useForm<CreateTenantFormInput>({
+    resolver: zodResolver(createTenantSchema) as any,
   })
 
   const mutation = useMutation({
     mutationFn: tenantsApi.create,
     onSuccess: () => {
+      toast.success('Tenant creado exitosamente');
       queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all() })
       reset()
     },
   })
 
-  const onSubmit = (data: CreateTenantFormData) => {
-    mutation.mutate(data)
+  const onSubmit = (data: CreateTenantFormInput) => {
+    mutation.mutate(data as unknown as CreateTenantFormData)
   }
 
   return (
