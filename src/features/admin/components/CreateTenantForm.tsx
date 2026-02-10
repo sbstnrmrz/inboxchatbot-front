@@ -1,0 +1,219 @@
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
+import {
+  createTenantSchema,
+  type CreateTenantFormData,
+} from "@/features/admin/schemas/createTenant.schema"
+
+export function CreateTenantForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CreateTenantFormData>({
+    resolver: zodResolver(createTenantSchema),
+  })
+
+  const onSubmit = (data: CreateTenantFormData) => {
+    // TODO: implementar mutación para crear tenant
+    console.log(data)
+  }
+
+  return (
+    <Card className="w-full max-w-2xl">
+      <CardHeader>
+        <CardTitle>Nuevo tenant</CardTitle>
+        <CardDescription>
+          Completa la información general y, opcionalmente, configura los canales
+          de WhatsApp e Instagram.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <FieldGroup>
+            {/* ── Información general ─────────────────────────────── */}
+            <FieldSet>
+              <FieldLegend>Información general</FieldLegend>
+
+              <Field>
+                <FieldLabel htmlFor="name">Nombre</FieldLabel>
+                <Input
+                  id="name"
+                  placeholder="Acme Corp"
+                  {...register("name")}
+                />
+                <FieldError errors={[errors.name]} />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="slug">Slug</FieldLabel>
+                <Input
+                  id="slug"
+                  placeholder="acme-corp"
+                  {...register("slug")}
+                />
+                {errors.slug ? (
+                  <FieldError errors={[errors.slug]} />
+                ) : (
+                  <FieldDescription>
+                    Identificador único en minúsculas, solo letras, números y
+                    guiones. Ej: <code>acme-corp</code>
+                  </FieldDescription>
+                )}
+              </Field>
+            </FieldSet>
+
+            {/* ── WhatsApp (opcional) ──────────────────────────────── */}
+            <FieldSet>
+              <FieldLegend>
+                WhatsApp{" "}
+                <span className="text-muted-foreground font-normal text-sm">
+                  (opcional, debe establecerse para que funcione el bot correctamente)
+                </span>
+              </FieldLegend>
+
+              <Field>
+                <FieldLabel htmlFor="whatsapp-accessToken">
+                  Access Token
+                </FieldLabel>
+                <PasswordInput
+                  id="whatsapp-accessToken"
+                  placeholder="EAAxxxxxxx..."
+                  {...register("whatsappInfo.accessToken")}
+                />
+                <FieldError errors={[errors.whatsappInfo?.accessToken]} />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="whatsapp-businessId">
+                  WhatsApp Business ID
+                </FieldLabel>
+                <Input
+                  id="whatsapp-businessId"
+                  placeholder="123456789"
+                  {...register("whatsappInfo.whatsappBusinessId")}
+                />
+                <FieldError errors={[errors.whatsappInfo?.whatsappBusinessId]} />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="whatsapp-appSecret">App Secret</FieldLabel>
+                <PasswordInput
+                  id="whatsapp-appSecret"
+                  placeholder="abcdef123456..."
+                  {...register("whatsappInfo.appSecret")}
+                />
+                <FieldError errors={[errors.whatsappInfo?.appSecret]} />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="whatsapp-phoneNumberId">
+                  Phone Number ID
+                </FieldLabel>
+                <Input
+                  id="whatsapp-phoneNumberId"
+                  placeholder="987654321"
+                  {...register("whatsappInfo.phoneNumberId")}
+                />
+                <FieldError errors={[errors.whatsappInfo?.phoneNumberId]} />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="whatsapp-webhookVerifyToken">
+                  Webhook Verify Token{" "}
+                  <span className="text-muted-foreground font-normal">
+                    (opcional)
+                  </span>
+                </FieldLabel>
+                <Input
+                  id="whatsapp-webhookVerifyToken"
+                  placeholder="mi-token-secreto"
+                  {...register("whatsappInfo.webhookVerifyToken")}
+                />
+                <FieldError errors={[errors.whatsappInfo?.webhookVerifyToken]} />
+              </Field>
+            </FieldSet>
+
+            {/* ── Instagram (opcional) ─────────────────────────────── */}
+            <FieldSet>
+              <FieldLegend>
+                Instagram{" "}
+                <span className="text-muted-foreground font-normal text-sm">
+                  (opcional, debe establecerse para que funcione el bot correctamente)
+                </span>
+              </FieldLegend>
+
+              <Field>
+                <FieldLabel htmlFor="instagram-accessToken">
+                  Access Token
+                </FieldLabel>
+                <PasswordInput
+                  id="instagram-accessToken"
+                  placeholder="IGAAxxxxxxx..."
+                  {...register("instagramInfo.accessToken")}
+                />
+                <FieldError errors={[errors.instagramInfo?.accessToken]} />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="instagram-pageId">Page ID</FieldLabel>
+                <Input
+                  id="instagram-pageId"
+                  placeholder="123456789"
+                  {...register("instagramInfo.pageId")}
+                />
+                <FieldError errors={[errors.instagramInfo?.pageId]} />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="instagram-accountId">Account ID</FieldLabel>
+                <Input
+                  id="instagram-accountId"
+                  placeholder="987654321"
+                  {...register("instagramInfo.accountId")}
+                />
+                <FieldError errors={[errors.instagramInfo?.accountId]} />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="instagram-appSecret">App Secret</FieldLabel>
+                <PasswordInput
+                  id="instagram-appSecret"
+                  placeholder="abcdef123456..."
+                  {...register("instagramInfo.appSecret")}
+                />
+                <FieldError errors={[errors.instagramInfo?.appSecret]} />
+              </Field>
+            </FieldSet>
+
+            {/* ── Submit ───────────────────────────────────────────── */}
+            <Field>
+              <Button type="submit" className="w-full">
+                Crear tenant
+              </Button>
+            </Field>
+          </FieldGroup>
+        </form>
+      </CardContent>
+    </Card>
+  )
+}

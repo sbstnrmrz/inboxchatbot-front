@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronRight, type LucideIcon } from "lucide-react"
+import { Building2, Building2Icon, ChevronRight, Map, type LucideIcon } from "lucide-react"
 
 import {
   Collapsible,
@@ -17,6 +17,15 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { useNavigate, useRouter } from "@tanstack/react-router"
+
+const links = [
+  {
+    title: "Tenants",
+    path: "/tenants",
+    icon: Building2,
+  },
+]
 
 export function NavMain({
   items,
@@ -32,40 +41,27 @@ export function NavMain({
     }[]
   }[]
 }) {
+
+  const navigate = useNavigate();
+  const router = useRouter();
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
-          <Collapsible
-            key={item.title}
-            asChild
-            defaultOpen={item.isActive}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
-                        <a href={subItem.url}>
-                          <span>{subItem.title}</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
+        {links.map((item) => (
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              className="cursor-pointer" 
+              tooltip={item.title}
+              onClick={() => {
+                navigate({to: `/admin/dashboard/${item.path}`})
+              }}
+            >
+              {item.icon && <item.icon/>}
+              <span>{item.title}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         ))}
       </SidebarMenu>
     </SidebarGroup>
