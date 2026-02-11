@@ -1,41 +1,58 @@
 import { useAuth } from "@/features/auth/context";
 import { logger } from "@/lib/logger";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { io, Socket } from 'socket.io-client';
 import { SocketEvents } from "../types/events";
 
-const URL = import.meta.env.API_URL || 'http://localtest.me:3001'
+const URL = import.meta.env.VITE_API_URL || 'http://localtest.me:3001'
 const PATH = '/socket'
 
 export function useSocket() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isReconnecting, setIsReconnecting] = useState(false);
+  const socketRef = useRef<Socket | null>(null);
 
-  const {session} = useAuth();
+  const { session, isPending } = useAuth();
 
   useEffect(() => {
+    // Wait until better-auth finishes loading the session
+    if (isPending) return;
+
+    // No session = no connection (user not authenticated)
+    if (!session) {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+        setSocket(null);
+        setIsConnected(false);
+      }
+      return;
+    }
+
+    // Already connected with an active socket — skip re-creation
+    if (socketRef.current?.connected) return;
+
     function onConnect() {
-      logger.log('Socket connected:', newSocket.id);
+      logger.log('✅ Socket connected:', newSocket.id);
       setIsConnected(true);
       setIsReconnecting(false);
     }
     function onDisconnect(reason: Socket.DisconnectReason) {
-      logger.log('Socket disconnected:', reason);
+      logger.log('🔴 Socket disconnected:', reason);
       setIsConnected(false);
     }
 
     const newSocket = io(URL.replace('/api', ''), {
       path: PATH,
-      auth: {
-        session
-      },
-      withCredentials: true, // Important: sends cookies with socket connection
       transports: ['polling', 'websocket'],
       reconnection: true,
+      withCredentials: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
     });
+
+    socketRef.current = newSocket;
 
     newSocket.on(SocketEvents.Connect, onConnect);
     newSocket.on(SocketEvents.Disconnect, onDisconnect);
@@ -72,13 +89,19 @@ export function useSocket() {
       setSocket(newSocket);
     });
 
-    // Cleanup on unmount
+    // Cleanup on unmount or when session changes
     return () => {
-      newSocket.off(SocketEvents.Connect);
-      newSocket.off('disconnect');
+      newSocket.off(SocketEvents.Connect, onConnect);
+      newSocket.off(SocketEvents.Disconnect, onDisconnect);
       newSocket.disconnect();
+      socketRef.current = null;
       setSocket(null);
     };
-  }, [])
+  }, [isPending, session])
 
+  return {
+    socket,
+    isConnected,
+    isReconnecting
+  }
 }

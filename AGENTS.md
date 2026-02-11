@@ -419,6 +419,88 @@ export function useCreateTenant() {
 
 ---
 
+## Guide: Socket.IO Authentication with better-auth
+
+Socket.IO authentication relies on **browser cookies** managed by better-auth. No token is passed manually — the browser sends the session cookie automatically on the HTTP handshake.
+
+### How it works
+
+1. better-auth sets a `better-auth.session_token` HttpOnly cookie on sign-in.
+2. The `useSocket` hook waits until `isPending === false && session !== null` before creating the socket.
+3. Socket.IO performs an HTTP long-polling handshake first (`GET /socket?EIO=4&transport=polling`). The browser includes the cookie automatically because `withCredentials: true` is set.
+4. The server reads `socket.handshake.headers.cookie` and validates the session.
+5. After the handshake, the connection upgrades to WebSocket. The browser also sends cookies on the `Upgrade` request.
+
+### Client configuration
+
+```ts
+// src/features/sockets/hooks/useSocket.ts
+const socket = io(URL, {
+  path: '/socket',
+  transports: ['polling', 'websocket'],
+  withCredentials: true, // required for cross-origin cookie sending
+});
+```
+
+**Rules:**
+- Never pass the session or token in `auth: { ... }` — better-auth uses HttpOnly cookies, not JS-accessible tokens.
+- Never use `extraHeaders` for auth — browsers ignore custom headers on WebSocket upgrades.
+- `withCredentials: true` is required whenever frontend and backend run on different origins (different ports count as different origins in development).
+
+### Connection lifecycle
+
+The socket must only connect after the session is confirmed. The `useSocket` hook enforces this:
+
+```ts
+useEffect(() => {
+  if (isPending) return;        // still loading session — do nothing
+  if (!session) {               // not authenticated — disconnect if needed
+    socket?.disconnect();
+    return;
+  }
+  // session is valid — create socket
+}, [isPending, session]);
+```
+
+This prevents a race condition where the socket handshake fires before the session cookie is available, which would result in an auth rejection from the server.
+
+### Server requirements
+
+The backend Socket.IO server must mirror these settings:
+
+```ts
+// server-side (NestJS / Express)
+new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173", // exact frontend origin, never "*"
+    credentials: true,               // required to accept cookies
+  },
+  path: '/socket',
+});
+```
+
+> `origin: "*"` is **incompatible** with `credentials: true`. The browser will block the request.
+
+### Verifying cookies reach the server
+
+```ts
+io.on('connection', (socket) => {
+  const cookies = socket.handshake.headers.cookie;
+  // "better-auth.session_token=abc123; ..."
+  // if undefined → CORS misconfiguration on the server
+});
+```
+
+### Quick checklist
+
+- [ ] `withCredentials: true` set on the `io()` call
+- [ ] Socket only created after `isPending === false && session !== null`
+- [ ] Server CORS has exact `origin` and `credentials: true`
+- [ ] No token passed via `auth`, `extraHeaders`, or `query`
+- [ ] `VITE_API_URL` env var used (not `API_URL` — Vite requires the `VITE_` prefix)
+
+---
+
 ## Final Note
 
 This frontend is expected to scale to **many tenants**, **high message throughput**, and **real‑time collaboration**. Every agent decision should favor maintainability, performance, and clarity over short‑term convenience.
