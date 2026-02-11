@@ -17,10 +17,10 @@ export interface InstagramInfo {
 }
 
 export interface Tenant {
-  id: string;
+  _id: string;
   name: string;
   slug: string;
-  createdAt?: string;
   whatsappInfo?: WhatsAppInfo;
   instagramInfo?: InstagramInfo;
+  createdAt?: Date;
 }

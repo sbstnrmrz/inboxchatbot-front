@@ -5,14 +5,17 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AuthProvider } from '@/features/auth/context'
 import { queryClient } from '@/lib/query-client'
 import { Toaster } from 'sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 const RootLayout = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <Outlet />
-      <TanStackRouterDevtools position='top-right' />
-      <ReactQueryDevtools initialIsOpen={false} />
-      <Toaster/>
+      <TooltipProvider>
+        <Outlet />
+        <TanStackRouterDevtools position='top-right' />
+        <ReactQueryDevtools initialIsOpen={false} />
+        <Toaster/>
+      </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
 )

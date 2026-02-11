@@ -1,6 +1,6 @@
 "use client"
 
-import { Building2, Building2Icon, ChevronRight, Map, type LucideIcon } from "lucide-react"
+import { Building2, Building2Icon, ChevronRight, IdCard, Map, Users, type LucideIcon } from "lucide-react"
 
 import {
   Collapsible,
@@ -25,23 +25,19 @@ const links = [
     path: "/tenants",
     icon: Building2,
   },
+  {
+    title: "Memberships",
+    path: "/memberships",
+    icon: IdCard,
+  },
+  {
+    title: "Users",
+    path: "/users",
+    icon: Users,
+  },
 ]
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string
-    url: string
-    icon?: LucideIcon
-    isActive?: boolean
-    items?: {
-      title: string
-      url: string
-    }[]
-  }[]
-}) {
-
+export function NavMain() {
   const navigate = useNavigate();
   const router = useRouter();
 

@@ -1,14 +1,15 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card"
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import {
   Field,
   FieldDescription,
@@ -27,26 +28,39 @@ import {
 } from "@/features/admin/schemas/createTenant.schema"
 import { tenantsApi } from "@/features/admin/api/tenants.api"
 import { queryKeys } from "@/lib/query-keys"
-import { toast } from "sonner"
+import type { Tenant } from "@/types/tenant.type"
 
-export function CreateTenantForm() {
+interface EditTenantModalProps {
+  tenant: Tenant
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+export function EditTenantModal({ tenant, open, onOpenChange }: EditTenantModalProps) {
   const queryClient = useQueryClient()
 
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<CreateTenantFormInput>({
     resolver: zodResolver(createTenantSchema) as any,
+    defaultValues: {
+      name: tenant.name,
+      slug: tenant.slug,
+    },
   })
 
   const mutation = useMutation({
-    mutationFn: tenantsApi.create,
+    mutationFn: (data: CreateTenantFormData) =>
+      tenantsApi.update({ id: tenant._id, data }),
     onSuccess: () => {
-      toast.success('Tenant creado exitosamente');
+      toast.success("Tenant actualizado")
       queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all() })
-      reset()
+      onOpenChange(false)
+    },
+    onError: () => {
+      toast.error("Error al actualizar el tenant")
     },
   })
 
@@ -55,15 +69,12 @@ export function CreateTenantForm() {
   }
 
   return (
-    <Card className="w-full max-w-2xl">
-      <CardHeader>
-        <CardTitle>Nuevo tenant</CardTitle>
-        <CardDescription>
-          Completa la información general y, opcionalmente, configura los canales
-          de WhatsApp e Instagram.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Editar tenant</DialogTitle>
+        </DialogHeader>
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
             {/* ── Información general ─────────────────────────────── */}
@@ -71,9 +82,9 @@ export function CreateTenantForm() {
               <FieldLegend>Información general</FieldLegend>
 
               <Field>
-                <FieldLabel htmlFor="name">Nombre</FieldLabel>
+                <FieldLabel htmlFor="edit-name">Nombre</FieldLabel>
                 <Input
-                  id="name"
+                  id="edit-name"
                   placeholder="Acme Corp"
                   {...register("name")}
                 />
@@ -81,9 +92,9 @@ export function CreateTenantForm() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="slug">Slug</FieldLabel>
+                <FieldLabel htmlFor="edit-slug">Slug</FieldLabel>
                 <Input
-                  id="slug"
+                  id="edit-slug"
                   placeholder="acme-corp"
                   {...register("slug")}
                 />
@@ -103,16 +114,14 @@ export function CreateTenantForm() {
               <FieldLegend>
                 WhatsApp{" "}
                 <span className="text-muted-foreground font-normal text-sm">
-                  (opcional, debe establecerse para que funcione el bot correctamente)
+                  (opcional)
                 </span>
               </FieldLegend>
 
               <Field>
-                <FieldLabel htmlFor="whatsapp-accessToken">
-                  Access Token
-                </FieldLabel>
+                <FieldLabel htmlFor="edit-whatsapp-accessToken">Access Token</FieldLabel>
                 <PasswordInput
-                  id="whatsapp-accessToken"
+                  id="edit-whatsapp-accessToken"
                   placeholder="EAAxxxxxxx..."
                   {...register("whatsappInfo.accessToken")}
                 />
@@ -120,11 +129,9 @@ export function CreateTenantForm() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="whatsapp-businessId">
-                  WhatsApp Business ID
-                </FieldLabel>
+                <FieldLabel htmlFor="edit-whatsapp-businessId">WhatsApp Business ID</FieldLabel>
                 <Input
-                  id="whatsapp-businessId"
+                  id="edit-whatsapp-businessId"
                   placeholder="123456789"
                   {...register("whatsappInfo.whatsappBusinessId")}
                 />
@@ -132,9 +139,9 @@ export function CreateTenantForm() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="whatsapp-appSecret">App Secret</FieldLabel>
+                <FieldLabel htmlFor="edit-whatsapp-appSecret">App Secret</FieldLabel>
                 <PasswordInput
-                  id="whatsapp-appSecret"
+                  id="edit-whatsapp-appSecret"
                   placeholder="abcdef123456..."
                   {...register("whatsappInfo.appSecret")}
                 />
@@ -142,11 +149,9 @@ export function CreateTenantForm() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="whatsapp-phoneNumberId">
-                  Phone Number ID
-                </FieldLabel>
+                <FieldLabel htmlFor="edit-whatsapp-phoneNumberId">Phone Number ID</FieldLabel>
                 <Input
-                  id="whatsapp-phoneNumberId"
+                  id="edit-whatsapp-phoneNumberId"
                   placeholder="987654321"
                   {...register("whatsappInfo.phoneNumberId")}
                 />
@@ -154,14 +159,12 @@ export function CreateTenantForm() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="whatsapp-webhookVerifyToken">
+                <FieldLabel htmlFor="edit-whatsapp-webhookVerifyToken">
                   Webhook Verify Token{" "}
-                  <span className="text-muted-foreground font-normal">
-                    (opcional)
-                  </span>
+                  <span className="text-muted-foreground font-normal">(opcional)</span>
                 </FieldLabel>
                 <PasswordInput
-                  id="whatsapp-webhookVerifyToken"
+                  id="edit-whatsapp-webhookVerifyToken"
                   placeholder="mi-token-secreto"
                   {...register("whatsappInfo.webhookVerifyToken")}
                 />
@@ -174,16 +177,14 @@ export function CreateTenantForm() {
               <FieldLegend>
                 Instagram{" "}
                 <span className="text-muted-foreground font-normal text-sm">
-                  (opcional, debe establecerse para que funcione el bot correctamente)
+                  (opcional)
                 </span>
               </FieldLegend>
 
               <Field>
-                <FieldLabel htmlFor="instagram-accessToken">
-                  Access Token
-                </FieldLabel>
+                <FieldLabel htmlFor="edit-instagram-accessToken">Access Token</FieldLabel>
                 <PasswordInput
-                  id="instagram-accessToken"
+                  id="edit-instagram-accessToken"
                   placeholder="IGAAxxxxxxx..."
                   {...register("instagramInfo.accessToken")}
                 />
@@ -191,9 +192,9 @@ export function CreateTenantForm() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="instagram-pageId">Page ID</FieldLabel>
+                <FieldLabel htmlFor="edit-instagram-pageId">Page ID</FieldLabel>
                 <Input
-                  id="instagram-pageId"
+                  id="edit-instagram-pageId"
                   placeholder="123456789"
                   {...register("instagramInfo.pageId")}
                 />
@@ -201,9 +202,9 @@ export function CreateTenantForm() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="instagram-accountId">Account ID</FieldLabel>
+                <FieldLabel htmlFor="edit-instagram-accountId">Account ID</FieldLabel>
                 <Input
-                  id="instagram-accountId"
+                  id="edit-instagram-accountId"
                   placeholder="987654321"
                   {...register("instagramInfo.accountId")}
                 />
@@ -211,36 +212,32 @@ export function CreateTenantForm() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="instagram-appSecret">App Secret</FieldLabel>
+                <FieldLabel htmlFor="edit-instagram-appSecret">App Secret</FieldLabel>
                 <PasswordInput
-                  id="instagram-appSecret"
+                  id="edit-instagram-appSecret"
                   placeholder="abcdef123456..."
                   {...register("instagramInfo.appSecret")}
                 />
                 <FieldError errors={[errors.instagramInfo?.appSecret]} />
               </Field>
             </FieldSet>
-
-            {/* ── Submit ───────────────────────────────────────────── */}
-            <Field>
-              {mutation.isError && (
-                <p className="text-destructive text-sm">
-                  {mutation.error instanceof Error
-                    ? mutation.error.message
-                    : "Error al crear el tenant"}
-                </p>
-              )}
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={mutation.isPending}
-              >
-                {mutation.isPending ? "Creando..." : "Crear tenant"}
-              </Button>
-            </Field>
           </FieldGroup>
+
+          <DialogFooter className="mt-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={mutation.isPending}
+            >
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={mutation.isPending}>
+              {mutation.isPending ? "Guardando..." : "Guardar cambios"}
+            </Button>
+          </DialogFooter>
         </form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   )
 }
