@@ -2,13 +2,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card"
+import { DialogFooter } from "@/components/ui/dialog"
 import {
   Field,
   FieldDescription,
@@ -29,7 +23,11 @@ import { tenantsApi } from "@/features/admin/api/tenants.api"
 import { queryKeys } from "@/lib/query-keys"
 import { toast } from "sonner"
 
-export function CreateTenantForm() {
+interface CreateTenantFormProps {
+  onSuccess?: () => void
+}
+
+export function CreateTenantForm({ onSuccess }: CreateTenantFormProps = {}) {
   const queryClient = useQueryClient()
 
   const {
@@ -44,9 +42,10 @@ export function CreateTenantForm() {
   const mutation = useMutation({
     mutationFn: tenantsApi.create,
     onSuccess: () => {
-      toast.success('Tenant creado exitosamente');
+      toast.success('Tenant creado exitosamente')
       queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all() })
       reset()
+      onSuccess?.()
     },
   })
 
@@ -55,16 +54,7 @@ export function CreateTenantForm() {
   }
 
   return (
-    <Card className="w-full max-w-2xl">
-      <CardHeader>
-        <CardTitle>Nuevo tenant</CardTitle>
-        <CardDescription>
-          Completa la información general y, opcionalmente, configura los canales
-          de WhatsApp e Instagram.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
             {/* ── Información general ─────────────────────────────── */}
             <FieldSet>
@@ -221,26 +211,20 @@ export function CreateTenantForm() {
               </Field>
             </FieldSet>
 
-            {/* ── Submit ───────────────────────────────────────────── */}
-            <Field>
-              {mutation.isError && (
-                <p className="text-destructive text-sm">
-                  {mutation.error instanceof Error
-                    ? mutation.error.message
-                    : "Error al crear el tenant"}
-                </p>
-              )}
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={mutation.isPending}
-              >
-                {mutation.isPending ? "Creando..." : "Crear tenant"}
-              </Button>
-            </Field>
           </FieldGroup>
+
+          <DialogFooter className="mt-6">
+            {mutation.isError && (
+              <p className="text-destructive text-sm mr-auto">
+                {mutation.error instanceof Error
+                  ? mutation.error.message
+                  : "Error al crear el tenant"}
+              </p>
+            )}
+            <Button type="submit" disabled={mutation.isPending}>
+              {mutation.isPending ? "Creando..." : "Crear tenant"}
+            </Button>
+          </DialogFooter>
         </form>
-      </CardContent>
-    </Card>
   )
 }
