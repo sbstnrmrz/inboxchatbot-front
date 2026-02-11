@@ -16,6 +16,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin/dashboard/index'
+import { Route as AdminDashboardUsersIndexRouteImport } from './routes/admin/dashboard/users/index'
 import { Route as AdminDashboardTenantsIndexRouteImport } from './routes/admin/dashboard/tenants/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +54,12 @@ const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminDashboardRoute,
 } as any)
+const AdminDashboardUsersIndexRoute =
+  AdminDashboardUsersIndexRouteImport.update({
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => AdminDashboardRoute,
+  } as any)
 const AdminDashboardTenantsIndexRoute =
   AdminDashboardTenantsIndexRouteImport.update({
     id: '/tenants/',
@@ -69,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/inbox/': typeof InboxIndexRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
   '/admin/dashboard/tenants/': typeof AdminDashboardTenantsIndexRoute
+  '/admin/dashboard/users/': typeof AdminDashboardUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +86,7 @@ export interface FileRoutesByTo {
   '/inbox': typeof InboxIndexRoute
   '/admin/dashboard': typeof AdminDashboardIndexRoute
   '/admin/dashboard/tenants': typeof AdminDashboardTenantsIndexRoute
+  '/admin/dashboard/users': typeof AdminDashboardUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +98,7 @@ export interface FileRoutesById {
   '/inbox/': typeof InboxIndexRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
   '/admin/dashboard/tenants/': typeof AdminDashboardTenantsIndexRoute
+  '/admin/dashboard/users/': typeof AdminDashboardUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +111,7 @@ export interface FileRouteTypes {
     | '/inbox/'
     | '/admin/dashboard/'
     | '/admin/dashboard/tenants/'
+    | '/admin/dashboard/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -110,6 +121,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/admin/dashboard'
     | '/admin/dashboard/tenants'
+    | '/admin/dashboard/users'
   id:
     | '__root__'
     | '/'
@@ -120,6 +132,7 @@ export interface FileRouteTypes {
     | '/inbox/'
     | '/admin/dashboard/'
     | '/admin/dashboard/tenants/'
+    | '/admin/dashboard/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -182,6 +195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardIndexRouteImport
       parentRoute: typeof AdminDashboardRoute
     }
+    '/admin/dashboard/users/': {
+      id: '/admin/dashboard/users/'
+      path: '/users'
+      fullPath: '/admin/dashboard/users/'
+      preLoaderRoute: typeof AdminDashboardUsersIndexRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
     '/admin/dashboard/tenants/': {
       id: '/admin/dashboard/tenants/'
       path: '/tenants'
@@ -195,11 +215,13 @@ declare module '@tanstack/react-router' {
 interface AdminDashboardRouteChildren {
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
   AdminDashboardTenantsIndexRoute: typeof AdminDashboardTenantsIndexRoute
+  AdminDashboardUsersIndexRoute: typeof AdminDashboardUsersIndexRoute
 }
 
 const AdminDashboardRouteChildren: AdminDashboardRouteChildren = {
   AdminDashboardIndexRoute: AdminDashboardIndexRoute,
   AdminDashboardTenantsIndexRoute: AdminDashboardTenantsIndexRoute,
+  AdminDashboardUsersIndexRoute: AdminDashboardUsersIndexRoute,
 }
 
 const AdminDashboardRouteWithChildren = AdminDashboardRoute._addFileChildren(

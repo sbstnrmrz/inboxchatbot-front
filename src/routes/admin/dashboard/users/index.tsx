@@ -1,0 +1,21 @@
+import { createFileRoute } from '@tanstack/react-router'
+import { UsersTable } from '@/features/admin/components/users/UsersTable'
+
+export const Route = createFileRoute('/admin/dashboard/users/')({
+  component: Users,
+})
+
+function Users() {
+  return (
+    <div className="flex flex-col gap-6 p-6">
+      <div>
+        <h1 className="text-2xl font-semibold mb-1">Usuarios</h1>
+        <p className="text-muted-foreground text-sm">
+          Gestiona los usuarios registrados en la plataforma.
+        </p>
+      </div>
+
+      <UsersTable />
+    </div>
+  )
+}

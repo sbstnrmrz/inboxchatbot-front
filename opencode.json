@@ -19,6 +19,11 @@
       "type": "local",
       "command": ["npx", "@tanstack/cli", "mcp" ],
       "enabled": true
+    },
+    "zod": {
+      "type": "remote",
+      "url": "https://mcp.inkeep.com/zod/mcp",
+      "enabled": true
     }
   }
 }

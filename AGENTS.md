@@ -310,9 +310,115 @@ Agents should NOT:
 
 ---
 
+## Guide: Adding Queries & Query Keys for a Feature
+
+Follow this pattern every time a feature needs to fetch or mutate server data.
+
+### File layout
+
+```
+src/features/<feature>/
+├─ api/
+│  ├─ <feature>.query-keys.ts   # Key factory — pure constants, no logic
+│  └─ <feature>.queries.ts      # queryFn / mutationFn — no hooks, no UI
+└─ hooks/
+   └─ use<Feature>.ts           # useQuery / useMutation wrappers
+```
+
+### 1. Query keys (`<feature>.query-keys.ts`)
+
+Keys are **typed tuples** produced by factory functions. This makes invalidation
+safe and refactor-friendly.
+
+```ts
+// src/features/admin/api/tenants.query-keys.ts
+export const tenantQueryKeys = {
+  all: ()         => ["tenants"]         as const,
+  detail: (id: string) => ["tenants", id] as const,
+}
+```
+
+Rules:
+- One file per feature domain.
+- Always use `as const` so TanStack Query infers the narrowest type.
+- Nest keys hierarchically so `invalidateQueries({ queryKey: tenantQueryKeys.all() })`
+  also invalidates all detail queries.
+
+### 2. Query / mutation functions (`<feature>.queries.ts`)
+
+Plain async functions — no hooks, no React, no UI.
+
+```ts
+// src/features/admin/api/tenants.queries.ts
+import { apiClient } from "@/lib/api/client"
+import type { Tenant } from "@/types/tenant.type"
+
+export const tenantsQueries = {
+  list: () => apiClient.get<Tenant[]>("/tenants"),
+  create: (data: CreateTenantFormData) => apiClient.post<Tenant>("/tenants", data),
+  update: ({ id, data }: { id: string; data: Partial<CreateTenantFormData> }) =>
+    apiClient.patch<Tenant>(`/tenants/${id}`, data),
+}
+```
+
+For **better-auth admin methods** (no REST endpoint), call the client directly
+and unwrap the result/error pattern:
+
+```ts
+// src/features/admin/hooks/useUsers.ts
+import { authClient } from "@/lib/auth-client"
+
+queryFn: async () => {
+  const result = await authClient.admin.listUsers({ query: {} })
+  if (result.error) throw new Error(result.error.message ?? "Error")
+  return result.data?.users ?? []
+},
+```
+
+### 3. Hook (`use<Feature>.ts`)
+
+Composes keys + query functions. This is the only file UI components import.
+
+```ts
+// src/features/admin/hooks/useTenants.ts
+import { useQuery } from "@tanstack/react-query"
+import { tenantQueryKeys } from "@/features/admin/api/tenants.query-keys"
+import { tenantsQueries } from "@/features/admin/api/tenants.queries"
+
+export function useTenants() {
+  return useQuery({
+    queryKey: tenantQueryKeys.all(),
+    queryFn: tenantsQueries.list,
+  })
+}
+```
+
+For mutations, invalidate using the key factory on `onSuccess`:
+
+```ts
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+
+export function useCreateTenant() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: tenantsQueries.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tenantQueryKeys.all() })
+    },
+  })
+}
+```
+
+### Quick checklist
+
+- [ ] `query-keys.ts` — factory functions, `as const`, one file per domain
+- [ ] `queries.ts` — pure async functions, no hooks
+- [ ] `use<Feature>.ts` — single hook exported, composes keys + fn
+- [ ] Mutations invalidate via the key factory, never hardcoded strings
+- [ ] UI components import **only** the hook, never `apiClient` or `authClient` directly
+
+---
+
 ## Final Note
 
 This frontend is expected to scale to **many tenants**, **high message throughput**, and **real‑time collaboration**. Every agent decision should favor maintainability, performance, and clarity over short‑term convenience.
-
-```
-

@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query"
-import { tenantsApi } from "@/features/admin/api/tenants.api"
-import { queryKeys } from "@/lib/query-keys"
+import { tenantsQueries } from "@/features/admin/api/tenants.queries"
+import { tenantQueryKeys } from "../api/tenants.query-keys"
 
 export function useTenants() {
   return useQuery({
-    queryKey: queryKeys.tenants.all(),
-    queryFn: tenantsApi.list,
+    queryKey: tenantQueryKeys.all(),
+    queryFn: tenantsQueries.list,
   })
 }

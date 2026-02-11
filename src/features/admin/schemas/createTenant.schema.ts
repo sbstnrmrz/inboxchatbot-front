@@ -7,7 +7,7 @@ import { z } from "zod"
 const whatsappInfoSchema = z
   .object({
     accessToken: z.string(),
-    whatsappBusinessId: z.string(),
+    businessAccountId: z.string(),
     appSecret: z.string(),
     phoneNumberId: z.string(),
     webhookVerifyToken: z.string().optional(),
@@ -22,8 +22,8 @@ const whatsappInfoSchema = z
     // Si llenó algo, validar que todos los campos requeridos estén completos
     if (!val.accessToken.trim())
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["accessToken"], message: "El access token de WhatsApp es requerido" })
-    if (!val.whatsappBusinessId.trim())
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["whatsappBusinessId"], message: "El WhatsApp Business ID es requerido" })
+    if (!val.businessAccountId.trim())
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["businessAccountId"], message: "El WhatsApp Business ID es requerido" })
     if (!val.appSecret.trim())
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["appSecret"], message: "El app secret de WhatsApp es requerido" })
     if (!val.phoneNumberId.trim())
@@ -31,7 +31,7 @@ const whatsappInfoSchema = z
 
     return {
       accessToken: val.accessToken,
-      whatsappBusinessId: val.whatsappBusinessId,
+      businessAccountId: val.businessAccountId,
       appSecret: val.appSecret,
       phoneNumberId: val.phoneNumberId,
       webhookVerifyToken: val.webhookVerifyToken || undefined,

@@ -19,7 +19,7 @@ import {
   type CreateTenantFormInput,
   type CreateTenantFormData,
 } from "@/features/admin/schemas/createTenant.schema"
-import { tenantsApi } from "@/features/admin/api/tenants.api"
+import { tenantsQueries } from "@/features/admin/api/tenants.queries"
 import { queryKeys } from "@/lib/query-keys"
 import { toast } from "sonner"
 
@@ -40,7 +40,7 @@ export function CreateTenantForm({ onSuccess }: CreateTenantFormProps = {}) {
   })
 
   const mutation = useMutation({
-    mutationFn: tenantsApi.create,
+    mutationFn: tenantsQueries.create,
     onSuccess: () => {
       toast.success('Tenant creado exitosamente')
       queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all() })
@@ -116,9 +116,9 @@ export function CreateTenantForm({ onSuccess }: CreateTenantFormProps = {}) {
                 <Input
                   id="whatsapp-businessId"
                   placeholder="123456789"
-                  {...register("whatsappInfo.whatsappBusinessId")}
+                  {...register("whatsappInfo.businessAccountId")}
                 />
-                <FieldError errors={[errors.whatsappInfo?.whatsappBusinessId]} />
+                <FieldError errors={[errors.whatsappInfo?.businessAccountId]} />
               </Field>
 
               <Field>

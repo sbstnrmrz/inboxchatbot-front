@@ -26,7 +26,7 @@ import {
   type CreateTenantFormInput,
   type CreateTenantFormData,
 } from "@/features/admin/schemas/createTenant.schema"
-import { tenantsApi } from "@/features/admin/api/tenants.api"
+import { tenantsQueries } from "@/features/admin/api/tenants.queries"
 import { queryKeys } from "@/lib/query-keys"
 import type { Tenant } from "@/types/tenant.type"
 
@@ -48,12 +48,29 @@ export function EditTenantModal({ tenant, open, onOpenChange }: EditTenantModalP
     defaultValues: {
       name: tenant.name,
       slug: tenant.slug,
+      whatsappInfo: tenant.whatsappInfo
+        ? {
+            accessToken: tenant.whatsappInfo.accessToken ?? "",
+            businessAccountId: tenant.whatsappInfo.businessAccountId ?? "",
+            appSecret: tenant.whatsappInfo.appSecret ?? "",
+            phoneNumberId: tenant.whatsappInfo.phoneNumberId ?? "",
+            webhookVerifyToken: tenant.whatsappInfo.webhookVerifyToken ?? "",
+          }
+        : undefined,
+      instagramInfo: tenant.instagramInfo
+        ? {
+            accessToken: tenant.instagramInfo.accessToken ?? "",
+            pageId: tenant.instagramInfo.pageId ?? "",
+            accountId: tenant.instagramInfo.accountId ?? "",
+            appSecret: tenant.instagramInfo.appSecret ?? "",
+          }
+        : undefined,
     },
   })
 
   const mutation = useMutation({
     mutationFn: (data: CreateTenantFormData) =>
-      tenantsApi.update({ id: tenant._id, data }),
+      tenantsQueries.update({ id: tenant._id, data }),
     onSuccess: () => {
       toast.success("Tenant actualizado")
       queryClient.invalidateQueries({ queryKey: queryKeys.tenants.all() })
@@ -133,9 +150,9 @@ export function EditTenantModal({ tenant, open, onOpenChange }: EditTenantModalP
                 <Input
                   id="edit-whatsapp-businessId"
                   placeholder="123456789"
-                  {...register("whatsappInfo.whatsappBusinessId")}
+                  {...register("whatsappInfo.businessAccountId")}
                 />
-                <FieldError errors={[errors.whatsappInfo?.whatsappBusinessId]} />
+                <FieldError errors={[errors.whatsappInfo?.businessAccountId]} />
               </Field>
 
               <Field>
