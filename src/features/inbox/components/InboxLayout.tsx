@@ -18,9 +18,11 @@ import { ChannelFilters } from './ChannelFilters';
 import { SearchFilter } from './SearchFilter';
 import { InboxLayoutFooter } from './InboxLayoutFooter';
 import { useAuth } from '@/features/auth/context';
+import { useSocket } from '@/features/sockets/hooks/useSocket';
 
 
 export function InboxLayout() {
+  const {socket} = useSocket();
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showMobileSearch, setShowMobileSearch] = useState<boolean>(false);

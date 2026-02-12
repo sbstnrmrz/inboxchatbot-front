@@ -2,7 +2,7 @@
  * Logger utility that only logs in development mode
  */
 
-const isDevelopment = import.meta.env.NODE_ENV === 'development';
+const isDevelopment = import.meta.env.DEV;
 
 export const logger = {
   log: (...args: unknown[]) => {
