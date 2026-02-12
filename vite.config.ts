@@ -10,6 +10,7 @@ export default defineConfig({
   server: {
     host: 'localtest.me',
     port: 5173,
+    allowedHosts: true,
   },
   resolve: {
     alias: {

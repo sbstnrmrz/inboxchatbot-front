@@ -20,7 +20,8 @@ import { authClient } from "@/lib/auth-client"
 import { useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
 import { useAuth } from "@/features/auth/context"
-import { getRedirectPathByRole } from "@/features/auth/utils/getRedirectPath"
+import { getRedirectPathByRole, getTenantInboxUrl } from "@/features/auth/utils/getRedirectPath"
+import { tenantsQueries } from "@/features/admin/api/tenants.queries"
 
 export function LoginForm({
   className,
@@ -54,15 +55,28 @@ export function LoginForm({
       // Refrescar la sesión en el contexto
       await refetch()
 
-      // Obtener la sesión actualizada para determinar el rol
+      // Obtener la sesión actualizada para determinar el rol y el tenantId
       const { data: sessionData } = await authClient.getSession()
       const userRole = sessionData?.user?.role ?? undefined
-
-      // Determinar la ruta de redirección según el rol
-      const redirectPath = getRedirectPathByRole(userRole)
+      const tenantId = (sessionData?.user as any)?.tenantId as string | undefined
 
       toast.success("Inicio de sesión exitoso")
-      navigate({ to: redirectPath as any })
+
+      // Superadmin → redirección interna a /admin/dashboard
+      if (userRole === "superadmin" || userRole === "super-admin") {
+        navigate({ to: getRedirectPathByRole(userRole) as any })
+        return
+      }
+
+      // Usuarios de tenant → obtener el slug y redirigir al subdominio
+      if (tenantId) {
+        const tenant = await tenantsQueries.getById(tenantId)
+        navigate({ href: getTenantInboxUrl(tenant.slug) })
+        return
+      }
+
+      // Fallback: no hay tenantId asignado
+      navigate({ to: "/inbox" as any })
     } catch (error) {
       console.error("Error durante el inicio de sesión:", error)
       toast.error("Ocurrió un error inesperado. Intenta de nuevo.")

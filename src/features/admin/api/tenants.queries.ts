@@ -11,4 +11,7 @@ export const tenantsQueries = {
 
   list: () =>
     apiClient.get<Tenant[]>("/tenants"),
+
+  getById: (id: string) =>
+    apiClient.get<Tenant>(`/tenants/${id}`),
 }
