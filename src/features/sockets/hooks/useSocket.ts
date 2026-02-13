@@ -2,7 +2,7 @@ import { useAuth } from "@/features/auth/context";
 import { logger } from "@/lib/logger";
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from 'socket.io-client';
-import { SocketEvents } from "../types/events";
+import { MessageEvent, SocketEvents } from "../types/events";
 
 const URL = import.meta.env.VITE_API_URL || 'http://localtest.me:3001'
 const PATH = '/socket'
@@ -53,6 +53,10 @@ export function useSocket() {
     });
 
     socketRef.current = newSocket;
+
+    newSocket.onAny((event) => {
+      logger.debug(`Socket event: ${event}`);
+    })
 
     newSocket.on(SocketEvents.Connect, onConnect);
     newSocket.on(SocketEvents.Disconnect, onDisconnect);

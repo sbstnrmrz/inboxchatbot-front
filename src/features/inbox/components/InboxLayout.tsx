@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ChatWindow } from './ChatWindow';
 import { User, Settings, LogOut, HelpCircle, MoreVertical, Plus, SearchIcon, EllipsisVertical, EllipsisVerticalIcon } from 'lucide-react';
 import {
@@ -19,14 +19,33 @@ import { SearchFilter } from './SearchFilter';
 import { InboxLayoutFooter } from './InboxLayoutFooter';
 import { useAuth } from '@/features/auth/context';
 import { useSocket } from '@/features/sockets/hooks/useSocket';
+import { MessageEvent } from '@/features/sockets/types/events';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/logger';
 
 
 export function InboxLayout() {
-  const {socket} = useSocket();
+  const {socket, isConnected} = useSocket();
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showMobileSearch, setShowMobileSearch] = useState<boolean>(false);
   const {session} = useAuth();
+
+  useEffect(() => {
+    const handleMessageReceived = (data: any) => {
+      logger.debug(`Message received`);
+      logger.debug(data);
+    }
+    
+    socket?.on(MessageEvent.Received, handleMessageReceived)
+    logger.debug(`Message Received listener set`);
+
+    return () => {
+      socket?.off(MessageEvent.Received, handleMessageReceived);
+    }
+
+  }, [socket])
 
   return (
     <>
@@ -54,6 +73,22 @@ export function InboxLayout() {
             </SidebarFooter>
           </Sidebar>
           <SidebarInset>
+            <form
+              className='flex gap-2 p-4'
+              onSubmit={(e) => {
+                e.preventDefault();
+                const form = e.currentTarget;
+                const message = (form.elements.namedItem('message') as HTMLTextAreaElement).value.trim();
+                if (!socket || !message) return;
+                socket.emit(MessageEvent.Sent, { message });
+                logger.debug('Message sent');
+                logger.debug(message);
+                form.reset();
+              }}
+            >
+              <Textarea name='message' placeholder='Test socket message...' className='w-full' />
+              <Button type='submit' disabled={!isConnected}>Send</Button>
+            </form>
           </SidebarInset>
         </div>
       </SidebarProvider>

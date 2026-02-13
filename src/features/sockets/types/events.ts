@@ -15,9 +15,9 @@ export enum SocketEvents {
   ConversationDeleted = 'conversation_deleted',
 }
 
-export enum MessageEvents {
-  MessageReceived = 'message_received',
-  MessageSent = 'message_sent',
+export enum MessageEvent {
+  Received = 'message_received',
+  Sent = 'message_sent',
 
   TranscriptReceived = 'transcript_received',
   WaitingBotResponse = 'waiting_bot_response',
