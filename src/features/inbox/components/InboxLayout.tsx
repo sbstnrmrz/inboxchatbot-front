@@ -23,6 +23,10 @@ import { MessageEvent } from '@/features/sockets/types/events';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { logger } from '@/lib/logger';
+import { ChatLayout } from './chat-layout';
+import { MessageInput } from './message-input';
+import { ChatMain } from './chat-main';
+import { ChatList } from './chat-list';
 
 
 export function InboxLayout() {
@@ -55,40 +59,47 @@ export function InboxLayout() {
       <SidebarProvider defaultOpen={true}>
         <div className="hidden md:flex h-screen w-screen overflow-hidden">
           <Sidebar collapsible="icon" className="flex border-r">
-            <SidebarHeader className='bg-primary-white border-b border-secondary-white h-[52px] justify-center'>
-                <div className="flex w-full items-center justify-center">
-                  <h1 className=" text-lg font-semibold group-data-[collapsible=icon]:hidden">Chats</h1>
-                </div>
+            <SidebarHeader className='bg-primary-white border-b border-secondary-white min-h-[52px] justify-center'>
+              <div className="flex w-full items-center ">
+                <h1 className=" text-lg font-semibold group-data-[collapsible=icon]:hidden">Chats</h1>
+              </div>
             </SidebarHeader>
+            <div className="flex items-center p-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">
+              <SearchFilter value={searchQuery} onChange={setSearchQuery} />
+            </div>
             <div className="flex items-center px-4 py-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">
               <span className='text-sm mr-2'>Filtrar por</span>
             </div>
-            <div className="flex items-center px-4 py-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">
-              <SearchFilter value={searchQuery} onChange={setSearchQuery} />
-            </div>
+
+            <ChatList/>
             <SidebarContent>
             </SidebarContent>
             <SidebarFooter>
               <InboxLayoutFooter user={session?.user}/>
             </SidebarFooter>
           </Sidebar>
-          <SidebarInset>
-            <form
-              className='flex gap-2 p-4'
-              onSubmit={(e) => {
-                e.preventDefault();
-                const form = e.currentTarget;
-                const message = (form.elements.namedItem('message') as HTMLTextAreaElement).value.trim();
-                if (!socket || !message) return;
-                socket.emit(MessageEvent.Sent, { message });
-                logger.debug('Message sent');
-                logger.debug(message);
-                form.reset();
-              }}
-            >
-              <Textarea name='message' placeholder='Test socket message...' className='w-full' />
-              <Button type='submit' disabled={!isConnected}>Send</Button>
-            </form>
+          <SidebarInset className=''>
+            <ChatLayout>
+              <ChatMain/>
+              <div className='p-2'>
+                <form
+                  className='flex gap-2 p-4'
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const form = e.currentTarget;
+                    const message = (form.elements.namedItem('message') as HTMLTextAreaElement).value.trim();
+                    if (!socket || !message) return;
+                    socket.emit(MessageEvent.Sent, { message });
+                    logger.debug('Message sent');
+                    logger.debug(message);
+                    form.reset();
+                  }}
+                >
+                  <Textarea name='message' placeholder='Test socket message...' className='w-full' />
+                  <Button type='submit' disabled={!isConnected}>Send</Button>
+                </form>
+              </div>
+            </ChatLayout>
           </SidebarInset>
         </div>
       </SidebarProvider>

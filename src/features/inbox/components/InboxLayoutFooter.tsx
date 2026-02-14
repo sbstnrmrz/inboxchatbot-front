@@ -40,7 +40,7 @@ export function InboxLayoutFooter({user}: Props) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="cursor-pointer bg-white shadow-2xl border-t-1 border-t-secondary-white hover:bg-primary-white" asChild>
+      <DropdownMenuTrigger className="cursor-pointer h-[52px] bg-white shadow-2xl border-t-1 border-t-secondary-white hover:bg-primary-white" asChild>
         <div className="flex gap-2 p-2 items-center">
           <Avatar className="h-8 w-8 rounded-lg grayscale">
             <AvatarFallback className="rounded-lg">CN</AvatarFallback>
