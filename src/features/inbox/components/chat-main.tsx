@@ -10,18 +10,20 @@ export const ChatMain = () => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-primary-white">
-      <div className="flex-1 overflow-y-auto flex flex-col gap-4 px-4 py-4">
-        {Array.from({length: 14}, (_, i) => {
-          return (
-            <>
-              <MessageBubble key={i} direction={getRandomDir()}/>
-            </>
-          ) 
-        })}
-      </div>
-      <div className=" px-4 pb-4 shrink-0">
-        <MessageInput/>
+    <div className="flex-1 min-h-0">
+      <div className="flex flex-col h-full bg-primary-white">
+        <div className="flex-1 overflow-y-auto flex flex-col gap-4 px-4 py-4">
+          {Array.from({length: 14}, (_, i) => {
+            return (
+              <>
+                <MessageBubble key={i} direction={getRandomDir()}/>
+              </>
+            ) 
+          })}
+        </div>
+        <div className=" px-4 pb-4 shrink-0">
+          <MessageInput/>
+        </div>
       </div>
     </div>
   )

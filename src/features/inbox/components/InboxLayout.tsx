@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { ChatWindow } from './ChatWindow';
-import { User, Settings, LogOut, HelpCircle, MoreVertical, Plus, SearchIcon, EllipsisVertical, EllipsisVerticalIcon } from 'lucide-react';
+import { User, Settings, LogOut, HelpCircle, MoreVertical, Plus, SearchIcon, EllipsisVertical, EllipsisVerticalIcon, MessageCircleMoreIcon } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -28,6 +28,7 @@ import { ChatLayout } from './chat-layout';
 import { MessageInput } from './message-input';
 import { ChatMain } from './chat-main';
 import { ChatList } from './chat-list';
+import { ChatLayoutHeader } from './chat-layout-header';
 
 
 export function InboxLayout() {
@@ -83,31 +84,28 @@ export function InboxLayout() {
             </SidebarFooter>
           </Sidebar>
           <SidebarInset className=''>
-            <ChatLayout>
-              <ChatMain/>
-              <div className='p-2'>
-                <form
-                  className='flex gap-2 p-4'
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const form = e.currentTarget;
-                    const message = (form.elements.namedItem('message') as HTMLTextAreaElement).value.trim();
-                    if (!socket || !message) return;
-                    socket.emit(MessageEvent.Sent, { message });
-                    logger.debug('Message sent');
-                    logger.debug(message);
-                    form.reset();
-                  }}
-                >
-                  <Textarea name='message' placeholder='Test socket message...' className='w-full' />
-                  <Button type='submit' disabled={!isConnected}>Send</Button>
-                </form>
-              </div>
-            </ChatLayout>
+            {!selectedConversationId
+              ?
+              <NoChatSelected/>
+              :
+              <ChatLayout>
+                <ChatLayoutHeader/>
+                <ChatMain/>
+              </ChatLayout>
+            }
           </SidebarInset>
         </div>
       </SidebarProvider>
     </>
   );
+}
+
+function NoChatSelected() {
+  return (
+    <div className='flex flex-col m-auto gap-4 items-center justify-between'>
+      <MessageCircleMoreIcon className='text-gray-500' size={148}/>
+      <span className='text-lg text-gray-500'>Selecciona un chat</span>
+    </div>
+  )
 }
 
