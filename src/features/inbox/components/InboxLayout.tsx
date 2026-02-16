@@ -1,6 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
-import { ChatWindow } from './ChatWindow';
-import { User, Settings, LogOut, HelpCircle, MoreVertical, Plus, SearchIcon, EllipsisVertical, EllipsisVerticalIcon, MessageCircleMoreIcon } from 'lucide-react';
+import { useState } from 'react';
+import { MessageCircleMoreIcon } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -8,24 +7,15 @@ import {
   SidebarHeader,
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { CustomerAvatar } from './CustomerAvatar';
-import { DropdownMenu } from '@/components/ui/dropdown-menu';
 import { UserOptionsDropdown } from './UserOptionsDropdown';
-import { ChannelFilters } from './ChannelFilters';
 import { SearchFilter } from './SearchFilter';
 import { InboxLayoutFooter } from './InboxLayoutFooter';
 import { useAuth } from '@/features/auth/context';
 import { useSocket } from '@/features/sockets/hooks/useSocket';
 import { useInitialSync } from '@/features/inbox/hooks/useInitialSync';
-import { MessageEvent } from '@/features/sockets/types/events';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { logger } from '@/lib/logger';
+import { useMessageEvents } from '@/features/inbox/hooks/useMessageEvents';
 import { ChatLayout } from './chat-layout';
-import { MessageInput } from './message-input';
 import { ChatMain } from './chat-main';
 import { ChatList } from './chat-list';
 import { ChatLayoutHeader } from './chat-layout-header';
@@ -41,20 +31,8 @@ export function InboxLayout() {
   // Trigger initial sync as soon as the session is confirmed
   useInitialSync({ enabled: !isPending && !!session });
 
-  useEffect(() => {
-    const handleMessageReceived = (data: any) => {
-      logger.debug(`Message received`);
-      logger.debug(data);
-    }
-    
-    socket?.on(MessageEvent.Received, handleMessageReceived)
-    logger.debug(`Message Received listener set`);
-
-    return () => {
-      socket?.off(MessageEvent.Received, handleMessageReceived);
-    }
-
-  }, [socket])
+  // Listen for real-time message events and persist them into IndexedDB
+  useMessageEvents({ socket });
 
   return (
     <>
