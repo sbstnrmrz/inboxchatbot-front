@@ -12,17 +12,33 @@ export const MessageBubble = ({direction}: MessageBubbleProps) => {
         <AvatarImage src="https://github.com/shadcn.png" />
         <AvatarFallback>CN</AvatarFallback>
       </Avatar>
-      <div className="px-4 py-2 rounded-lg bg-white shadow-sm text-sm max-w-[50%] min-w-0">
+      <div className={`px-4 py-2 rounded-lg shadow-sm text-sm max-w-[50%] min-w-0 ${direction === 'OUTBOUND' ? 'bg-[#d4f1ff]' : 'bg-white '}`}>
         <p className="wrap-break-word whitespace-pre-wrap">
           lorem ipsum jasdjkzxc ikasdklzxc lzkxcjasdjpioasdsdashkldjhkljasdhjklasdjklhasjklhdjklhasdjklhaslk
           asjkdjkahsdkhjashkdjlhkjalsdhkjlaskldhjlahjksd
-          asjkdhaskjldhkasjdhajklsdhalskd
-          asdjkasjlkdlkajsdjklaskdjla
-          sdasjkldljkasdjkasldkajsdas
-          dasdlkjasdjklasdjlk
         </p>
       </div>
     </div>
   )
 }
+
+function MessageText() {
+  return (
+    <p className="wrap-break-word whitespace-pre-wrap">
+      lorem ipsum jasdjkzxc ikasdklzxc lzkxcjasdjpioasdsdashkldjhkljasdhjklasdjklhasjklhdjklhasdjklhaslk
+      asjkdjkahsdkhjashkdjlhkjalsdhkjlaskldhjlahjksd
+    </p>
+
+  )
+
+}
+
+function MessageAudio() {
+
+}
+
+function MessageImage() {
+
+}
+
 

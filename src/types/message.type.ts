@@ -67,10 +67,11 @@ export interface Message {
   externalId?: string
   status: MessageStatus
   /** Channel timestamp (not server time) */
-  sentAt: string
+
   deliveredAt?: string
-  readAt?: string
+  readAt?: Date 
+  sentAt: Date 
   referral?: MessageReferral
-  createdAt?: string
-  updatedAt?: string
+  createdAt?: Date 
+  updatedAt?: Date 
 }

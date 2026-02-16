@@ -6,9 +6,11 @@ interface ChatLayoutProps {
 
 export const ChatLayout = ({children}: ChatLayoutProps) => {
   return (
-    <div className="">
+    <div className="flex flex-col h-full">
       <ChatLayoutHeader/>
-      {children}
+      <div className="flex-1 min-h-0">
+        {children}
+      </div>
     </div>
   )
 }
