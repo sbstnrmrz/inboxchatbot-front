@@ -16,11 +16,11 @@ export function useMessages(conversationId: string | undefined) {
     queryKey: queryKeys.messages.byConversation(conversationId ?? ""),
     enabled: !!conversationId,
     queryFn: async () => {
-      const response = await messagesQueries.byConversation(conversationId!, {
+      const messages = await messagesQueries.byConversation(conversationId!, {
         limit: 50,
       })
-      syncMessages(response.data).catch(console.error)
-      return response
+      syncMessages(messages).catch(console.error)
+      return messages
     },
   })
 }

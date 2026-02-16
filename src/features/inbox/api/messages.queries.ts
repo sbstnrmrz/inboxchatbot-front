@@ -14,26 +14,20 @@ export interface MessagesListParams {
   limit?: number
 }
 
-export interface MessagesListResponse {
-  data: Message[]
-  /** Cursor for the next page — undefined when no more pages */
-  nextCursor?: string
-}
-
 export const messagesQueries = {
   /**
-   * Fetch a page of messages for a conversation, sorted by sentAt descending.
-   * Pass `before` cursor for loading older messages (infinite scroll upward).
+   * Fetch messages for a conversation. The API returns a plain Message[] array.
+   * Pass `before` (ISO timestamp) for cursor-based pagination (older messages).
    */
   byConversation: (
     conversationId: string,
     params?: MessagesListParams,
-  ): Promise<MessagesListResponse> => {
+  ): Promise<Message[]> => {
     const searchParams = new URLSearchParams()
     if (params?.before) searchParams.set("before", params.before)
     if (params?.limit) searchParams.set("limit", String(params.limit))
     const query = searchParams.toString()
-    return apiClient.get<MessagesListResponse>(
+    return apiClient.get<Message[]>(
       query
         ? `/conversations/${conversationId}/messages?${query}`
         : `/conversations/${conversationId}/messages`,
