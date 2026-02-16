@@ -1,12 +1,14 @@
 import { useAuth } from "@/features/auth/context"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "@tanstack/react-router"
-import { LogOut, User } from "lucide-react"
+import { LogOut, MoonIcon, SunIcon, User } from "lucide-react"
 import { toast } from "sonner"
+import { useTheme } from "next-themes"
 
 export function UserMenu() {
   const { session, signOut, isAuthenticated } = useAuth()
   const navigate = useNavigate()
+  const {theme, setTheme} = useTheme();
 
   if (!isAuthenticated || !session) {
     return null
@@ -36,6 +38,14 @@ export function UserMenu() {
       >
         <LogOut className="h-4 w-4 mr-2" />
         Cerrar sesión
+      </Button>
+      <Button 
+        variant="outline" 
+        size="sm"
+        onClick={handleSignOut}
+      >
+        {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+        Change Theme 
       </Button>
     </div>
   )

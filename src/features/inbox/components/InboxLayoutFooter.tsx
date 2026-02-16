@@ -20,9 +20,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/features/auth/context"
+import { useTheme } from "@/hooks/use-theme"
 import { useNavigate } from "@tanstack/react-router"
 import type { User } from "better-auth"
-import { EllipsisVertical, LogOutIcon } from "lucide-react"
+import { EllipsisVertical, LogOutIcon, MoonIcon, SunIcon } from "lucide-react"
 
 interface Props {
   user?: User
@@ -32,6 +33,7 @@ export function InboxLayoutFooter({user}: Props) {
   const { isMobile } = useSidebar()
   const { signOut, isPending } = useAuth();
   const navigate = useNavigate();
+  const {theme, toggleTheme} = useTheme();
 
   const handleLogout = async() => {
     await signOut();
@@ -55,11 +57,18 @@ export function InboxLayoutFooter({user}: Props) {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+        className="w-(--radix-dropdown-menu-trigger-width) flex flex-col gap-1 min-w-56 rounded-lg"
         side={isMobile ? "bottom" : "top"}
         align="end"
         sideOffset={4}
       >
+        <DropdownMenuItem 
+          className="cursor-pointer"
+          onClick={toggleTheme}
+        >
+          {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+          Change Theme 
+        </DropdownMenuItem>
         <DropdownMenuItem 
           className="cursor-pointer"
           onClick={handleLogout}
@@ -67,6 +76,7 @@ export function InboxLayoutFooter({user}: Props) {
           <LogOutIcon />
           Log out
         </DropdownMenuItem>
+
       </DropdownMenuContent>
     </DropdownMenu>
   )
