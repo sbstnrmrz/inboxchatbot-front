@@ -25,4 +25,10 @@ export const queryKeys = {
     byConversation: (conversationId: string) =>
       ["messages", "conversation", conversationId] as const,
   },
+
+  customers: {
+    all: () => ["customers"] as const,
+    list: () => ["customers", "list"] as const,
+    detail: (id: string) => ["customers", id] as const,
+  },
 } as const

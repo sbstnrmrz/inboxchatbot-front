@@ -19,6 +19,7 @@ import { SearchFilter } from './SearchFilter';
 import { InboxLayoutFooter } from './InboxLayoutFooter';
 import { useAuth } from '@/features/auth/context';
 import { useSocket } from '@/features/sockets/hooks/useSocket';
+import { useInitialSync } from '@/features/inbox/hooks/useInitialSync';
 import { MessageEvent } from '@/features/sockets/types/events';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -34,7 +35,10 @@ export function InboxLayout() {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showMobileSearch, setShowMobileSearch] = useState<boolean>(false);
-  const {session} = useAuth();
+  const { session, isPending } = useAuth();
+
+  // Trigger initial sync as soon as the session is confirmed
+  useInitialSync({ enabled: !isPending && !!session });
 
   useEffect(() => {
     const handleMessageReceived = (data: any) => {

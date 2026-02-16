@@ -6,26 +6,48 @@
  */
 
 import { conversationsRepository } from "@/lib/db/repositories/conversations.repository"
-import { mapConversationToCache, mapConversationsToCache } from "@/lib/sync/mappers"
+import { messagesRepository } from "@/lib/db/repositories/messages.repository"
+import {
+  mapConversationToCache,
+  mapConversationsToCache,
+  mapMessageToCache,
+} from "@/lib/sync/mappers"
 import type { CachedConversation } from "@/lib/db/schema"
 import type { Conversation } from "@/types/conversation.type"
 
 /**
  * Persist a list of conversations returned by the API into IndexedDB.
- * Typically called in `onSuccess` of the conversations list query.
+ * Also persists the populated lastMessage of each conversation so the
+ * inbox list can show message previews without a separate messages fetch.
  */
 export async function syncConversations(conversations: Conversation[]): Promise<void> {
   if (conversations.length === 0) return
-  const cached = mapConversationsToCache(conversations)
-  await conversationsRepository.upsertMany(cached)
+
+  const cachedConversations = mapConversationsToCache(conversations)
+  await conversationsRepository.upsertMany(cachedConversations)
+
+  // Extract and persist populated lastMessage objects
+  const lastMessages = conversations
+    .map((c) => c.lastMessage)
+    .filter((m): m is NonNullable<typeof m> => !!m)
+    .map(mapMessageToCache)
+
+  if (lastMessages.length > 0) {
+    await messagesRepository.upsertMany(lastMessages)
+  }
 }
 
 /**
  * Persist a single conversation (e.g. received via socket event).
+ * Also persists its lastMessage if populated.
  */
 export async function syncConversation(conversation: Conversation): Promise<void> {
   const cached = mapConversationToCache(conversation)
   await conversationsRepository.upsert(cached)
+
+  if (conversation.lastMessage) {
+    await messagesRepository.upsert(mapMessageToCache(conversation.lastMessage))
+  }
 }
 
 /**

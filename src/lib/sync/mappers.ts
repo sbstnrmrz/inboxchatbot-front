@@ -39,11 +39,13 @@ function deriveLastMessagePreview(conversation: Conversation): string | undefine
   const msg = conversation.lastMessage
   if (!msg) return undefined
 
-  if (msg.messageType === "TEXT" && msg.body) {
+  // Always prefer body text when available
+  if (msg.body) {
     return msg.body.length > 80 ? `${msg.body.slice(0, 80)}…` : msg.body
   }
 
-  const typeLabels: Record<string, string> = {
+  // Only fall back to media label when there is no body
+  const mediaLabels: Partial<Record<string, string>> = {
     IMAGE: "📷 Imagen",
     AUDIO: "🎵 Audio",
     VIDEO: "🎬 Video",
@@ -51,22 +53,14 @@ function deriveLastMessagePreview(conversation: Conversation): string | undefine
     STICKER: "🏷️ Sticker",
     LOCATION: "📍 Ubicación",
     CONTACTS: "👤 Contacto",
-    INTERACTIVE: "⚡ Interactivo",
-    BUTTON: "🔘 Botón",
-    REACTION: "❤️ Reacción",
-    ORDER: "📦 Orden",
-    REEL: "🎞️ Reel",
-    SHARE: "🔗 Compartido",
-    POSTBACK: "↩️ Respuesta",
-    SYSTEM: "⚙️ Sistema",
   }
 
-  return typeLabels[msg.messageType] ?? "Mensaje"
+  return mediaLabels[msg.messageType]
 }
 
 export function mapConversationToCache(conversation: Conversation): CachedConversation {
   const lastMessageAt = conversation.lastMessageAt
-    ? new Date(conversation.lastMessageAt).getTime()
+    ? new Date(conversation.lastMessageAt)
     : undefined
 
   return {

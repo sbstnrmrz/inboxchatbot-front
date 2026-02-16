@@ -17,6 +17,7 @@ export const MessageBubble = ({direction}: MessageBubbleProps) => {
           lorem ipsum jasdjkzxc ikasdklzxc lzkxcjasdjpioasdsdashkldjhkljasdhjklasdjklhasjklhdjklhasdjklhaslk
           asjkdjkahsdkhjashkdjlhkjalsdhkjlaskldhjlahjksd
         </p>
+        <MessageTimestamp/>
       </div>
     </div>
   )
@@ -41,4 +42,10 @@ function MessageImage() {
 
 }
 
-
+function MessageTimestamp() {
+  return (
+    <span className="flex justify-end text-gray-500 text-xs wrap-break-word whitespace-pre-wrap">
+      13:13 PM
+    </span>
+  )
+}

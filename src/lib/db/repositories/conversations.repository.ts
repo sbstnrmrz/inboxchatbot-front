@@ -32,11 +32,11 @@ export const conversationsRepository = {
    */
   async getAllByTenant(tenantId: string): Promise<CachedConversation[]> {
     const rows = await db.conversations
-      .where("tenantId")
-      .equals(tenantId)
       .toArray()
 
-    return rows.sort((a, b) => (b.lastMessageAt ?? 0) - (a.lastMessageAt ?? 0))
+    return rows.sort(
+      (a, b) => (b.lastMessageAt?.getTime() ?? 0) - (a.lastMessageAt?.getTime() ?? 0),
+    )
   },
 
   /**
@@ -51,7 +51,9 @@ export const conversationsRepository = {
       .equals([tenantId, status])
       .toArray()
 
-    return rows.sort((a, b) => (b.lastMessageAt ?? 0) - (a.lastMessageAt ?? 0))
+    return rows.sort(
+      (a, b) => (b.lastMessageAt?.getTime() ?? 0) - (a.lastMessageAt?.getTime() ?? 0),
+    )
   },
 
   /**
@@ -66,7 +68,9 @@ export const conversationsRepository = {
       .equals([tenantId, channel])
       .toArray()
 
-    return rows.sort((a, b) => (b.lastMessageAt ?? 0) - (a.lastMessageAt ?? 0))
+    return rows.sort(
+      (a, b) => (b.lastMessageAt?.getTime() ?? 0) - (a.lastMessageAt?.getTime() ?? 0),
+    )
   },
 
   /** Update specific fields on a conversation (partial update). */

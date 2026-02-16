@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react"
 import { authClient } from "@/lib/auth-client"
+import { clearAllCache } from "@/lib/sync"
 
 // Inferir tipos directamente de Better Auth
 type Session = typeof authClient.$Infer.Session
@@ -20,8 +21,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: session, isPending, isRefetching, error, refetch } = authClient.useSession()
 
   const signOut = async () => {
+    // Clear local IndexedDB cache before signing out to prevent data leakage
+    await clearAllCache().catch(console.error)
     await authClient.signOut()
-    // Better Auth maneja automáticamente la actualización del estado
   }
 
   const value: AuthContextType = {

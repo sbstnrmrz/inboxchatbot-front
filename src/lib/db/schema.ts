@@ -52,7 +52,7 @@ export interface CachedConversation {
   /** Preview text derived from lastMessage.body or media type */
   lastMessagePreview?: string
   /** Unix ms — used for inbox sort order (mirrors server lastMessageAt) */
-  lastMessageAt?: number
+  lastMessageAt?: Date 
   unreadCount: number
   requestingAgent: boolean
   botEnabled: boolean
