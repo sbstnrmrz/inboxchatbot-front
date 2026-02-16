@@ -8,11 +8,11 @@ import { messagesRepository } from "@/lib/db/repositories/messages.repository";
 interface ChatListItemProps {
   conversation: CachedConversation;
   isSelected?: boolean;
-  onClick?: () => void;
+  onClick: (conversationId: string) => void;
 }
 
 export function ChatListItem({ conversation, isSelected, onClick }: ChatListItemProps) {
-  const { lastMessageId, unreadCount, channel } = conversation;
+  const {id, lastMessageId, unreadCount, channel } = conversation;
 
   const lastMessage = useLiveQuery(
     () =>
@@ -24,7 +24,9 @@ export function ChatListItem({ conversation, isSelected, onClick }: ChatListItem
 
   return (
     <div
-      onClick={onClick}
+      onClick={() => {
+        onClick(id)
+      }}
       className={`cursor-pointer w-full p-2 rounded-lg hover:bg-secondary-white ${isSelected ? "bg-secondary-white" : "bg-white shadow-sm"}`}
     >
       <div className="flex gap-2 items-center">

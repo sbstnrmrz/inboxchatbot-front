@@ -4,7 +4,11 @@ import { Spinner } from '@/components/ui/spinner';
 import { useLiveConversations } from '../hooks/useLiveConversations';
 import { logger } from '@/lib/logger';
 
-export const ChatList = () => {
+interface ChatListProps {
+  onChatSelected: (conversationId: string) => void;
+}
+
+export const ChatList = ({onChatSelected}: ChatListProps) => {
   const conversations = useLiveConversations();
 
   useEffect(() => {
@@ -17,7 +21,11 @@ export const ChatList = () => {
       {conversations.length > 0 
         ?
         conversations.map((conv) => (
-          <ChatListItem conversation={conv} key={conv.id} />
+          <ChatListItem 
+            key={conv.id}
+            conversation={conv}  
+            onClick={onChatSelected}
+          />
         ))
         :
         <ChatLoading/>

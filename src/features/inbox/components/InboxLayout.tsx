@@ -75,8 +75,7 @@ export function InboxLayout() {
             <div className="flex items-center px-4 py-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">
               <span className='text-sm mr-2'>Filtrar por</span>
             </div>
-
-            <ChatList/>
+            <ChatList onChatSelected={setSelectedConversationId}/>
             <SidebarContent>
             </SidebarContent>
             <SidebarFooter>
@@ -90,7 +89,7 @@ export function InboxLayout() {
               :
               <ChatLayout>
                 <ChatLayoutHeader/>
-                <ChatMain/>
+                <ChatMain conversationId={selectedConversationId} />
               </ChatLayout>
             }
           </SidebarInset>

@@ -2,7 +2,11 @@ import type { MessageDirection } from "@/types/message.type";
 import { MessageBubble } from "./message-bubble"
 import { MessageInput } from "./message-input"
 
-export const ChatMain = () => {
+export interface ChatMainProps {
+  conversationId: string; 
+}
+
+export const ChatMain = ({conversationId}: ChatMainProps) => {
   function getRandomDir() {
     const dirs = ['OUTBOUND', 'INBOUND'];
     const randomIndex = Math.floor(Math.random() * dirs.length);
