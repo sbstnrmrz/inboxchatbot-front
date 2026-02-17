@@ -15,10 +15,15 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
     <div className={`flex gap-2 ${isOutbound ? "flex-row-reverse" : ""}`}>
       <Avatar className={`flex shadow-sm items-center justify-center w-10 h-10 shrink-0 ${isBotMessage ? 'bg-[#d4f1ff]' : ''}`}>
         {isBotMessage
-          ? <BotIcon className="w-6 h-6"/>
-          : <AvatarImage src="https://github.com/shadcn.png" />
+          ? 
+          <BotIcon className="w-6 h-6"/>
+          : 
+          <>
+            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarFallback>CN</AvatarFallback>
+          </>
         }
-        <AvatarFallback>CN</AvatarFallback>
+
       </Avatar>
       <div
         className={`px-4 py-2 rounded-lg shadow-sm text-sm max-w-[50%] min-w-0 ${

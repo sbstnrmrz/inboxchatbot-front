@@ -1,20 +1,19 @@
 import { ButtonWithIcon } from "@/components/icons/ButtonWithIcon";
-import { Mic, SendIcon, Trash2Icon } from "lucide-react";
+import { SendIcon, Trash2Icon } from "lucide-react";
 import { BotStatusSwitch } from "./BotStatusSwitch";
 
 export interface MessageInputProps {
-
+  botEnabled: boolean;
+  isTogglingBot: boolean;
+  onToggleBot: () => void;
 }
 
-export const MessageInput = () => {
+export const MessageInput = ({ botEnabled, isTogglingBot, onToggleBot }: MessageInputProps) => {
   const handleSubmit = () => {}
   const handleCancelRecording = () => {}
-  const onToggleBotEnabled = () => {}
 
-  const botEnabled = false;
   const isRecording = false;
-  const isTextDisabled = false;
-  const isTogglingBot = false;
+  const isTextDisabled = botEnabled;
 
   return (
     <div className="w-full mx-auto bg-primary-white">
@@ -35,10 +34,10 @@ botEnabled
             }
             rows={1}
             disabled={isTextDisabled}
-            className={`w-full resize-none bg-transparent px-4 pt-4 pb-2 focus:outline-none min-h-[52px] max-h-[200px] ${
+            className={`text-black w-full resize-none bg-transparent px-4 pt-4 pb-2 focus:outline-none min-h-[52px] max-h-[200px] ${
 isRecording || botEnabled
 ? "text-muted-foreground placeholder:text-muted-foreground/60 cursor-not-allowed"
-: "text-foreground placeholder:text-muted-foreground"
+: "text-black placeholder:text-muted-foreground"
 }`}
           />
 
@@ -56,14 +55,14 @@ isRecording || botEnabled
               ) : (
                   <BotStatusSwitch
                     botEnabled={botEnabled}
-                    onToggleBotEnabled={onToggleBotEnabled}
+                    onToggleBotEnabled={onToggleBot}
                     isTogglingBot={isTogglingBot}
                   />
                 )}
             </div>
             <ButtonWithIcon
               type="submit"
-              disabled={false}
+              disabled={botEnabled}
               className="bg-green-600 text-background hover:bg-green-600/70"
               icon={<SendIcon className="size-6"/>}
             />

@@ -1,5 +1,7 @@
 import { useMessages } from "@/features/inbox/hooks/useMessages"
 import { useLiveMessages } from "@/features/inbox/hooks/useLiveMessages"
+import { useToggleBot } from "@/features/inbox/hooks/useToggleBot"
+import { useLiveConversations } from "@/features/inbox/hooks/useLiveConversations"
 import { MessageBubble } from "./message-bubble"
 import { MessageInput } from "./message-input"
 import { Spinner } from "@/components/ui/spinner"
@@ -14,6 +16,14 @@ export const ChatMain = ({ conversationId }: ChatMainProps) => {
 
   // Reactive read from IndexedDB — updates automatically as sync writes data
   const messages = useLiveMessages(conversationId)
+
+  // Read botEnabled from the live conversation in IndexedDB
+  const conversations = useLiveConversations()
+  const conversation = conversations.find((c) => c.id === conversationId)
+  const botEnabled = conversation?.botEnabled ?? false
+
+  // Toggle bot mutation — updates TanStack Query cache and IndexedDB on success
+  const { mutate: toggleBot, isPending: isTogglingBot } = useToggleBot(conversationId)
 
   return (
     <div className="flex-1 min-h-0 text-black">
@@ -32,7 +42,11 @@ export const ChatMain = ({ conversationId }: ChatMainProps) => {
           )}
         </div>
         <div className="px-4 pb-4 shrink-0">
-          <MessageInput />
+          <MessageInput
+            botEnabled={botEnabled}
+            isTogglingBot={isTogglingBot}
+            onToggleBot={() => toggleBot()}
+          />
         </div>
       </div>
     </div>

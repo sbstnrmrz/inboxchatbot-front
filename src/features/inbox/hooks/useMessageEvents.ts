@@ -2,6 +2,10 @@
  * useMessageEvents — listens for real-time message socket events and persists
  * them into IndexedDB.
  *
+ * Handles:
+ *  - message_received: incoming messages from other participants
+ *  - message_sent: confirmation of messages sent by the current agent
+ *
  * Because useLiveMessages reads IndexedDB reactively, writing here is enough
  * to trigger an automatic re-render in the chat view — no manual state updates
  * or query invalidations needed for the message list.
@@ -39,10 +43,22 @@ export function useMessageEvents({ socket }: UseMessageEventsOptions) {
       queryClient.invalidateQueries({ queryKey: queryKeys.conversations.all() })
     }
 
+    const handleMessageSent = (data: Message) => {
+      logger.debug("[useMessageEvents] message_sent", data)
+
+      // Persist the sent message confirmation into IndexedDB
+      syncMessage(data).catch(console.error)
+
+      // Invalidate conversations so inbox list reflects the latest outbound message
+      queryClient.invalidateQueries({ queryKey: queryKeys.conversations.all() })
+    }
+
     socket.on(MessageEvent.Received, handleMessageReceived)
+    socket.on(MessageEvent.Sent, handleMessageSent)
 
     return () => {
       socket.off(MessageEvent.Received, handleMessageReceived)
+      socket.off(MessageEvent.Sent, handleMessageSent)
     }
   }, [socket, queryClient])
 }

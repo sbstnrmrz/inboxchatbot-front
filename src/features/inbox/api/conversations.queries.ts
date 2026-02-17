@@ -7,6 +7,11 @@
 import { apiClient } from "@/lib/api/client"
 import type { Conversation } from "@/types/conversation.type"
 
+export interface ToggleBotResponse {
+  botEnabled: boolean
+  botDisabledAt?: string
+}
+
 export interface ConversationsListParams {
   /** Cursor: return conversations with lastMessageAt before this ISO timestamp */
   before?: string
@@ -27,4 +32,11 @@ export const conversationsQueries = {
       query ? `/conversations?${query}` : "/conversations",
     )
   },
+
+  /**
+   * Toggle the bot on/off for a conversation.
+   * Returns { botEnabled, botDisabledAt } — not the full conversation.
+   */
+  toggleBot: (conversationId: string): Promise<ToggleBotResponse> =>
+    apiClient.patch<ToggleBotResponse>(`/conversations/${conversationId}/toggle-bot`),
 }
