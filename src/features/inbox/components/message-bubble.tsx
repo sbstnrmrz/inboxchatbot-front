@@ -1,18 +1,23 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { CachedMessage } from "@/lib/db/schema"
+import { BotIcon } from "lucide-react"
 
 interface MessageBubbleProps {
   message: CachedMessage
 }
 
 export const MessageBubble = ({ message }: MessageBubbleProps) => {
-  const { direction, body, messageType, sentAt } = message
+  const { direction, body, messageType, sentAt, sender } = message
   const isOutbound = direction === "OUTBOUND"
+  const isBotMessage = sender.type === 'BOT';
 
   return (
     <div className={`flex gap-2 ${isOutbound ? "flex-row-reverse" : ""}`}>
-      <Avatar className="w-10 h-10 shrink-0">
-        <AvatarImage src="https://github.com/shadcn.png" />
+      <Avatar className={`flex shadow-sm items-center justify-center w-10 h-10 shrink-0 ${isBotMessage ? 'bg-[#d4f1ff]' : ''}`}>
+        {isBotMessage
+          ? <BotIcon className="w-6 h-6"/>
+          : <AvatarImage src="https://github.com/shadcn.png" />
+        }
         <AvatarFallback>CN</AvatarFallback>
       </Avatar>
       <div

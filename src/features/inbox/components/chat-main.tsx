@@ -16,8 +16,8 @@ export const ChatMain = ({ conversationId }: ChatMainProps) => {
   const messages = useLiveMessages(conversationId)
 
   return (
-    <div className="flex-1 min-h-0">
-      <div className="flex flex-col h-full bg-primary-white">
+    <div className="flex-1 min-h-0 text-black">
+      <div className="flex flex-col h-full bg-background">
         <div className="flex-1 overflow-y-auto flex flex-col gap-4 px-4 py-4">
           {isPending && messages.length === 0 ? (
             <MessagesLoading />

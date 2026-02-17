@@ -15,6 +15,11 @@ export enum SocketEvents {
   ConversationDeleted = 'conversation_deleted',
 }
 
+export enum ConversationEvents {
+  Read = 'conversation_read',
+
+}
+
 export enum MessageEvent {
   Received = 'message_received',
   Sent = 'message_sent',
