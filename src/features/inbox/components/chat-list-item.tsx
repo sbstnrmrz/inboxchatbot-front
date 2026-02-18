@@ -4,6 +4,7 @@ import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { CachedConversation, CachedMessage } from "@/lib/db";
 import { messagesRepository } from "@/lib/db/repositories/messages.repository";
+import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer";
 
 interface ChatListItemProps {
   conversation: CachedConversation;
@@ -12,7 +13,9 @@ interface ChatListItemProps {
 }
 
 export function ChatListItem({ conversation, isSelected, onClick }: ChatListItemProps) {
-  const {id, lastMessageId, unreadCount, channel } = conversation;
+  const {id, customerId, lastMessageId, unreadCount, channel } = conversation;
+
+  const customer = useLiveCustomer(customerId);
 
   const lastMessage = useLiveQuery(
     () =>
@@ -36,7 +39,7 @@ export function ChatListItem({ conversation, isSelected, onClick }: ChatListItem
         </Avatar>
         <div className="w-full min-w-0 flex flex-col">
           <ChatItemHeader
-            customerName={conversation.customerId}
+            customerName={customer?.name ?? customerId}
             lastMessageAt={conversation.lastMessageAt}
           />
           <ChatItemLastMessage

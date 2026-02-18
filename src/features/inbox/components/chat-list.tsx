@@ -6,9 +6,10 @@ import { logger } from '@/lib/logger';
 
 interface ChatListProps {
   onChatSelected: (conversationId: string) => void;
+  selectedConversationId?: string | null;
 }
 
-export const ChatList = ({onChatSelected}: ChatListProps) => {
+export const ChatList = ({onChatSelected, selectedConversationId}: ChatListProps) => {
   const conversations = useLiveConversations();
 
   useEffect(() => {
@@ -23,7 +24,8 @@ export const ChatList = ({onChatSelected}: ChatListProps) => {
         conversations.map((conv) => (
           <ChatListItem 
             key={conv.id}
-            conversation={conv}  
+            conversation={conv}
+            isSelected={selectedConversationId === conv.id}
             onClick={onChatSelected}
           />
         ))

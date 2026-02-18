@@ -63,7 +63,7 @@ isRecording || botEnabled
             <ButtonWithIcon
               type="submit"
               disabled={botEnabled}
-              className="bg-green-600 text-background hover:bg-green-600/70"
+              className={`${botEnabled ? 'cursor-not-allowed bg-white' : ''} bg-green-600 text-background hover:bg-green-600/70`}
               icon={<SendIcon className="size-6"/>}
             />
           </div>

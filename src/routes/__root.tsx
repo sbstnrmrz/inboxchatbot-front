@@ -13,7 +13,7 @@ const RootLayout = () => (
       <TooltipProvider>
         <Outlet />
         <TanStackRouterDevtools position='top-right' />
-        <ReactQueryDevtools initialIsOpen={false} />
+        <ReactQueryDevtools buttonPosition='top-left' initialIsOpen={false} />
         <Toaster/>
       </TooltipProvider>
     </AuthProvider>

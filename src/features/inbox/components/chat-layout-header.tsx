@@ -8,7 +8,7 @@ export const ChatLayoutHeader = () => {
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
-        <span>John Doe</span>
+        <span className="text-black">John Doe</span>
       </div>
     </div>
   )
