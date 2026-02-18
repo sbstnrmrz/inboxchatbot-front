@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { MessageCircleMoreIcon } from 'lucide-react';
 import {
   Sidebar,
@@ -20,6 +20,7 @@ import { ChatLayout } from './chat-layout';
 import { ChatMain } from './chat-main';
 import { ChatList } from './chat-list';
 import { ChatLayoutHeader } from './chat-layout-header';
+import type { ConversationChannel } from '@/types/conversation.type';
 
 
 export function InboxLayout() {
@@ -55,9 +56,7 @@ export function InboxLayout() {
             <div className="flex items-center p-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">
               <SearchFilter value={searchQuery} onChange={setSearchQuery} />
             </div>
-            <div className="flex items-center px-4 py-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">
-              <span className='text-sm mr-2'>Filtrar por</span>
-            </div>
+
             <ChatList onChatSelected={setSelectedConversationId} selectedConversationId={selectedConversationId}/>
             <SidebarContent>
             </SidebarContent>
@@ -90,4 +89,3 @@ function NoChatSelected() {
     </div>
   )
 }
-
