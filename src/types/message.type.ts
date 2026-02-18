@@ -54,6 +54,12 @@ export interface MessageReferral {
   thumbnailUrl?: string
 }
 
+export interface SendMessageDto {
+  conversationId: string
+  messageType: MessageType
+  body: string
+}
+
 export interface Message {
   _id: string
   tenantId: string

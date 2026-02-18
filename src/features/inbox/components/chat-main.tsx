@@ -2,28 +2,49 @@ import { useMessages } from "@/features/inbox/hooks/useMessages"
 import { useLiveMessages } from "@/features/inbox/hooks/useLiveMessages"
 import { useToggleBot } from "@/features/inbox/hooks/useToggleBot"
 import { useLiveConversations } from "@/features/inbox/hooks/useLiveConversations"
+import { useSendMessage } from "@/features/inbox/hooks/useSendMessage"
+import { useAuth } from "@/features/auth/context"
 import { MessageBubble } from "./message-bubble"
 import { MessageInput } from "./message-input"
 import { Spinner } from "@/components/ui/spinner"
+import type { Socket } from "socket.io-client"
 
 export interface ChatMainProps {
   conversationId: string;
+  socket: Socket | null;
 }
 
-export const ChatMain = ({ conversationId }: ChatMainProps) => {
+export const ChatMain = ({ conversationId, socket }: ChatMainProps) => {
+  const { session } = useAuth()
+  const tenantId = ((session?.user as any)?.tenantId as string) ?? ""
+  const senderId = session?.user?.id ?? ""
+
   // Trigger server fetch + sync into IndexedDB
   const { isPending, isError } = useMessages(conversationId)
 
   // Reactive read from IndexedDB — updates automatically as sync writes data
   const messages = useLiveMessages(conversationId)
 
-  // Read botEnabled from the live conversation in IndexedDB
+  // Read botEnabled and channel from the live conversation in IndexedDB
   const conversations = useLiveConversations()
   const conversation = conversations.find((c) => c.id === conversationId)
   const botEnabled = conversation?.botEnabled ?? false
+  const channel = conversation?.channel ?? "WHATSAPP"
 
   // Toggle bot mutation — updates TanStack Query cache and IndexedDB on success
   const { mutate: toggleBot, isPending: isTogglingBot } = useToggleBot(conversationId)
+
+  // Send message over socket with optimistic IndexedDB write
+  const { send, isSending } = useSendMessage({
+    socket,
+    tenantId,
+    channel,
+    senderId,
+  })
+
+  const handleSend = (body: string) => {
+    send({ conversationId, messageType: "TEXT", body })
+  }
 
   return (
     <div className="flex-1 min-h-0 text-black">
@@ -46,6 +67,8 @@ export const ChatMain = ({ conversationId }: ChatMainProps) => {
             botEnabled={botEnabled}
             isTogglingBot={isTogglingBot}
             onToggleBot={() => toggleBot()}
+            onSend={handleSend}
+            isSending={isSending}
           />
         </div>
       </div>

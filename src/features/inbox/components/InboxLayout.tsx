@@ -72,7 +72,7 @@ export function InboxLayout() {
               :
               <ChatLayout>
                 <ChatLayoutHeader conversationId={selectedConversationId} />
-                <ChatMain conversationId={selectedConversationId} />
+                <ChatMain conversationId={selectedConversationId} socket={socket} />
               </ChatLayout>
             }
           </SidebarInset>

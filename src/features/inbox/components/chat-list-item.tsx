@@ -70,7 +70,7 @@ function ChatItemHeader({
     : "";
 
   return (
-    <div className="w-full flex justify-between gap-2">
+    <div className="w-full flex justify-between gap-2 items-center">
       <span className="font-semibold truncate">{customerName}</span>
       <span className="text-xs text-gray-500 text-nowrap">{formatted}</span>
     </div>
