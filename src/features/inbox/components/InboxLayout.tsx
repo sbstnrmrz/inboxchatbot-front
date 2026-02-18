@@ -71,7 +71,7 @@ export function InboxLayout() {
               <NoChatSelected/>
               :
               <ChatLayout>
-                <ChatLayoutHeader/>
+                <ChatLayoutHeader conversationId={selectedConversationId} />
                 <ChatMain conversationId={selectedConversationId} />
               </ChatLayout>
             }
