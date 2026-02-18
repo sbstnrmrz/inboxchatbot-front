@@ -37,7 +37,7 @@ export function ChatListItem({ conversation, isSelected, onClick }: ChatListItem
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
-        <div className="w-full min-w-0 flex flex-col">
+        <div className="w-full min-w-0 flex flex-col justify-center">
           <ChatItemHeader
             customerName={customer?.name ?? customerId}
             lastMessageAt={conversation.lastMessageAt}
