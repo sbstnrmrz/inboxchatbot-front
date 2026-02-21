@@ -1,9 +1,18 @@
+import { FacebookIcon } from "@/components/icons/FacebookIcon"
+import { InstagramIcon } from "@/components/icons/InstagramIcon"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { CachedMessage } from "@/lib/db/schema"
+import type { MessageReferral } from "@/types/message.type"
 import { BotIcon } from "lucide-react"
 
 interface MessageBubbleProps {
   message: CachedMessage
+}
+
+enum ReferralType {
+  Facebook = 'facebook',
+  Instagram = 'instagram',
+  Unknown = 'unknown',
 }
 
 export const MessageBubble = ({ message }: MessageBubbleProps) => {
@@ -23,19 +32,21 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
             <AvatarFallback>CN</AvatarFallback>
           </>
         }
-
       </Avatar>
       <div
         className={`px-4 py-2 rounded-lg shadow-sm text-sm max-w-[50%] min-w-0 ${
           isOutbound ? "bg-[#d4f1ff]" : "bg-white"
         }`}
       >
+        <ReferralLabel referral={message.referral}/>
         <MessageContent body={body} messageType={messageType} />
         <MessageTimestamp sentAt={sentAt} />
       </div>
     </div>
   )
 }
+
+
 
 function MessageContent({
   body,
@@ -75,3 +86,40 @@ function MessageTimestamp({ sentAt }: { sentAt: number }) {
     </span>
   )
 }
+
+function ReferralLabel({referral}: {referral?: MessageReferral}) {
+  const referralType = detectReferralPlatform(referral)
+  if (referralType === ReferralType.Unknown) return;
+
+  return (
+    <div className="flex items-center gap-1 mb-1">
+      {referralType === ReferralType.Facebook
+        ?
+        <FacebookIcon className="w-4 h-4"/>
+        :
+        <InstagramIcon className="w-4 h-4"/>
+      }
+      <span className="text-gray-500">Referido</span>
+    </div>
+  )
+}
+
+function detectReferralPlatform(referral?: MessageReferral): ReferralType {
+  const url = referral?.sourceUrl?.toLowerCase();
+  if (!url) return ReferralType.Unknown;
+
+  // Check for Facebook patterns
+  if (url.includes('fb') || url.includes('facebook')) {
+    return ReferralType.Facebook;
+  }
+
+  // Check for Instagram patterns
+  if (url.includes('instagr.am') || url.includes('instagram')) {
+    return ReferralType.Instagram;
+  }
+
+  return ReferralType.Unknown;
+}
+
+
+
