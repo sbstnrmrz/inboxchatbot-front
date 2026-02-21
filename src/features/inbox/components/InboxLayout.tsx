@@ -29,6 +29,7 @@ export function InboxLayout() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showMobileSearch, setShowMobileSearch] = useState<boolean>(false);
   const { session, isPending } = useAuth();
+  const [showContactDetails, setShowContactDetails] = useState(false);
 
   // Trigger initial sync as soon as the session is confirmed
   useInitialSync({ enabled: !isPending && !!session });
@@ -56,7 +57,6 @@ export function InboxLayout() {
             <div className="flex items-center p-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">
               <SearchFilter value={searchQuery} onChange={setSearchQuery} />
             </div>
-
             <ChatList onChatSelected={setSelectedConversationId} selectedConversationId={selectedConversationId}/>
             <SidebarContent>
             </SidebarContent>
@@ -70,8 +70,15 @@ export function InboxLayout() {
               <NoChatSelected/>
               :
               <ChatLayout>
-                <ChatLayoutHeader conversationId={selectedConversationId} />
-                <ChatMain conversationId={selectedConversationId} socket={socket} />
+                <ChatLayoutHeader 
+                  conversationId={selectedConversationId} 
+                  onShowContactDetails={setShowContactDetails}
+                />
+                <ChatMain
+                  conversationId={selectedConversationId} 
+                  socket={socket} 
+                  showContactDetails={showContactDetails}
+                />
               </ChatLayout>
             }
           </SidebarInset>

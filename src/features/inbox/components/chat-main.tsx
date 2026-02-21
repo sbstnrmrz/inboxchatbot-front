@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react"
 import { useMessages } from "@/features/inbox/hooks/useMessages"
 import { useLiveMessages } from "@/features/inbox/hooks/useLiveMessages"
 import { useToggleBot } from "@/features/inbox/hooks/useToggleBot"
@@ -8,13 +9,16 @@ import { MessageBubble } from "./message-bubble"
 import { MessageInput } from "./message-input"
 import { Spinner } from "@/components/ui/spinner"
 import type { Socket } from "socket.io-client"
+import { MessageSquareIcon, PhoneIcon, UserIcon } from "lucide-react"
+import { WhatsappIcon } from "@/components/icons/WhatsappIcon"
 
 export interface ChatMainProps {
   conversationId: string;
   socket: Socket | null;
+  showContactDetails: boolean;
 }
 
-export const ChatMain = ({ conversationId, socket }: ChatMainProps) => {
+export const ChatMain = ({ conversationId, socket, showContactDetails = false }: ChatMainProps) => {
   const { session } = useAuth()
   const tenantId = ((session?.user as any)?.tenantId as string) ?? ""
   const senderId = session?.user?.id ?? ""
@@ -46,9 +50,15 @@ export const ChatMain = ({ conversationId, socket }: ChatMainProps) => {
     send({ conversationId, messageType: "TEXT", body })
   }
 
+  // Scroll to bottom sentinel whenever messages change or conversation switches
+  const bottomRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "instant" })
+  }, [conversationId, messages.length])
+
   return (
-    <div className="flex-1 min-h-0 text-black">
-      <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-1 min-h-0 text-black">
+      <div className="flex flex-col h-full bg-background flex-1 min-w-0">
         <div className="flex-1 overflow-y-auto flex flex-col gap-4 px-4 py-4">
           {isPending && messages.length === 0 ? (
             <MessagesLoading />
@@ -61,6 +71,7 @@ export const ChatMain = ({ conversationId, socket }: ChatMainProps) => {
               <MessageBubble key={message.id} message={message} />
             ))
           )}
+          <div ref={bottomRef} />
         </div>
         <div className="px-4 pb-4 shrink-0">
           <MessageInput
@@ -72,6 +83,16 @@ export const ChatMain = ({ conversationId, socket }: ChatMainProps) => {
           />
         </div>
       </div>
+      {showContactDetails &&
+        <div className="w-[20%] shrink-0 flex flex-col p-4 bg-white">
+          <div className="">
+            <span className="font-semibold">Detalles del contacto</span>
+          </div>
+          <div className="flex flex-col gap-2 mt-4">
+            <ContactDetails/>
+          </div>
+        </div>
+      }
     </div>
   )
 }
@@ -109,4 +130,24 @@ function DateSeparator() {
       <span className="flex w-full h-[1px] bg-black"></span>
     </div>
   )
+}
+
+function ContactDetails() {
+  const items = [
+    {label: 'Nombre', value: 'John Doe', icon: <UserIcon className="w-5 h-5"/>},
+    {label: 'Nombre', value: 'John Doe', icon: <UserIcon className="w-5 h-5"/>},
+    {label: 'Nombre', value: 'John Doe', icon: <UserIcon className="w-5 h-5"/>},
+  ]
+
+  return items.map((item) => {
+    return (
+      <div className="flex items-center gap-2">
+        {item.icon}
+        <div className="flex flex-col text-sm">
+          <span className="font-semibold">{item.label}</span>
+          <span>{item.value}</span>
+        </div>
+      </div>
+    )
+  })
 }

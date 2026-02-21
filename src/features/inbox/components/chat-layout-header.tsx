@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, type Dispatch, type SetStateAction } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -15,9 +15,10 @@ import { CustomerInfo } from "@/features/inbox/components/customer-info"
 
 interface ChatLayoutHeaderProps {
   conversationId: string;
+  onShowContactDetails: Dispatch<SetStateAction<boolean>>;
 }
 
-export const ChatLayoutHeader = ({ conversationId }: ChatLayoutHeaderProps) => {
+export const ChatLayoutHeader = ({ conversationId, onShowContactDetails }: ChatLayoutHeaderProps) => {
   const [customerInfoOpen, setCustomerInfoOpen] = useState(false)
 
   const conversation = useLiveQuery(
@@ -46,7 +47,7 @@ export const ChatLayoutHeader = ({ conversationId }: ChatLayoutHeaderProps) => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setCustomerInfoOpen(true)}
+            onClick={() => onShowContactDetails(prev => !prev)}
           >
             <InfoIcon className="stroke-black w-8 h-8" />
           </Button>
