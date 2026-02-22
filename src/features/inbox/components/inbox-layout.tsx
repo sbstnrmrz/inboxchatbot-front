@@ -50,44 +50,39 @@ export function InboxLayout() {
 
 
       {/* Vista desktop - sidebar + chat */}
-      <SidebarProvider defaultOpen={true}>
-        <div className="hidden md:flex h-screen w-screen overflow-hidden">
-          <InboxNavBar/>
-          <Sidebar collapsible="icon" className="flex border-r">
-            <SidebarHeader className='bg-primary-white border-b border-secondary-white min-h-[52px] justify-center'>
-              <div className="flex w-full items-center ">
-                <h1 className=" text-lg font-semibold group-data-[collapsible=icon]:hidden">Chats</h1>
-              </div>
-            </SidebarHeader>
-            <div className="flex items-center p-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">
-              <SearchFilter value={searchQuery} onChange={setSearchQuery} />
-            </div>
-            <ChatList onChatSelected={setSelectedConversationId} selectedConversationId={selectedConversationId}/>
-            <SidebarContent>
-            </SidebarContent>
-            <SidebarFooter>
-            </SidebarFooter>
-          </Sidebar>
-          <SidebarInset className=''>
-            {!selectedConversationId
-              ?
-              <NoChatSelected/>
-              :
-              <ChatLayout>
-                <ChatLayoutHeader 
-                  conversationId={selectedConversationId} 
-                  onShowContactDetails={setShowContactDetails}
-                />
-                <ChatMain
-                  conversationId={selectedConversationId} 
-                  socket={socket} 
-                  showContactDetails={showContactDetails}
-                />
-              </ChatLayout>
-            }
-          </SidebarInset>
+      <Sidebar collapsible="icon" className="flex border-r">
+        <SidebarHeader className='bg-primary-white border-b border-secondary-white min-h-[52px] justify-center'>
+          <div className="flex w-full items-center ">
+            <h1 className=" text-lg font-semibold group-data-[collapsible=icon]:hidden">Chats</h1>
+          </div>
+        </SidebarHeader>
+        <div className="flex items-center p-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">
+          <SearchFilter value={searchQuery} onChange={setSearchQuery} />
         </div>
-      </SidebarProvider>
+        <ChatList onChatSelected={setSelectedConversationId} selectedConversationId={selectedConversationId}/>
+        <SidebarContent>
+        </SidebarContent>
+        <SidebarFooter>
+        </SidebarFooter>
+      </Sidebar>
+      <SidebarInset className=''>
+        {!selectedConversationId
+          ?
+          <NoChatSelected/>
+          :
+          <ChatLayout>
+            <ChatLayoutHeader 
+              conversationId={selectedConversationId} 
+              onShowContactDetails={setShowContactDetails}
+            />
+            <ChatMain
+              conversationId={selectedConversationId} 
+              socket={socket} 
+              showContactDetails={showContactDetails}
+            />
+          </ChatLayout>
+        }
+      </SidebarInset>
     </>
   );
 }

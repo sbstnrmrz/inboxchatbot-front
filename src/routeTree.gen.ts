@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InboxIndexRouteImport } from './routes/inbox/index'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
@@ -19,15 +20,20 @@ import { Route as AdminDashboardIndexRouteImport } from './routes/admin/dashboar
 import { Route as AdminDashboardUsersIndexRouteImport } from './routes/admin/dashboard/users/index'
 import { Route as AdminDashboardTenantsIndexRouteImport } from './routes/admin/dashboard/tenants/index'
 
+const InboxRoute = InboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InboxIndexRoute = InboxIndexRouteImport.update({
-  id: '/inbox/',
-  path: '/inbox/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => InboxRoute,
 } as any)
 const AuthIndexRoute = AuthIndexRouteImport.update({
   id: '/auth/',
@@ -69,6 +75,7 @@ const AdminDashboardTenantsIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/inbox': typeof InboxRouteWithChildren
   '/admin/dashboard': typeof AdminDashboardRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/admin/': typeof AdminIndexRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/inbox': typeof InboxRouteWithChildren
   '/admin/dashboard': typeof AdminDashboardRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/admin/': typeof AdminIndexRoute
@@ -104,6 +112,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/inbox'
     | '/admin/dashboard'
     | '/auth/login'
     | '/admin/'
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/inbox'
     | '/admin/dashboard'
     | '/auth/login'
     | '/admin/'
@@ -137,15 +147,22 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  InboxRoute: typeof InboxRouteWithChildren
   AdminDashboardRoute: typeof AdminDashboardRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AuthIndexRoute: typeof AuthIndexRoute
-  InboxIndexRoute: typeof InboxIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/inbox': {
+      id: '/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof InboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -155,10 +172,10 @@ declare module '@tanstack/react-router' {
     }
     '/inbox/': {
       id: '/inbox/'
-      path: '/inbox'
+      path: '/'
       fullPath: '/inbox/'
       preLoaderRoute: typeof InboxIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof InboxRoute
     }
     '/auth/': {
       id: '/auth/'
@@ -212,6 +229,16 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface InboxRouteChildren {
+  InboxIndexRoute: typeof InboxIndexRoute
+}
+
+const InboxRouteChildren: InboxRouteChildren = {
+  InboxIndexRoute: InboxIndexRoute,
+}
+
+const InboxRouteWithChildren = InboxRoute._addFileChildren(InboxRouteChildren)
+
 interface AdminDashboardRouteChildren {
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
   AdminDashboardTenantsIndexRoute: typeof AdminDashboardTenantsIndexRoute
@@ -230,11 +257,11 @@ const AdminDashboardRouteWithChildren = AdminDashboardRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  InboxRoute: InboxRouteWithChildren,
   AdminDashboardRoute: AdminDashboardRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
   AdminIndexRoute: AdminIndexRoute,
   AuthIndexRoute: AuthIndexRoute,
-  InboxIndexRoute: InboxIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
