@@ -3,7 +3,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/features/auth/context";
 import { useTheme } from "@/hooks/use-theme";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { LogOutIcon, MessageSquareIcon, MoonIcon, SunIcon, UsersIcon } from "lucide-react"
 
 const navItems = [
@@ -13,6 +13,7 @@ const navItems = [
 
 export const InboxNavBar = () => {
   const { signOut, isPending } = useAuth();
+  const location = useRouterState({ select: (s) => s.location })
 
   const navigate = useNavigate();
   const {theme, toggleTheme} = useTheme();
@@ -31,7 +32,12 @@ export const InboxNavBar = () => {
           return (
             <Tooltip>
               <TooltipTrigger asChild>
-                <button className='cursor-pointer hover:bg-secondary-white p-2 rounded-sm'>
+                <button 
+                  className={`cursor-pointer ${item.link === location.pathname ? 'bg-secondary-white' : ''} hover:bg-secondary-white p-2 rounded-sm`}
+                  onClick={() => {
+                    navigate({to: item.link})
+                  }}
+                >
                   {item.icon}
                 </button>
               </TooltipTrigger>
