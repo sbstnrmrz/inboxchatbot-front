@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { authClient } from '@/lib/auth-client'
-import { InboxLayout } from '@/features/inbox/components/InboxLayout'
+import { InboxLayout } from '@/features/inbox/components/inbox-layout'
 import { tenantsQueries } from '@/features/admin/api/tenants.queries'
 import { getTenantInboxUrl } from '@/features/auth/utils/getRedirectPath'
 
