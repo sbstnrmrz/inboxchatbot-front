@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import type { CustomerWithCount } from "@/features/inbox/api/customers-additional.queries"
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon"
 import { InstagramIcon } from "@/components/icons/InstagramIcon"
+import parsePhoneNumber from 'libphonenumber-js'
 
 export type ChannelFilter = "all" | "whatsapp" | "instagram"
 
@@ -90,6 +91,26 @@ export const contactsColumns: ColumnDef<CustomerWithCount>[] = [
     enableSorting: false,
   },
   {
+    id: "phone",
+    header: "Teléfono",
+    cell: ({ row }) => row.original.whatsappInfo?.id 
+      ? getFlagEmoji(parsePhoneNumber('+' + row.original.whatsappInfo.id)?.country as string) + ' ' +  parsePhoneNumber('+' + row.original.whatsappInfo.id)?.formatInternational() 
+      : '-',
+    enableSorting: false,
+  },
+  {
+    id: "username",
+    header: "Usuario",
+    cell: ({ row }) => 
+      row.original.instagramInfo?.username 
+        ? 
+        <a target="_blank" className="underline text-blue-400" href={`https://www.instagram.com/${row.original.instagramInfo?.username}`}>
+          @{row.original.instagramInfo?.username}
+        </a> 
+        : '-',
+    enableSorting: false,
+  },
+  {
     accessorKey: "messageCount",
     header: ({ column }) => (
       <Button
@@ -105,3 +126,11 @@ export const contactsColumns: ColumnDef<CustomerWithCount>[] = [
     ),
   },
 ]
+
+function getFlagEmoji(countryCode: string) {
+  return countryCode
+    .toUpperCase()
+    .replace(/./g, (char) => 
+      String.fromCodePoint(char.charCodeAt(0) + 127397)
+    );
+}
