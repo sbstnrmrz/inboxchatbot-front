@@ -11,7 +11,6 @@ import {
 import { conversationsRepository } from "@/lib/db/repositories/conversations.repository"
 import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer"
 import { EllipsisVerticalIcon, InfoIcon, ShieldOffIcon } from "lucide-react"
-import { CustomerInfo } from "@/features/inbox/components/customer-info"
 
 interface ChatLayoutHeaderProps {
   conversationId: string;
@@ -54,14 +53,6 @@ export const ChatLayoutHeader = ({ conversationId, onShowContactDetails }: ChatL
           <ChatOptionsDropdown/>
         </div>
       </div>
-
-      {customer && (
-        <CustomerInfo
-          customer={customer}
-          open={customerInfoOpen}
-          onOpenChange={setCustomerInfoOpen}
-        />
-      )}
     </div>
   )
 }
