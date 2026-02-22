@@ -16,6 +16,7 @@ import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
+import { Route as InboxContactsIndexRouteImport } from './routes/inbox/contacts/index'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin/dashboard/index'
 import { Route as AdminDashboardUsersIndexRouteImport } from './routes/admin/dashboard/users/index'
 import { Route as AdminDashboardTenantsIndexRouteImport } from './routes/admin/dashboard/tenants/index'
@@ -55,6 +56,11 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   path: '/admin/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InboxContactsIndexRoute = InboxContactsIndexRouteImport.update({
+  id: '/contacts/',
+  path: '/contacts/',
+  getParentRoute: () => InboxRoute,
+} as any)
 const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/auth/': typeof AuthIndexRoute
   '/inbox/': typeof InboxIndexRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
+  '/inbox/contacts/': typeof InboxContactsIndexRoute
   '/admin/dashboard/tenants/': typeof AdminDashboardTenantsIndexRoute
   '/admin/dashboard/users/': typeof AdminDashboardUsersIndexRoute
 }
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthIndexRoute
   '/inbox': typeof InboxIndexRoute
   '/admin/dashboard': typeof AdminDashboardIndexRoute
+  '/inbox/contacts': typeof InboxContactsIndexRoute
   '/admin/dashboard/tenants': typeof AdminDashboardTenantsIndexRoute
   '/admin/dashboard/users': typeof AdminDashboardUsersIndexRoute
 }
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/auth/': typeof AuthIndexRoute
   '/inbox/': typeof InboxIndexRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
+  '/inbox/contacts/': typeof InboxContactsIndexRoute
   '/admin/dashboard/tenants/': typeof AdminDashboardTenantsIndexRoute
   '/admin/dashboard/users/': typeof AdminDashboardUsersIndexRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/inbox/'
     | '/admin/dashboard/'
+    | '/inbox/contacts/'
     | '/admin/dashboard/tenants/'
     | '/admin/dashboard/users/'
   fileRoutesByTo: FileRoutesByTo
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/inbox'
     | '/admin/dashboard'
+    | '/inbox/contacts'
     | '/admin/dashboard/tenants'
     | '/admin/dashboard/users'
   id:
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/inbox/'
     | '/admin/dashboard/'
+    | '/inbox/contacts/'
     | '/admin/dashboard/tenants/'
     | '/admin/dashboard/users/'
   fileRoutesById: FileRoutesById
@@ -205,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inbox/contacts/': {
+      id: '/inbox/contacts/'
+      path: '/contacts'
+      fullPath: '/inbox/contacts/'
+      preLoaderRoute: typeof InboxContactsIndexRouteImport
+      parentRoute: typeof InboxRoute
+    }
     '/admin/dashboard/': {
       id: '/admin/dashboard/'
       path: '/'
@@ -231,10 +250,12 @@ declare module '@tanstack/react-router' {
 
 interface InboxRouteChildren {
   InboxIndexRoute: typeof InboxIndexRoute
+  InboxContactsIndexRoute: typeof InboxContactsIndexRoute
 }
 
 const InboxRouteChildren: InboxRouteChildren = {
   InboxIndexRoute: InboxIndexRoute,
+  InboxContactsIndexRoute: InboxContactsIndexRoute,
 }
 
 const InboxRouteWithChildren = InboxRoute._addFileChildren(InboxRouteChildren)

@@ -41,7 +41,7 @@ export const InboxNavBar = () => {
                   {item.icon}
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right" className="shadow-xl">
+              <TooltipContent side="right" className="shadow-xl bg-white">
                 <p className="text-black">{item.label}</p>
               </TooltipContent>
             </Tooltip>
