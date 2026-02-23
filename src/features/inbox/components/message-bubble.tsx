@@ -2,8 +2,9 @@ import { FacebookIcon } from "@/components/icons/FacebookIcon"
 import { InstagramIcon } from "@/components/icons/InstagramIcon"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { CachedMessage } from "@/lib/db/schema"
-import type { MessageReferral } from "@/types/message.type"
+import type { MessageChannel, MessageMedia, MessageReferral } from "@/types/message.type"
 import { BotIcon } from "lucide-react"
+import { AudioPlayer } from "./audio-player"
 
 interface MessageBubbleProps {
   message: CachedMessage
@@ -39,7 +40,7 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
         }`}
       >
         <ReferralLabel referral={message.referral}/>
-        <MessageContent body={body} messageType={messageType} />
+        <MessageContent body={body} messageType={messageType} media={message.media} channel={message.channel} />
         <MessageTimestamp sentAt={sentAt} />
       </div>
     </div>
@@ -51,10 +52,19 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
 function MessageContent({
   body,
   messageType,
+  media,
+  channel,
 }: {
   body?: string
   messageType: CachedMessage["messageType"]
+  media?: MessageMedia
+  channel: MessageChannel
 }) {
+  // Audio messages: render the player if we have a mediaId
+  if (messageType === "AUDIO" && media?.whatsappMediaId) {
+    return <AudioPlayer channel={channel} mediaId={media.whatsappMediaId} />
+  }
+
   if (body) {
     return <p className="wrap-break-word whitespace-pre-wrap">{body}</p>
   }
