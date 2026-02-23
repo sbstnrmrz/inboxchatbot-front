@@ -44,9 +44,13 @@ export function ImageViewer({ channel, mediaId, caption }: ImageViewerProps) {
 
     return () => {
       cancelled = true
-      if (blobUrlRef.current) {
-        URL.revokeObjectURL(blobUrlRef.current)
+      // Defer revocation so the browser has time to finish rendering the blob
+      // before we free it. A microtask is enough — no visible delay.
+      const urlToRevoke = blobUrlRef.current
+      if (urlToRevoke) {
         blobUrlRef.current = null
+        setBlobUrl(null)
+        setTimeout(() => URL.revokeObjectURL(urlToRevoke), 0)
       }
     }
   }, [channel, mediaId])
