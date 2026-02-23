@@ -5,6 +5,7 @@ import type { CachedMessage } from "@/lib/db/schema"
 import type { MessageChannel, MessageMedia, MessageReferral } from "@/types/message.type"
 import { BotIcon } from "lucide-react"
 import { AudioPlayer } from "./audio-player"
+import { ImageViewer } from "./image-viewer"
 
 interface MessageBubbleProps {
   message: CachedMessage
@@ -63,6 +64,11 @@ function MessageContent({
   // Audio messages: render the player if we have a mediaId
   if (messageType === "AUDIO" && media?.whatsappMediaId) {
     return <AudioPlayer channel={channel} mediaId={media.whatsappMediaId} />
+  }
+
+  // Image messages: render the viewer + optional lightbox
+  if (messageType === "IMAGE" && media?.whatsappMediaId) {
+    return <ImageViewer channel={channel} mediaId={media.whatsappMediaId} caption={media.caption} />
   }
 
   if (body) {
