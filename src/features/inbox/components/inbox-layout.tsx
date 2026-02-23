@@ -20,19 +20,24 @@ import { ChatList } from './chat-list';
 import { ChatLayoutHeader } from './chat-layout-header';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useNavigate } from '@tanstack/react-router';
+import { getRouteApi, useNavigate } from '@tanstack/react-router';
 import { useTheme } from '@/hooks/use-theme';
 import { Button } from '@/components/ui/button';
 import { InboxNavBar } from './inbox-navbar';
+import { logger } from '@/lib/logger';
 
+interface InboxLayoutProps {
+  conversationId?: string 
+}
 
-export function InboxLayout() {
+export function InboxLayout({conversationId}: InboxLayoutProps) {
   const {socket, isConnected} = useSocket();
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(conversationId || null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showMobileSearch, setShowMobileSearch] = useState<boolean>(false);
   const { session, signOut, isPending } = useAuth();
   const [showContactDetails, setShowContactDetails] = useState(false);
+  logger.debug('selected conversationId: ' + selectedConversationId);
 
   // Trigger initial sync as soon as the session is confirmed
   useInitialSync({ enabled: !isPending && !!session });

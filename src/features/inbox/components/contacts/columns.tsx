@@ -1,18 +1,19 @@
 import { type ColumnDef, type FilterFn, type Row } from "@tanstack/react-table"
-import { ArrowUpDown } from "lucide-react"
+import { ArrowUpDown, SquareArrowOutUpRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import type { CustomerWithCount } from "@/features/inbox/api/customers-additional.queries"
+import type { CustomerAdditionalDetails } from "@/features/inbox/api/customers-additional.queries"
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon"
 import { InstagramIcon } from "@/components/icons/InstagramIcon"
 import parsePhoneNumber from 'libphonenumber-js'
+import { useNavigate, Link } from "@tanstack/react-router"
 
 export type ChannelFilter = "all" | "whatsapp" | "instagram"
 
 // Stable module-level reference — never recreated on render.
-const channelFilterFn: FilterFn<CustomerWithCount> = (
-  row: Row<CustomerWithCount>,
+const channelFilterFn: FilterFn<CustomerAdditionalDetails> = (
+  row: Row<CustomerAdditionalDetails>,
   _columnId: string,
   filterValue: ChannelFilter,
 ) => {
@@ -22,7 +23,7 @@ const channelFilterFn: FilterFn<CustomerWithCount> = (
   return true
 }
 
-function ChannelBadges({ customer }: { customer: CustomerWithCount }) {
+function ChannelBadges({ customer }: { customer: CustomerAdditionalDetails }) {
   return (
     <div className="flex gap-1.5">
       {customer.whatsappInfo && (
@@ -45,7 +46,7 @@ function ChannelBadges({ customer }: { customer: CustomerWithCount }) {
 }
 
 // Static array — module-level so the reference never changes between renders.
-export const contactsColumns: ColumnDef<CustomerWithCount>[] = [
+export const contactsColumns: ColumnDef<CustomerAdditionalDetails>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -125,6 +126,13 @@ export const contactsColumns: ColumnDef<CustomerWithCount>[] = [
       <span className="tabular-nums">{row.getValue<number>("messageCount")}</span>
     ),
   },
+  {
+    id: "actions",
+    header: "Acciones",
+    cell: ({ row }) => <GoToConversationButton conversationId={row.original.conversationId}/>,
+    enableSorting: false,
+    enableHiding: false,
+  },
 ]
 
 function getFlagEmoji(countryCode: string) {
@@ -133,4 +141,23 @@ function getFlagEmoji(countryCode: string) {
     .replace(/./g, (char) => 
       String.fromCodePoint(char.charCodeAt(0) + 127397)
     );
+}
+
+function GoToConversationButton({conversationId}: {conversationId: string}) {
+  const navigate = useNavigate();
+  return (
+    <button
+      className="flex items-center cursor-pointer hover:bg-secondary-white p-1 rounded-sm"
+      onClick={() => {
+        navigate({
+          to: '/inbox',
+          search: {
+            conversationId: conversationId
+          }
+        })
+      }}
+    >
+      <SquareArrowOutUpRight className="w-4 h-4"/>
+    </button>
+  )
 }

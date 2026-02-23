@@ -1,10 +1,20 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, getRouteApi, redirect } from '@tanstack/react-router'
 import { authClient } from '@/lib/auth-client'
 import { InboxLayout } from '@/features/inbox/components/inbox-layout'
 import { tenantsQueries } from '@/features/admin/api/tenants.queries'
 import { getTenantInboxUrl } from '@/features/auth/utils/getRedirectPath'
+import { logger } from '@/lib/logger'
+import z from 'zod'
+
+
+const inboxSearchSchema = z.object({
+  conversationId: z.string(),
+})
+
+type InboxSearch = z.infer<typeof inboxSearchSchema>
 
 export const Route = createFileRoute('/inbox/')({
+  validateSearch: (search) => inboxSearchSchema.parse(search), 
   beforeLoad: async () => {
     const { data } = await authClient.getSession()
     if (!data) {
@@ -27,7 +37,11 @@ export const Route = createFileRoute('/inbox/')({
 })
 
 function Inbox() {
+  const { conversationId } = Route.useSearch()
+  logger.debug('conversation id: ' + conversationId);
+
+
   return (
-    <InboxLayout/>
+    <InboxLayout conversationId={conversationId}/>
   )
 }

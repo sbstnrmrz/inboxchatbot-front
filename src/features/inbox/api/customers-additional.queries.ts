@@ -8,11 +8,12 @@
 import { apiClient } from "@/lib/api/client"
 import type { Customer } from "@/types/customer.type"
 
-export interface CustomerWithCount extends Customer {
-  messageCount: number
+export interface CustomerAdditionalDetails extends Customer {
+  messageCount: number;
+  conversationId: string;
 }
 
 export const customersAdditionalQueries = {
-  list: (): Promise<CustomerWithCount[]> =>
-    apiClient.get<CustomerWithCount[]>("/customers/additional"),
+  list: (): Promise<CustomerAdditionalDetails[]> =>
+    apiClient.get<CustomerAdditionalDetails[]>("/customers/additional"),
 }
