@@ -113,6 +113,14 @@ export const contactsColumns: ColumnDef<CustomerAdditionalDetails>[] = [
     enableSorting: false,
   },
   {
+    id: "email",
+    header: "Email",
+    cell: () => (
+      <span className="text-muted-foreground text-xs italic">Sin email</span>
+    ),
+    enableSorting: false,
+  },
+  {
     accessorKey: "messageCount",
     header: ({ column }) => (
       <Button
