@@ -162,7 +162,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
