@@ -8,7 +8,7 @@ import z from 'zod'
 
 
 const inboxSearchSchema = z.object({
-  conversationId: z.string(),
+  conversationId: z.string().optional(),
 })
 
 type InboxSearch = z.infer<typeof inboxSearchSchema>
