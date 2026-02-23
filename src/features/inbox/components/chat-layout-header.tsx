@@ -43,13 +43,12 @@ export const ChatLayoutHeader = ({ conversationId, onShowContactDetails }: ChatL
         </div>
 
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
+            className="p-1 hover:bg-secondary-white rounded-sm"
             onClick={() => onShowContactDetails(prev => !prev)}
           >
-            <InfoIcon className="stroke-black w-8 h-8" />
-          </Button>
+            <InfoIcon className="stroke-black w-5 h-5" />
+          </button>
           <ChatOptionsDropdown/>
         </div>
       </div>
@@ -61,9 +60,9 @@ function ChatOptionsDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <button className="p-1 hover:bg-secondary-white rounded-sm">
           <EllipsisVerticalIcon className="stroke-black w-5 h-5" />
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem

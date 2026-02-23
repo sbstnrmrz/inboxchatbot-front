@@ -8,6 +8,7 @@ import { WhatsappIcon } from "@/components/icons/WhatsappIcon"
 import { InstagramIcon } from "@/components/icons/InstagramIcon"
 import parsePhoneNumber from 'libphonenumber-js'
 import { useNavigate, Link } from "@tanstack/react-router"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 export type ChannelFilter = "all" | "whatsapp" | "instagram"
 
@@ -129,7 +130,20 @@ export const contactsColumns: ColumnDef<CustomerAdditionalDetails>[] = [
   {
     id: "actions",
     header: "Acciones",
-    cell: ({ row }) => <GoToConversationButton conversationId={row.original.conversationId}/>,
+    cell: ({ row }) => {
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <>
+              <GoToConversationButton conversationId={row.original.conversationId}/>
+            </>
+          </TooltipTrigger>
+          <TooltipContent side="top">
+            <p>Ir a la conversacion</p>
+          </TooltipContent>
+        </Tooltip>
+      )
+    },
     enableSorting: false,
     enableHiding: false,
   },
