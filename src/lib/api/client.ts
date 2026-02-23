@@ -1,4 +1,6 @@
-const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localtest.me:3001"
+import { env } from "@/lib/env"
+
+const BASE_URL = env.VITE_API_URL
 
 export class ApiError extends Error {
   constructor(

@@ -1,10 +1,11 @@
 import { useAuth } from "@/features/auth/context";
+import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from 'socket.io-client';
 import { MessageEvent, SocketEvents } from "../types/events";
 
-const URL = import.meta.env.VITE_API_URL || 'http://localtest.me:3001'
+const URL = env.VITE_API_URL
 const PATH = '/socket'
 
 export function useSocket() {
