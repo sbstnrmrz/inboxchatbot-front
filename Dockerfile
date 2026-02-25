@@ -12,6 +12,11 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 FROM deps AS build
 COPY . .
+# Build args for Vite env vars (must be declared here to be available during build)
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_BASE_DOMAIN
+ENV VITE_BASE_DOMAIN=$VITE_BASE_DOMAIN
 RUN pnpm run build
 
 # Etapa final: Nginx (lo más profesional para Vite/React)

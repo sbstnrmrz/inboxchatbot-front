@@ -4,6 +4,7 @@ import { InboxLayout } from '@/features/inbox/components/inbox-layout'
 import { tenantsQueries } from '@/features/admin/api/tenants.queries'
 import { getTenantInboxUrl } from '@/features/auth/utils/getRedirectPath'
 import { logger } from '@/lib/logger'
+import { env } from '@/lib/env'
 import z from 'zod'
 
 
@@ -21,7 +22,7 @@ export const Route = createFileRoute('/inbox/')({
       throw redirect({ to: '/auth/login' })
     }
 
-    const baseDomain = import.meta.env.VITE_BASE_DOMAIN as string
+    const baseDomain = env.VITE_BASE_DOMAIN
     const currentHost = window.location.host
 
     // Si estamos en el dominio base (sin subdominio del tenant), redirigir al subdominio

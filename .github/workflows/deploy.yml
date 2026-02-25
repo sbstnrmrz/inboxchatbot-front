@@ -28,6 +28,9 @@ jobs:
           tags: |
             sbstnrmrz/inboxchatbot-frontend:v2 
           platforms: linux/amd64
+          build-args: |
+            VITE_API_URL=${{ secrets.PROD_API_URL }}
+            VITE_BASE_DOMAIN=${{ secrets.PROD_BASE_DOMAIN }}
       - name: Trigger Dokploy Deployment
         run: |
             curl -X 'POST' \

@@ -20,4 +20,5 @@ function requireEnv(key: string): string {
 
 export const env = {
   VITE_API_URL: requireEnv("VITE_API_URL"),
+  VITE_BASE_DOMAIN: requireEnv("VITE_BASE_DOMAIN"),
 } as const

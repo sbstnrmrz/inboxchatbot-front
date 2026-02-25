@@ -1,3 +1,5 @@
+import { env } from '@/lib/env'
+
 /**
  * Determina la URL de redirección después del login basado en el rol del usuario.
  * - superadmin → /admin/dashboard (mismo dominio)
@@ -17,8 +19,6 @@ export function getRedirectPathByRole(role?: string): string {
  * Ejemplo: slug="acme", VITE_BASE_DOMAIN="localtest.me" → "http://acme.localtest.me/inbox"
  */
 export function getTenantInboxUrl(slug: string): string {
-  const apiUrl = import.meta.env.VITE_API_URL as string
-  const protocol = new URL(apiUrl).protocol
-  const baseDomain = import.meta.env.VITE_BASE_DOMAIN as string
-  return `${protocol}//${slug}.${baseDomain}/inbox`
+  const protocol = new URL(env.VITE_API_URL).protocol
+  return `${protocol}//${slug}.${env.VITE_BASE_DOMAIN}/inbox`
 }
