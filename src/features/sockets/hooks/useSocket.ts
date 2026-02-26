@@ -105,7 +105,7 @@ export function useSocket() {
       socketRef.current = null;
       setSocket(null);
     };
-  }, [isPending, session])
+  }, [isPending, session?.user?.id])
 
   return {
     socket,
