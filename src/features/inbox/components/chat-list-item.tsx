@@ -80,12 +80,12 @@ function ChatItemHeader({
 }
 
 const MESSAGE_TYPE_LABEL: Partial<Record<MessageType, { label: string; icon: React.ReactNode }>> = {
-  AUDIO:    { label: "Audio",     icon: <MicIcon className="w-3 h-3" /> },
-  IMAGE:    { label: "Imagen",    icon: <ImageIcon className="w-3 h-3" /> },
-  VIDEO:    { label: "Video",     icon: <VideoIcon className="w-3 h-3" /> },
-  DOCUMENT: { label: "Documento", icon: <FileIcon className="w-3 h-3" /> },
-  STICKER:  { label: "Sticker",   icon: <SmileIcon className="w-3 h-3" /> },
-  LOCATION: { label: "Ubicación", icon: <MapPinIcon className="w-3 h-3" /> },
+  AUDIO:    { label: "Audio",     icon: <MicIcon className="w-4 h-4" /> },
+  IMAGE:    { label: "Imagen",    icon: <ImageIcon className="w-4 h-4" /> },
+  VIDEO:    { label: "Video",     icon: <VideoIcon className="w-4 h-4" /> },
+  DOCUMENT: { label: "Documento", icon: <FileIcon className="w-4 h-4" /> },
+  STICKER:  { label: "Sticker",   icon: <SmileIcon className="w-4 h-4" /> },
+  LOCATION: { label: "Ubicación", icon: <MapPinIcon className="w-4 h-4" /> },
 };
 
 function ChatItemLastMessage({

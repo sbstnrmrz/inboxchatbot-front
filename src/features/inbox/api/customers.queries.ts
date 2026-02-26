@@ -26,4 +26,8 @@ export const customersQueries = {
       query ? `/customers?${query}` : "/customers",
     )
   },
+
+  /** Fetch a single customer by ID. */
+  getById: (id: string): Promise<Customer> =>
+    apiClient.get<Customer>(`/customers/${id}`),
 }

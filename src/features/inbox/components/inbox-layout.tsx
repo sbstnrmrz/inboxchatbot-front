@@ -14,6 +14,7 @@ import { useSocket } from '@/features/sockets/hooks/useSocket';
 import { useInitialSync } from '@/features/inbox/hooks/useInitialSync';
 import { useMessageEvents } from '@/features/inbox/hooks/useMessageEvents';
 import { useConversationReadEvent } from '@/features/inbox/hooks/useConversationReadEvent';
+import { useConversationEvents } from '@/features/inbox/hooks/useConversationEvents';
 import { ChatLayout } from './chat-layout';
 import { ChatMain } from './chat-main';
 import { ChatList } from './chat-list';
@@ -44,6 +45,9 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
 
   // Listen for real-time message events and persist them into IndexedDB
   useMessageEvents({ socket });
+
+  // Listen for real-time conversation events (created, updated, deleted)
+  useConversationEvents({ socket });
 
   // Emit conversation_read when a conversation is selected and listen for
   // re-broadcasts from the server to keep the unread badge in sync.
