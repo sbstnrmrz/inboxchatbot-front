@@ -30,7 +30,7 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false }:
   const messages = useLiveMessages(conversationId)
 
   // Read botEnabled and channel from the live conversation in IndexedDB
-  const conversations = useLiveConversations()
+  const { conversations } = useLiveConversations()
   const conversation = conversations.find((c) => c.id === conversationId)
   const botEnabled = conversation?.botEnabled ?? false
   const channel = conversation?.channel ?? "WHATSAPP"
