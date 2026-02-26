@@ -15,7 +15,7 @@ type ChannelFilterValue = ConversationChannel | "ALL";
 
 
 export const ChatList = ({onChatSelected, selectedConversationId}: ChatListProps) => {
-  const conversations = useLiveConversations();
+  const { conversations, isLoading } = useLiveConversations();
   const [channelFilter, setChannelFilter] = useState<ChannelFilterValue>("ALL");
 
   const filteredConversations = useMemo(() => {
@@ -63,18 +63,18 @@ export const ChatList = ({onChatSelected, selectedConversationId}: ChatListProps
         <ChannelFilters value={channelFilter} onValueChange={setChannelFilter}/>
       </div>
       <div className='flex flex-col w-full h-full p-2 overflow-y-auto gap-2'>
-        {filteredConversations.length > 0 
-          ?
-          filteredConversations.map((conv) => (
-            <ChatListItem 
-              key={conv.id}
-              conversation={conv}
-              isSelected={selectedConversationId === conv.id}
-              onClick={onChatSelected}
-            />
-          ))
-          :
-          <ChatLoading/>
+        {isLoading
+          ? <ChatLoading/>
+          : filteredConversations.length > 0
+            ? filteredConversations.map((conv) => (
+                <ChatListItem 
+                  key={conv.id}
+                  conversation={conv}
+                  isSelected={selectedConversationId === conv.id}
+                  onClick={onChatSelected}
+                />
+              ))
+            : <EmptyConversations/>
         }
       </div>
     </>
@@ -86,6 +86,14 @@ function ChatLoading() {
     <div className='flex flex-col gap-2 h-full my-auto items-center justify-center text-gray-500'>
       <Spinner className='size-16 ' />
       <span>Cargando chats</span>
+    </div>
+  )
+}
+
+function EmptyConversations() {
+  return (
+    <div className='flex flex-col gap-2 h-full my-auto items-center justify-center text-gray-500'>
+      <span>No existen conversaciones</span>
     </div>
   )
 }

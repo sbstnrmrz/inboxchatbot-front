@@ -13,17 +13,25 @@ import { conversationsRepository } from "@/lib/db/repositories/conversations.rep
 import { useAuth } from "@/features/auth/context"
 import type { CachedConversation } from "@/lib/db/schema"
 
-export function useLiveConversations(): CachedConversation[] {
+interface UseLiveConversationsResult {
+  conversations: CachedConversation[]
+  isLoading: boolean
+}
+
+export function useLiveConversations(): UseLiveConversationsResult {
   const { session } = useAuth()
   const tenantId = (session?.user as any)?.tenantId as string | undefined
 
-  return (
-    useLiveQuery(
-      () =>
-        tenantId
-          ? conversationsRepository.getAllByTenant(tenantId)
-          : Promise.resolve([]),
-      [tenantId],
-    ) ?? []
+  const result = useLiveQuery(
+    () =>
+      tenantId
+        ? conversationsRepository.getAllByTenant(tenantId)
+        : Promise.resolve([]),
+    [tenantId],
   )
+
+  return {
+    conversations: result ?? [],
+    isLoading: result === undefined,
+  }
 }

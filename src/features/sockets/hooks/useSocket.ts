@@ -4,6 +4,7 @@ import { logger } from "@/lib/logger";
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from 'socket.io-client';
 import { MessageEvent, SocketEvents } from "../types/events";
+import { toast } from "sonner";
 
 const URL = env.VITE_API_URL;
 const PATH = URL.includes('/api') ? '/api/socket' : '/socket';
@@ -36,11 +37,13 @@ export function useSocket() {
 
     function onConnect() {
       logger.log('✅ Socket connected:', newSocket.id);
+      toast.success('Conectado al servidor');
       setIsConnected(true);
       setIsReconnecting(false);
     }
     function onDisconnect(reason: Socket.DisconnectReason) {
       logger.log('🔴 Socket disconnected:', reason);
+      toast.error('Error conectando al servidor');
       setIsConnected(false);
     }
 
