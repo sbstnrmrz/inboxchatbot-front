@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { CachedConversation, CachedMessage } from "@/lib/db";
 import { messagesRepository } from "@/lib/db/repositories/messages.repository";
 import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer";
+import type { MessageType } from "@/types/message.type";
+import { MicIcon, ImageIcon, VideoIcon, FileIcon, MapPinIcon, SmileIcon } from "lucide-react";
 
 interface ChatListItemProps {
   conversation: CachedConversation;
@@ -77,6 +79,15 @@ function ChatItemHeader({
   );
 }
 
+const MESSAGE_TYPE_LABEL: Partial<Record<MessageType, { label: string; icon: React.ReactNode }>> = {
+  AUDIO:    { label: "Audio",     icon: <MicIcon className="w-3 h-3" /> },
+  IMAGE:    { label: "Imagen",    icon: <ImageIcon className="w-3 h-3" /> },
+  VIDEO:    { label: "Video",     icon: <VideoIcon className="w-3 h-3" /> },
+  DOCUMENT: { label: "Documento", icon: <FileIcon className="w-3 h-3" /> },
+  STICKER:  { label: "Sticker",   icon: <SmileIcon className="w-3 h-3" /> },
+  LOCATION: { label: "Ubicación", icon: <MapPinIcon className="w-3 h-3" /> },
+};
+
 function ChatItemLastMessage({
   message,
   preview,
@@ -88,7 +99,8 @@ function ChatItemLastMessage({
   channel: string;
   unreadCount: number;
 }) {
-  const text = message?.body ?? preview ?? "";
+  const mediaLabel = message?.messageType ? MESSAGE_TYPE_LABEL[message.messageType] : undefined;
+  const text = message?.body || (!mediaLabel ? (preview ?? "") : "");
 
   const ChannelIcon =
     channel === "INSTAGRAM" ? (
@@ -101,7 +113,14 @@ function ChatItemLastMessage({
     <div className="flex w-full items-center justify-between gap-1">
       <div className="flex items-center gap-1 min-w-0">
         {ChannelIcon}
-        <span className="text-sm text-gray-500 truncate">{text}</span>
+        {mediaLabel && !message?.body ? (
+          <span className="flex items-center gap-1 text-sm text-gray-500 shrink-0">
+            {mediaLabel.icon}
+            {mediaLabel.label}
+          </span>
+        ) : (
+          <span className="text-sm text-gray-500 truncate">{text}</span>
+        )}
       </div>
       {unreadCount > 0 && (
         <span className="shrink-0 bg-green-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
