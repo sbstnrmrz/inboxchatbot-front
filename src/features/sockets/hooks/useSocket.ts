@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { io, Socket } from 'socket.io-client';
 import { MessageEvent, SocketEvents } from "../types/events";
 
-const URL = env.VITE_API_URL
-const PATH = '/socket'
+const URL = env.VITE_API_URL;
+const PATH = URL.includes('/api') ? '/api/socket' : '/socket';
 
 export function useSocket() {
   const [socket, setSocket] = useState<Socket | null>(null);
