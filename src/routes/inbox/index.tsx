@@ -22,6 +22,13 @@ export const Route = createFileRoute('/inbox/')({
       throw redirect({ to: '/auth/login' })
     }
 
+    const role = (data.user as any)?.role as string | undefined
+
+    // Superadmin no debe ir al inbox del tenant
+    if (role === 'superadmin') {
+      throw redirect({ to: '/admin/dashboard' })
+    }
+
     const baseDomain = env.VITE_BASE_DOMAIN
     const currentHost = window.location.host
 
