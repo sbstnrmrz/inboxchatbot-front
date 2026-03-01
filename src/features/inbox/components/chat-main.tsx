@@ -67,9 +67,19 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false }:
           ) : messages.length === 0 ? (
             <MessagesEmpty />
           ) : (
-            messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))
+            messages.map((message, index) => {
+              const prevMessage = messages[index - 1]
+              const currentDay = new Date(message.sentAt).toDateString()
+              const prevDay = prevMessage ? new Date(prevMessage.sentAt).toDateString() : null
+              const showSeparator = currentDay !== prevDay
+
+              return (
+                <div key={message.id} className="flex flex-col gap-4">
+                  {showSeparator && <DateSeparator date={new Date(message.sentAt)} />}
+                  <MessageBubble message={message} />
+                </div>
+              )
+            })
           )}
           <div ref={bottomRef} />
         </div>
@@ -122,12 +132,28 @@ function MessagesEmpty() {
   )
 }
 
-function DateSeparator() {
+function DateSeparator({ date }: { date: Date }) {
+  const now = new Date()
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const startOfYesterday = new Date(startOfToday.getTime() - 86_400_000)
+  const startOfYear = new Date(now.getFullYear(), 0, 1)
+
+  let label: string
+  if (date >= startOfToday) {
+    label = "Hoy"
+  } else if (date >= startOfYesterday) {
+    label = "Ayer"
+  } else if (date >= startOfYear) {
+    label = new Intl.DateTimeFormat("es-VE", { weekday: "long", day: "numeric", month: "long" }).format(date)
+  } else {
+    label = new Intl.DateTimeFormat("es-VE", { day: "numeric", month: "long", year: "numeric" }).format(date)
+  }
+
   return (
-    <div className="flex justify-between items-center text-sm">
-      <span className="flex w-full h-[1px] bg-black"></span>
-      <span className="px-4 shrink-0">{new Date().toLocaleString()}</span>
-      <span className="flex w-full h-[1px] bg-black"></span>
+    <div className="flex items-center gap-3 py-1">
+      <span className="flex-1 h-px bg-gray-200" />
+      <span className="text-xs text-gray-400 font-medium shrink-0 capitalize">{label}</span>
+      <span className="flex-1 h-px bg-gray-200" />
     </div>
   )
 }
