@@ -33,6 +33,10 @@ export const conversationsQueries = {
     )
   },
 
+  /** Fetch a single conversation by ID. */
+  getById: (id: string): Promise<Conversation> =>
+    apiClient.get<Conversation>(`/conversations/${id}`),
+
   /**
    * Toggle the bot on/off for a conversation.
    * Returns { botEnabled, botDisabledAt } — not the full conversation.

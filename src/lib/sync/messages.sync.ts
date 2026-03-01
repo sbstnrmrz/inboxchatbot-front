@@ -6,6 +6,7 @@
  */
 
 import { messagesRepository } from "@/lib/db/repositories/messages.repository"
+import { conversationsRepository } from "@/lib/db/repositories/conversations.repository"
 import { mapMessageToCache, mapMessagesToCache } from "@/lib/sync/mappers"
 import type { Message, MessageStatus } from "@/types/message.type"
 
@@ -21,10 +22,18 @@ export async function syncMessages(messages: Message[]): Promise<void> {
 
 /**
  * Persist a single message (e.g. received via `message_received` socket event).
+ * Also patches the conversation's lastMessageAt so the inbox list re-sorts
+ * immediately without waiting for the next server refetch.
  */
 export async function syncMessage(message: Message): Promise<void> {
   const cached = mapMessageToCache(message)
   await messagesRepository.upsert(cached)
+
+  // Keep inbox order up-to-date in real time
+  const sentAt = new Date(message.sentAt)
+  await conversationsRepository.patch(message.conversationId, {
+    lastMessageAt: sentAt,
+  })
 }
 
 /**

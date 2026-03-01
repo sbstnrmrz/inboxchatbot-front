@@ -40,7 +40,7 @@ export function useConversationEvents({ socket }: UseConversationEventsOptions) 
       // Fetch the customer if not already cached
       const cached = await customersRepository.getById(data.customerId).catch(() => undefined)
       if (!cached) {
-        customersQueries
+        await customersQueries
           .getById(data.customerId)
           .then((customer) => syncCustomer(customer))
           .catch((err) => logger.error("[useConversationEvents] failed to fetch customer", err))

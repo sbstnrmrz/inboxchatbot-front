@@ -56,6 +56,35 @@ export function ChatListItem({ conversation, isSelected, onClick }: ChatListItem
   );
 }
 
+function formatMessageDate(date: Date): string {
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfYesterday = new Date(startOfToday.getTime() - 86_400_000);
+  const startOfWeek = new Date(startOfToday.getTime() - (now.getDay() || 7) * 86_400_000);
+
+  if (date >= startOfToday) {
+    return new Intl.DateTimeFormat("es-VE", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(date);
+  }
+
+  if (date >= startOfYesterday) {
+    return "Ayer";
+  }
+
+  if (date >= startOfWeek) {
+    return new Intl.DateTimeFormat("es-VE", { weekday: "short" }).format(date);
+  }
+
+  return new Intl.DateTimeFormat("es-VE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  }).format(date);
+}
+
 function ChatItemHeader({
   customerName,
   lastMessageAt,
@@ -64,11 +93,7 @@ function ChatItemHeader({
   lastMessageAt?: Date;
 }) {
   const formatted = lastMessageAt
-    ? new Intl.DateTimeFormat("es-VE", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      }).format(lastMessageAt)
+    ? formatMessageDate(lastMessageAt)
     : "";
 
   return (

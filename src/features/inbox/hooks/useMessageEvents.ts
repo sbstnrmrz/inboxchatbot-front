@@ -19,6 +19,12 @@ import { useQueryClient } from "@tanstack/react-query"
 import { Socket } from "socket.io-client"
 import { MessageEvent } from "@/features/sockets/types/events"
 import { syncMessage } from "@/lib/sync"
+import { syncConversation } from "@/lib/sync/conversations.sync"
+import { syncCustomer } from "@/lib/sync/customers.sync"
+import { conversationsRepository } from "@/lib/db/repositories/conversations.repository"
+import { customersRepository } from "@/lib/db/repositories/customers.repository"
+import { conversationsQueries } from "@/features/inbox/api/conversations.queries"
+import { customersQueries } from "@/features/inbox/api/customers.queries"
 import { queryKeys } from "@/lib/query-keys"
 import { logger } from "@/lib/logger"
 import type { Message } from "@/types/message.type"
@@ -33,8 +39,40 @@ export function useMessageEvents({ socket }: UseMessageEventsOptions) {
   useEffect(() => {
     if (!socket) return
 
-    const handleMessageReceived = (data: Message) => {
+    const handleMessageReceived = async (data: Message) => {
       logger.debug("[useMessageEvents] message_received", data)
+
+      // If the conversation isn't cached yet (new conversation arriving via
+      // message_received before any conversation_created event), fetch it and
+      // its customer so the inbox renders names instead of raw IDs.
+      const cachedConversation = await conversationsRepository
+        .getById(data.conversationId)
+        .catch(() => undefined)
+
+      if (!cachedConversation) {
+        logger.debug("[useMessageEvents] conversation not cached, fetching", data.conversationId)
+        const conversation = await conversationsQueries
+          .getById(data.conversationId)
+          .catch((err) => {
+            logger.error("[useMessageEvents] failed to fetch conversation", err)
+            return undefined
+          })
+
+        if (conversation) {
+          await syncConversation(conversation).catch(console.error)
+
+          const cachedCustomer = await customersRepository
+            .getById(conversation.customerId)
+            .catch(() => undefined)
+
+          if (!cachedCustomer) {
+            await customersQueries
+              .getById(conversation.customerId)
+              .then((customer) => syncCustomer(customer))
+              .catch((err) => logger.error("[useMessageEvents] failed to fetch customer", err))
+          }
+        }
+      }
 
       // Persist into IndexedDB — useLiveMessages will re-render automatically
       syncMessage(data).catch(console.error)
