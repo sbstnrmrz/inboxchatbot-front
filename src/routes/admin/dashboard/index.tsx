@@ -1,10 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 export const Route = createFileRoute('/admin/dashboard/')({
   component: DashboardPage,
 })
 
 function DashboardPage() {
+  usePageTitle('Dashboard')
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
       <div className="grid auto-rows-min gap-4 md:grid-cols-3">

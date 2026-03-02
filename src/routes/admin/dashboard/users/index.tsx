@@ -1,12 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { UsersTable } from '@/features/admin/components/users/UsersTable'
 import { CreateUserModal } from '@/features/admin/components/users/CreateUserModal'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 export const Route = createFileRoute('/admin/dashboard/users/')({
   component: Users,
 })
 
 function Users() {
+  usePageTitle('Usuarios')
   return (
     <div className="flex flex-col gap-6 p-6">
       <div className="flex items-center justify-between">

@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { authClient } from "@/lib/auth-client"
 
 export const Route = createFileRoute('/auth/login')({
+  head: () => ({ meta: [{ title: 'Iniciar sesión' }] }),
   beforeLoad: async () => {
     const { data } = await authClient.getSession()
     if (data) {

@@ -5,6 +5,7 @@ import { tenantsQueries } from '@/features/admin/api/tenants.queries'
 import { getTenantInboxUrl } from '@/features/auth/utils/getRedirectPath'
 import { logger } from '@/lib/logger'
 import { env } from '@/lib/env'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import z from 'zod'
 
 
@@ -47,7 +48,7 @@ export const Route = createFileRoute('/inbox/')({
 function Inbox() {
   const { conversationId } = Route.useSearch()
   logger.debug('conversation id: ' + conversationId);
-
+  usePageTitle('Inbox')
 
   return (
     <InboxLayout conversationId={conversationId}/>
