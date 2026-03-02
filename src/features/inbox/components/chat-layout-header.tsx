@@ -1,7 +1,6 @@
 import { useState, type Dispatch, type SetStateAction } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +9,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { conversationsRepository } from "@/lib/db/repositories/conversations.repository"
 import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer"
-import { EllipsisVerticalIcon, InfoIcon, ShieldOffIcon } from "lucide-react"
+import { useBlockCustomer } from "@/features/inbox/hooks/useBlockCustomer"
+import type { CachedCustomer } from "@/lib/db"
+import { EllipsisVerticalIcon, InfoIcon, ShieldCheckIcon, ShieldOffIcon } from "lucide-react"
 
 interface ChatLayoutHeaderProps {
   conversationId: string;
@@ -18,8 +19,6 @@ interface ChatLayoutHeaderProps {
 }
 
 export const ChatLayoutHeader = ({ conversationId, onShowContactDetails }: ChatLayoutHeaderProps) => {
-  const [customerInfoOpen, setCustomerInfoOpen] = useState(false)
-
   const conversation = useLiveQuery(
     () => conversationsRepository.getById(conversationId),
     [conversationId],
@@ -49,14 +48,27 @@ export const ChatLayoutHeader = ({ conversationId, onShowContactDetails }: ChatL
           >
             <InfoIcon className="stroke-black w-5 h-5" />
           </button>
-          <ChatOptionsDropdown/>
+          <ChatOptionsDropdown customer={customer} />
         </div>
       </div>
     </div>
   )
 }
 
-function ChatOptionsDropdown() {
+function ChatOptionsDropdown({ customer }: { customer: CachedCustomer | undefined }) {
+  const { block, unblock } = useBlockCustomer()
+  const isBlocked = customer?.isBlocked ?? false
+  const isPending = block.isPending || unblock.isPending
+
+  const handleToggleBlock = () => {
+    if (!customer) return
+    if (isBlocked) {
+      unblock.mutate(customer.id)
+    } else {
+      block.mutate(customer.id)
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -67,13 +79,15 @@ function ChatOptionsDropdown() {
       <DropdownMenuContent align="end">
         <DropdownMenuItem
           className="text-destructive focus:text-destructive"
-          onSelect={() => {/* TODO: block customer */}}
+          disabled={!customer || isPending}
+          onSelect={handleToggleBlock}
         >
-          <ShieldOffIcon className="w-4 h-4" />
-          Bloquear contacto
+          {isBlocked
+            ? <><ShieldCheckIcon className="w-4 h-4" /> Desbloquear contacto</>
+            : <><ShieldOffIcon className="w-4 h-4" /> Bloquear contacto</>
+          }
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
 }
-

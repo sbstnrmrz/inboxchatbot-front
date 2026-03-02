@@ -6,7 +6,7 @@ import type { CachedConversation, CachedMessage } from "@/lib/db";
 import { messagesRepository } from "@/lib/db/repositories/messages.repository";
 import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer";
 import type { MessageType } from "@/types/message.type";
-import { MicIcon, ImageIcon, VideoIcon, FileIcon, MapPinIcon, SmileIcon } from "lucide-react";
+import { MicIcon, ImageIcon, VideoIcon, FileIcon, MapPinIcon, SmileIcon, HandIcon, BanIcon } from "lucide-react";
 
 interface ChatListItemProps {
   conversation: CachedConversation;
@@ -51,6 +51,13 @@ export function ChatListItem({ conversation, isSelected, onClick }: ChatListItem
             unreadCount={unreadCount}
           />
         </div>
+      </div>
+      <div className="flex text-sm text-white mt-2 justify-between items-center">
+        <div></div>
+        <ChatStatuses 
+          requestingAgent={conversation.requestingAgent}
+          isBlocked={customer?.isBlocked || false}
+        />
       </div>
     </div>
   );
@@ -154,4 +161,22 @@ function ChatItemLastMessage({
       )}
     </div>
   );
+}
+
+function ChatStatuses({requestingAgent, isBlocked}: {requestingAgent: boolean; isBlocked: boolean}) {
+  return (
+    <div className="flex gap-0.3 items-center">
+      {requestingAgent && <HandIcon className="rounded-full bg-blue-400 w-6 h-6 p-1"/>}
+      {isBlocked && <BanIcon className="rounded-full text-red-400  w-7 h-7 p-1"/>} 
+    </div>
+  )
+}
+
+function ChatLabels() {
+  return (
+    <div className="py-1 px-2 rounded-full bg-blue-400">
+      Lead 
+    </div>
+  )
+
 }

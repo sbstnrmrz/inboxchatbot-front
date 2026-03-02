@@ -30,4 +30,12 @@ export const customersQueries = {
   /** Fetch a single customer by ID. */
   getById: (id: string): Promise<Customer> =>
     apiClient.get<Customer>(`/customers/${id}`),
+
+  /** Block a customer. */
+  block: (id: string): Promise<Customer> =>
+    apiClient.patch<Customer>(`/customers/${id}/block`),
+
+  /** Unblock a customer. */
+  unblock: (id: string): Promise<Customer> =>
+    apiClient.patch<Customer>(`/customers/${id}/unblock`),
 }

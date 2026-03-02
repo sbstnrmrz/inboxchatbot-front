@@ -17,6 +17,7 @@ export enum SocketEvents {
 
 export enum ConversationEvent {
   Read = 'conversation_read',
+  RequestAgent = 'request_agent',
 }
 
 export enum MessageEvent {
