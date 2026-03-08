@@ -16,6 +16,7 @@ import { useMessageEvents } from '@/features/inbox/hooks/useMessageEvents';
 import { useConversationReadEvent } from '@/features/inbox/hooks/useConversationReadEvent';
 import { useConversationEvents } from '@/features/inbox/hooks/useConversationEvents';
 import { useRequestAgentEvent } from '@/features/inbox/hooks/useRequestAgentEvent';
+import { useDismissAgentEvent } from '@/features/inbox/hooks/useDismissAgentEvent';
 import { ChatLayout } from './chat-layout';
 import { ChatMain } from './chat-main';
 import { ChatList } from './chat-list';
@@ -57,6 +58,9 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
   // Listen for request_agent events — patches IndexedDB and shows a toast
   // that allows the agent to navigate directly to the conversation.
   useRequestAgentEvent({ socket });
+
+  // Listen for dismiss_agent events — clears requestingAgent flag in IndexedDB.
+  useDismissAgentEvent({ socket });
 
   return (
     <>

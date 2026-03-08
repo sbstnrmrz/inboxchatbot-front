@@ -43,4 +43,11 @@ export const conversationsQueries = {
    */
   toggleBot: (conversationId: string): Promise<ToggleBotResponse> =>
     apiClient.patch<ToggleBotResponse>(`/conversations/${conversationId}/toggle-bot`),
+
+  /**
+   * Dismiss the agent request for a conversation.
+   * Clears the `requestingAgent` flag on the conversation.
+   */
+  dismissAgent: (conversationId: string): Promise<void> =>
+    apiClient.patch<void>(`/conversations/${conversationId}/dismiss-agent`),
 }

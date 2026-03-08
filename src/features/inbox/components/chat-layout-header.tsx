@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type SetStateAction } from "react"
+import { type Dispatch, type SetStateAction } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -10,8 +10,10 @@ import {
 import { conversationsRepository } from "@/lib/db/repositories/conversations.repository"
 import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer"
 import { useBlockCustomer } from "@/features/inbox/hooks/useBlockCustomer"
+import { useDismissAgent } from "@/features/inbox/hooks/useDismissAgent"
 import type { CachedCustomer } from "@/lib/db"
-import { EllipsisVerticalIcon, InfoIcon, ShieldCheckIcon, ShieldOffIcon } from "lucide-react"
+import { EllipsisVerticalIcon, HandIcon, InfoIcon, ShieldCheckIcon, ShieldOffIcon } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface ChatLayoutHeaderProps {
   conversationId: string;
@@ -25,8 +27,10 @@ export const ChatLayoutHeader = ({ conversationId, onShowContactDetails }: ChatL
   )
 
   const customer = useLiveCustomer(conversation?.customerId)
+  const dismissAgent = useDismissAgent(conversationId)
 
   const displayName = customer?.name ?? conversation?.customerId ?? ""
+  const isRequestingAgent = conversation?.requestingAgent ?? false
 
   return (
     <div className="flex items-center px-4 py-1 w-full h-[52px] border-b-1 bg-white shadow-sm">
@@ -42,6 +46,22 @@ export const ChatLayoutHeader = ({ conversationId, onShowContactDetails }: ChatL
         </div>
 
         <div className="flex items-center gap-1">
+          {isRequestingAgent && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  className="cursor-pointer p-1 hover:bg-secondary-white rounded-sm"
+                  disabled={dismissAgent.isPending}
+                  onClick={() => dismissAgent.mutate()}
+                >
+                  <HandIcon className="stroke-black w-5 h-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>Marcar como atendido</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
           <button
             className="p-1 hover:bg-secondary-white rounded-sm"
             onClick={() => onShowContactDetails(prev => !prev)}
