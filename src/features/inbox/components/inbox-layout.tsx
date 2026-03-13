@@ -43,7 +43,7 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
   logger.debug('selected conversationId: ' + selectedConversationId);
 
   // Trigger initial sync as soon as the session is confirmed
-  useInitialSync({ enabled: !isPending && !!session });
+  const { hasNextPage, fetchNextPage, isFetchingNextPage } = useInitialSync({ enabled: !isPending && !!session });
 
   // Listen for real-time message events and persist them into IndexedDB
   useMessageEvents({ socket });
@@ -77,7 +77,13 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
         <div className="flex items-center p-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">
           <SearchFilter value={searchQuery} onChange={setSearchQuery} />
         </div>
-        <ChatList onChatSelected={setSelectedConversationId} selectedConversationId={selectedConversationId}/>
+        <ChatList
+          onChatSelected={setSelectedConversationId}
+          selectedConversationId={selectedConversationId}
+          hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+        />
         <SidebarContent>
         </SidebarContent>
         <SidebarFooter>

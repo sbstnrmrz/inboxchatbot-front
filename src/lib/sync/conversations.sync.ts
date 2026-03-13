@@ -59,6 +59,32 @@ export async function syncConversations(conversations: Conversation[]): Promise<
 }
 
 /**
+ * Persist a page of conversations (pagination — NOT the first page).
+ * Only upserts — never removes stale rows, so previously loaded pages
+ * are preserved in the local cache.
+ *
+ * Call this for all pages after the first; use `syncConversations` for
+ * the initial page which handles stale-deletion.
+ */
+export async function syncConversationsPage(conversations: Conversation[]): Promise<void> {
+  if (conversations.length === 0) return
+
+  await db.transaction("rw", db.conversations, db.messages, async () => {
+    const cachedConversations = mapConversationsToCache(conversations)
+    await db.conversations.bulkPut(cachedConversations)
+
+    const lastMessages = conversations
+      .map((c) => c.lastMessage)
+      .filter((m): m is NonNullable<typeof m> => !!m)
+      .map(mapMessageToCache)
+
+    if (lastMessages.length > 0) {
+      await db.messages.bulkPut(lastMessages)
+    }
+  })
+}
+
+/**
  * Persist a single conversation (e.g. received via socket event).
  * Also persists its lastMessage if populated.
  */

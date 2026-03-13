@@ -14,6 +14,7 @@ export {
 export {
   syncConversation,
   syncConversations,
+  syncConversationsPage,
   removeConversation,
   patchConversation,
 } from "@/lib/sync/conversations.sync"

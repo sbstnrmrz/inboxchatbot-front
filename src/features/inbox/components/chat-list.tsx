@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { FetchNextPageOptions } from '@tanstack/react-query';
 import { ChatListItem } from './chat-list-item';
 import { Spinner } from '@/components/ui/spinner';
 import { useLiveConversations } from '../hooks/useLiveConversations';
@@ -9,14 +10,43 @@ import { ChannelFilters } from './ChannelFilters';
 interface ChatListProps {
   onChatSelected: (conversationId: string) => void;
   selectedConversationId?: string | null;
+  hasNextPage?: boolean;
+  fetchNextPage?: (options?: FetchNextPageOptions) => void;
+  isFetchingNextPage?: boolean;
 }
 
 type ChannelFilterValue = ConversationChannel | "ALL";
 
 
-export const ChatList = ({onChatSelected, selectedConversationId}: ChatListProps) => {
+export const ChatList = ({
+  onChatSelected,
+  selectedConversationId,
+  hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage,
+}: ChatListProps) => {
   const { conversations, isLoading } = useLiveConversations();
   const [channelFilter, setChannelFilter] = useState<ChannelFilterValue>("ALL");
+
+  // Sentinel element at the bottom — triggers next page load when visible
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !fetchNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   const filteredConversations = useMemo(() => {
     let filtered = conversations;
@@ -25,28 +55,6 @@ export const ChatList = ({onChatSelected, selectedConversationId}: ChatListProps
     if (channelFilter !== "ALL") {
       filtered = filtered.filter(conv => conv.channel === channelFilter);
     }
-    
-//  // Filter by agent request status
-//  if (agentRequestFilter === "REQUESTING_AGENT") {
-//    filtered = filtered.filter(conv => conv.requestingAgent === true);
-//  }
-//  
-//  // Filter by search query
-//  if (searchQuery.trim()) {
-//    const query = searchQuery.toLowerCase().trim();
-//    filtered = filtered.filter(conv => {
-//      // Search in customer name
-//      const nameMatch = conv.customer?.name?.toLowerCase().includes(query) || false;
-//      
-//      // Search in last message content
-//      const messageMatch = conv.lastMessage?.content?.toLowerCase().includes(query) || false;
-//      
-//      // Search in tags
-//      const tagsMatch = conv.tags?.some(tag => tag.toLowerCase().includes(query)) || false;
-//      
-//      return nameMatch || messageMatch || tagsMatch;
-//    });
-//  }
     
     return filtered;
   }, [conversations, channelFilter]);
@@ -66,14 +74,27 @@ export const ChatList = ({onChatSelected, selectedConversationId}: ChatListProps
         {isLoading
           ? <ChatLoading/>
           : filteredConversations.length > 0
-            ? filteredConversations.map((conv) => (
-                <ChatListItem 
-                  key={conv.id}
-                  conversation={conv}
-                  isSelected={selectedConversationId === conv.id}
-                  onClick={onChatSelected}
-                />
-              ))
+            ? (
+              <>
+                {filteredConversations.map((conv) => (
+                  <ChatListItem 
+                    key={conv.id}
+                    conversation={conv}
+                    isSelected={selectedConversationId === conv.id}
+                    onClick={onChatSelected}
+                  />
+                ))}
+
+                {/* Sentinel — watched by IntersectionObserver to load next page */}
+                <div ref={sentinelRef} className="h-1 shrink-0" />
+
+                {isFetchingNextPage && (
+                  <div className="flex justify-center py-2">
+                    <Spinner className="size-5" />
+                  </div>
+                )}
+              </>
+            )
             : <EmptyConversations/>
         }
       </div>
@@ -97,4 +118,3 @@ function EmptyConversations() {
     </div>
   )
 }
-
