@@ -28,25 +28,44 @@ export const ChatList = ({
   const { conversations, isLoading } = useLiveConversations();
   const [channelFilter, setChannelFilter] = useState<ChannelFilterValue>("ALL");
 
-  // Sentinel element at the bottom — triggers next page load when visible
+  // Keep latest values accessible inside the observer callback without
+  // recreating the observer on every render.
+  const hasNextPageRef = useRef(hasNextPage);
+  const isFetchingRef = useRef(isFetchingNextPage);
+  const fetchNextPageRef = useRef(fetchNextPage);
+  hasNextPageRef.current = hasNextPage;
+  isFetchingRef.current = isFetchingNextPage;
+  fetchNextPageRef.current = fetchNextPage;
+
+  // The scrollable list container — used as the IntersectionObserver root
+  // so the observer measures visibility relative to this div, not the document viewport.
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel || !fetchNextPage) return;
+    const sentinel = scrollContainerRef.current;
+    if (!sentinel) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
+        if (
+          entries[0].isIntersecting &&
+          hasNextPageRef.current &&
+          !isFetchingRef.current
+        ) {
+          fetchNextPageRef.current?.();
         }
       },
-      { threshold: 0.1 },
+      // root = the scrollable div; sentinel is measured relative to it
+      { root: sentinel, threshold: 0 },
     );
 
-    observer.observe(sentinel);
+    const sentinelEl = sentinelRef.current;
+    if (sentinelEl) observer.observe(sentinelEl);
+
     return () => observer.disconnect();
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filteredConversations = useMemo(() => {
     let filtered = conversations;
@@ -70,7 +89,7 @@ export const ChatList = ({
         <span className='text-sm mr-2'>Filtrar por</span>
         <ChannelFilters value={channelFilter} onValueChange={setChannelFilter}/>
       </div>
-      <div className='flex flex-col w-full h-full p-2 overflow-y-auto gap-2'>
+      <div ref={scrollContainerRef} className='flex flex-col w-full h-full p-2 overflow-y-auto gap-2'>
         {isLoading
           ? <ChatLoading/>
           : filteredConversations.length > 0
