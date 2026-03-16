@@ -39,6 +39,18 @@ export const ChatList = ({
     logger.debug('cached conversations', conversations);
   }, [conversations]);
 
+  // If the loaded items don't overflow the container yet but there are more
+  // pages available, keep fetching until the list is scrollable.
+  // This handles screens where PAGE_SIZE fits without generating a scrollbar.
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage || isLoading) return;
+    const el = document.getElementById(SCROLL_CONTAINER_ID);
+    if (!el) return;
+    if (el.scrollHeight <= el.clientHeight) {
+      fetchNextPage?.();
+    }
+  }, [filteredConversations.length, hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
+
   return (
     <>
       <div className="flex items-center px-4 py-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">

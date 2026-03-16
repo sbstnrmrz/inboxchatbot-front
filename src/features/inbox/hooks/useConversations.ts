@@ -14,7 +14,7 @@ import { conversationsQueries } from "@/features/inbox/api/conversations.queries
 import { syncConversations, syncConversationsPage } from "@/lib/sync"
 import type { Conversation } from "@/types/conversation.type"
 
-const PAGE_SIZE = 50
+const PAGE_SIZE = 10
 
 interface UseConversationsOptions {
   enabled?: boolean
@@ -26,26 +26,32 @@ export function useConversations({ enabled = true }: UseConversationsOptions = {
     enabled,
     initialPageParam: undefined as Date | undefined,
     queryFn: async ({ pageParam }) => {
-      const conversations = await conversationsQueries.list({
-        limit: PAGE_SIZE,
-        before: pageParam instanceof Date ? pageParam.toISOString() : undefined,
-      })
+      const before = pageParam instanceof Date ? pageParam.toISOString() : undefined
+      console.log('[useConversations] queryFn', { pageParam, before })
+
+      const conversations = await conversationsQueries.list({ limit: PAGE_SIZE, before })
+      console.log('[useConversations] fetched', conversations.length, 'conversations')
 
       if (pageParam === undefined) {
-        // First page: full sync — removes stale rows + upserts incoming
         syncConversations(conversations).catch(console.error)
       } else {
-        // Subsequent pages: additive upsert only, never delete
         syncConversationsPage(conversations).catch(console.error)
       }
 
       return conversations
     },
     getNextPageParam: (lastPage: Conversation[]) => {
-      if (lastPage.length < PAGE_SIZE) return undefined
-      // Cursor = lastMessageAt of the oldest conversation in this page
+      console.log('[useConversations] getNextPageParam — lastPage.length:', lastPage.length, 'PAGE_SIZE:', PAGE_SIZE)
+      if (lastPage.length < PAGE_SIZE) {
+        console.log('[useConversations] no more pages')
+        return undefined
+      }
       const last = lastPage[lastPage.length - 1]
-      return last.lastMessageAt instanceof Date ? last.lastMessageAt : undefined
+      console.log('[useConversations] last.lastMessageAt:', last.lastMessageAt, typeof last.lastMessageAt)
+      if (!last.lastMessageAt) return undefined
+      const date = new Date(last.lastMessageAt)
+      console.log('[useConversations] next cursor:', date)
+      return isNaN(date.getTime()) ? undefined : date
     },
   })
 }
