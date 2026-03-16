@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FetchNextPageOptions } from '@tanstack/react-query';
 import { ChatListItem } from './chat-list-item';
 import { Spinner } from '@/components/ui/spinner';
@@ -17,6 +17,7 @@ interface ChatListProps {
 
 type ChannelFilterValue = ConversationChannel | "ALL";
 
+const SCROLL_THRESHOLD_PX = 100;
 
 export const ChatList = ({
   onChatSelected,
@@ -28,8 +29,9 @@ export const ChatList = ({
   const { conversations, isLoading } = useLiveConversations();
   const [channelFilter, setChannelFilter] = useState<ChannelFilterValue>("ALL");
 
-  // Keep latest values accessible inside the observer callback without
-  // recreating the observer on every render.
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Keep latest values in refs so the scroll handler never goes stale
   const hasNextPageRef = useRef(hasNextPage);
   const isFetchingRef = useRef(isFetchingNextPage);
   const fetchNextPageRef = useRef(fetchNextPage);
@@ -37,51 +39,39 @@ export const ChatList = ({
   isFetchingRef.current = isFetchingNextPage;
   fetchNextPageRef.current = fetchNextPage;
 
-  // The scrollable list container — used as the IntersectionObserver root
-  // so the observer measures visibility relative to this div, not the document viewport.
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const handleScroll = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+
+    if (
+      distanceFromBottom < SCROLL_THRESHOLD_PX &&
+      hasNextPageRef.current &&
+      !isFetchingRef.current
+    ) {
+      fetchNextPageRef.current?.();
+    }
+  }, []);
 
   useEffect(() => {
-    const sentinel = scrollContainerRef.current;
-    if (!sentinel) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          hasNextPageRef.current &&
-          !isFetchingRef.current
-        ) {
-          fetchNextPageRef.current?.();
-        }
-      },
-      // root = the scrollable div; sentinel is measured relative to it
-      { root: sentinel, threshold: 0 },
-    );
-
-    const sentinelEl = sentinelRef.current;
-    if (sentinelEl) observer.observe(sentinelEl);
-
-    return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   const filteredConversations = useMemo(() => {
     let filtered = conversations;
-    
-    // Filter by channel
     if (channelFilter !== "ALL") {
       filtered = filtered.filter(conv => conv.channel === channelFilter);
     }
-    
     return filtered;
   }, [conversations, channelFilter]);
 
   useEffect(() => {
     logger.debug('cached conversations', conversations);
   }, [conversations]);
-
 
   return (
     <>
@@ -96,17 +86,13 @@ export const ChatList = ({
             ? (
               <>
                 {filteredConversations.map((conv) => (
-                  <ChatListItem 
+                  <ChatListItem
                     key={conv.id}
                     conversation={conv}
                     isSelected={selectedConversationId === conv.id}
                     onClick={onChatSelected}
                   />
                 ))}
-
-                {/* Sentinel — watched by IntersectionObserver to load next page */}
-                <div ref={sentinelRef} className="h-1 shrink-0" />
-
                 {isFetchingNextPage && (
                   <div className="flex justify-center py-2">
                     <Spinner className="size-5" />
