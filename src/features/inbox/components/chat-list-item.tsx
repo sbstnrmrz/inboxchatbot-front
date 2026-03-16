@@ -6,7 +6,8 @@ import type { CachedConversation, CachedMessage } from "@/lib/db";
 import { messagesRepository } from "@/lib/db/repositories/messages.repository";
 import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer";
 import type { MessageType } from "@/types/message.type";
-import { MicIcon, ImageIcon, VideoIcon, FileIcon, MapPinIcon, SmileIcon, HandIcon, BanIcon } from "lucide-react";
+import { MicIcon, ImageIcon, VideoIcon, FileIcon, MapPinIcon, SmileIcon, HandIcon, BanIcon, UserIcon } from "lucide-react";
+import { getAvatarBackgroundColor } from "@/utils/colors";
 
 interface ChatListItemProps {
   conversation: CachedConversation;
@@ -35,9 +36,8 @@ export function ChatListItem({ conversation, isSelected, onClick }: ChatListItem
       className={`cursor-pointer w-full p-2 rounded-lg hover:bg-secondary-white ${isSelected ? "bg-secondary-white" : "bg-white shadow-sm"}`}
     >
       <div className="flex gap-2 items-center">
-        <Avatar className="w-12 h-12">
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>CN</AvatarFallback>
+        <Avatar className={`${getAvatarBackgroundColor(customerId || id)} flex justify-center items-center w-12 h-12`}>
+          <UserIcon className="text-white"/>
         </Avatar>
         <div className="w-full min-w-0 flex flex-col justify-center">
           <ChatItemHeader

@@ -12,7 +12,8 @@ import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer"
 import { useBlockCustomer } from "@/features/inbox/hooks/useBlockCustomer"
 import { useDismissAgent } from "@/features/inbox/hooks/useDismissAgent"
 import type { CachedCustomer } from "@/lib/db"
-import { EllipsisVerticalIcon, HandIcon, InfoIcon, ShieldCheckIcon, ShieldOffIcon } from "lucide-react"
+import { EllipsisVerticalIcon, HandIcon, InfoIcon, ShieldCheckIcon, ShieldOffIcon, UserIcon } from "lucide-react"
+import { getAvatarBackgroundColor } from "@/utils/colors"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface ChatLayoutHeaderProps {
@@ -36,11 +37,9 @@ export const ChatLayoutHeader = ({ conversationId, onShowContactDetails }: ChatL
     <div className="flex items-center px-4 py-1 w-full h-[52px] border-b-1 bg-white shadow-sm">
       <div className="flex items-center gap-2 w-full justify-between">
         <div className="flex items-center gap-2">
-          <Avatar className="w-10 h-10">
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>
-              {displayName.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
+          <Avatar className={`${getAvatarBackgroundColor(conversation?.customerId ?? conversationId)} flex justify-center items-center w-10 h-10`}>
+            <UserIcon className="text-white" />
+            <AvatarFallback>{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
           <span className="text-black font-medium">{displayName}</span>
         </div>
