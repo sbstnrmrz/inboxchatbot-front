@@ -39,7 +39,6 @@ export const ChatLayoutHeader = ({ conversationId, onShowContactDetails }: ChatL
         <div className="flex items-center gap-2">
           <Avatar className={`${getAvatarBackgroundColor(conversation?.customerId ?? conversationId)} flex justify-center items-center w-10 h-10`}>
             <UserIcon className="text-white" />
-            <AvatarFallback>{displayName.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
           <span className="text-black font-medium">{displayName}</span>
         </div>

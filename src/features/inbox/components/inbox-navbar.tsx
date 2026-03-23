@@ -24,10 +24,10 @@ export const InboxNavBar = () => {
   }
 
   return (
-    <div className='flex flex-col items-center w-[52px] h-screen bg-white border-1 border-l-secondary-white '>
+    <div className='flex flex-col w-[52px] h-screen bg-white border-r border-r-secondary-white '>
       <div className='h-[52px]'>
       </div>
-      <div className='flex flex-col gap-2'>
+      <div className='flex items-center flex-col gap-2'>
         {navItems.map((item) => {
           return (
             <Tooltip>
@@ -50,8 +50,8 @@ export const InboxNavBar = () => {
       </div>
       <div className='mt-auto'>
         <DropdownMenu>
-          <DropdownMenuTrigger className="cursor-pointer w-full h-[52px] bg-white shadow-2xl border-t-1 border-t-secondary-white hover:bg-primary-white" asChild>
-            <div className="flex items-center w-full">
+          <DropdownMenuTrigger className="flex cursor-pointer w-full h-[52px] bg-white shadow-2xl  hover:bg-primary-white" asChild>
+            <div className="flex justify-center items-center w-full">
               <Avatar className="w-10 h-10">
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>
