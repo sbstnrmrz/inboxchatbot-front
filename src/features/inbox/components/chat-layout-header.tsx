@@ -1,6 +1,6 @@
 import { type Dispatch, type SetStateAction } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,16 +12,17 @@ import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer"
 import { useBlockCustomer } from "@/features/inbox/hooks/useBlockCustomer"
 import { useDismissAgent } from "@/features/inbox/hooks/useDismissAgent"
 import type { CachedCustomer } from "@/lib/db"
-import { EllipsisVerticalIcon, HandIcon, InfoIcon, ShieldCheckIcon, ShieldOffIcon, UserIcon } from "lucide-react"
+import { ArrowLeftIcon, EllipsisVerticalIcon, HandIcon, InfoIcon, ShieldCheckIcon, ShieldOffIcon, UserIcon } from "lucide-react"
 import { getAvatarBackgroundColor } from "@/utils/colors"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface ChatLayoutHeaderProps {
   conversationId: string;
   onShowContactDetails: Dispatch<SetStateAction<boolean>>;
+  onBack?: () => void;
 }
 
-export const ChatLayoutHeader = ({ conversationId, onShowContactDetails }: ChatLayoutHeaderProps) => {
+export const ChatLayoutHeader = ({ conversationId, onShowContactDetails, onBack }: ChatLayoutHeaderProps) => {
   const conversation = useLiveQuery(
     () => conversationsRepository.getById(conversationId),
     [conversationId],
@@ -37,6 +38,11 @@ export const ChatLayoutHeader = ({ conversationId, onShowContactDetails }: ChatL
     <div className="flex items-center px-4 py-1 w-full h-[52px] border-b-1 bg-white shadow-sm">
       <div className="flex items-center gap-2 w-full justify-between">
         <div className="flex items-center gap-2">
+          {onBack && (
+            <button className="p-1 hover:bg-secondary-white rounded-sm" onClick={onBack}>
+              <ArrowLeftIcon className="stroke-black w-5 h-5" />
+            </button>
+          )}
           <Avatar className={`${getAvatarBackgroundColor(conversation?.customerId ?? conversationId)} flex justify-center items-center w-10 h-10`}>
             <UserIcon className="text-white" />
           </Avatar>

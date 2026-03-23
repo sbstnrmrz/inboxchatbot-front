@@ -21,6 +21,7 @@ export function TenantsTable() {
     data: tenants,
     columns: tenantsColumns,
     getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row._id,
   })
 
   if (isError) {

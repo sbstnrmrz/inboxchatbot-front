@@ -209,7 +209,10 @@ export function EditTenantModal({ tenant, open, onOpenChange }: EditTenantModalP
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="edit-instagram-pageId">Page ID</FieldLabel>
+                <FieldLabel htmlFor="edit-instagram-pageId">
+                  Page ID{" "}
+                  <span className="text-muted-foreground font-normal">(opcional)</span>
+                </FieldLabel>
                 <Input
                   id="edit-instagram-pageId"
                   placeholder="123456789"

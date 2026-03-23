@@ -1,12 +1,11 @@
-import { useMemo, useState } from 'react';
-import { LogOutIcon, MessageCircleMoreIcon, MessageSquareIcon, MoonIcon, SunIcon, UsersIcon } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeftIcon, MessageCircleMoreIcon } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarInset,
-  SidebarProvider,
 } from '@/components/ui/sidebar';
 import { SearchFilter } from './SearchFilter';
 import { useAuth } from '@/features/auth/context';
@@ -21,24 +20,18 @@ import { ChatLayout } from './chat-layout';
 import { ChatMain } from './chat-main';
 import { ChatList } from './chat-list';
 import { ChatLayoutHeader } from './chat-layout-header';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getRouteApi, useNavigate } from '@tanstack/react-router';
-import { useTheme } from '@/hooks/use-theme';
-import { Button } from '@/components/ui/button';
-import { InboxNavBar } from './inbox-navbar';
 import { logger } from '@/lib/logger';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface InboxLayoutProps {
   conversationId?: string 
 }
 
 export function InboxLayout({conversationId}: InboxLayoutProps) {
-  const {socket, isConnected} = useSocket();
+  const {socket} = useSocket();
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(conversationId || null);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [showMobileSearch, setShowMobileSearch] = useState<boolean>(false);
-  const { session, signOut, isPending } = useAuth();
+  const { session, isPending } = useAuth();
   const [showContactDetails, setShowContactDetails] = useState(false);
   logger.debug('selected conversationId: ' + selectedConversationId);
 
@@ -62,11 +55,63 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
   // Listen for dismiss_agent events — clears requestingAgent flag in IndexedDB.
   useDismissAgentEvent({ socket });
 
+  const isMobile = useIsMobile()
+
+  if (isMobile) {
+    if (selectedConversationId && showContactDetails) {
+      return (
+        <div className="flex flex-col h-screen">
+          <div className="flex items-center gap-2 px-4 h-[52px] bg-white border-b border-secondary-white shrink-0">
+            <button className="p-1 hover:bg-secondary-white rounded-sm" onClick={() => setShowContactDetails(false)}>
+              <ArrowLeftIcon className="stroke-black w-5 h-5" />
+            </button>
+            <span className="font-semibold">Detalles del contacto</span>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            {/* TODO: contact details content */}
+          </div>
+        </div>
+      )
+    }
+
+    if (selectedConversationId) {
+      return (
+        <div className="flex flex-col h-screen">
+          <ChatLayoutHeader
+            conversationId={selectedConversationId}
+            onShowContactDetails={setShowContactDetails}
+            onBack={() => { setSelectedConversationId(null); setShowContactDetails(false) }}
+          />
+          <ChatMain
+            conversationId={selectedConversationId}
+            socket={socket}
+            showContactDetails={false}
+          />
+        </div>
+      )
+    }
+
+    return (
+      <div className="flex flex-col h-screen">
+        <div className="flex items-center px-4 h-[52px] bg-white border-b border-secondary-white shrink-0">
+          <h1 className="text-lg font-semibold">Chats</h1>
+        </div>
+        <div className="flex items-center p-2 bg-primary-white border-b border-secondary-white shrink-0">
+          <SearchFilter value={searchQuery} onChange={setSearchQuery} />
+        </div>
+        <ChatList
+          onChatSelected={setSelectedConversationId}
+          selectedConversationId={selectedConversationId}
+          hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+        />
+      </div>
+    )
+  }
+
   return (
     <>
-      {/* Vista móvil - solo lista O chat */}
-
-
       {/* Vista desktop - sidebar + chat */}
       <Sidebar collapsible="icon" className="flex border-r">
         <SidebarHeader className='bg-primary-white border-b border-secondary-white min-h-[52px] justify-center'>

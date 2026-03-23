@@ -181,7 +181,10 @@ export function CreateTenantForm({ onSuccess }: CreateTenantFormProps = {}) {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="instagram-pageId">Page ID</FieldLabel>
+                <FieldLabel htmlFor="instagram-pageId">
+                  Page ID{" "}
+                  <span className="text-muted-foreground font-normal">(opcional)</span>
+                </FieldLabel>
                 <Input
                   id="instagram-pageId"
                   placeholder="123456789"

@@ -41,25 +41,27 @@ const whatsappInfoSchema = z
 const instagramInfoSchema = z
   .object({
     accessToken: z.string(),
-    pageId: z.string(),
+    pageId: z.string().optional(),
     accountId: z.string(),
     appSecret: z.string(),
   })
   .transform((val, ctx) => {
-    const hasAny = Object.values(val).some((v) => v.trim() !== "")
+    const { pageId, ...required } = val
+    const hasAny = Object.values(required).some((v) => v.trim() !== "")
 
     if (!hasAny) return undefined
 
     if (!val.accessToken.trim())
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["accessToken"], message: "El access token de Instagram es requerido" })
-    if (!val.pageId.trim())
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["pageId"], message: "El Page ID es requerido" })
     if (!val.accountId.trim())
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["accountId"], message: "El Account ID es requerido" })
     if (!val.appSecret.trim())
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["appSecret"], message: "El app secret de Instagram es requerido" })
 
-    return val
+    return {
+      ...val,
+      pageId: val.pageId?.trim() || undefined,
+    }
   })
 
 export const createTenantSchema = z.object({

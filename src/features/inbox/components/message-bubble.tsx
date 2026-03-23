@@ -3,6 +3,7 @@ import { InstagramIcon } from "@/components/icons/InstagramIcon"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { CachedMessage } from "@/lib/db/schema"
 import type { MessageChannel, MessageMedia, MessageReferral } from "@/types/message.type"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { BotIcon } from "lucide-react"
 import { AudioPlayer } from "./audio-player"
 import { ImageViewer } from "./image-viewer"
@@ -17,18 +18,26 @@ enum ReferralType {
   Unknown = 'unknown',
 }
 
+const MEDIA_TYPES = new Set(["AUDIO", "IMAGE", "VIDEO", "DOCUMENT"])
+
 export const MessageBubble = ({ message }: MessageBubbleProps) => {
   const { direction, body, messageType, sentAt, sender } = message
   const isOutbound = direction === "OUTBOUND"
   const isBotMessage = sender.type === 'BOT';
+  const isMobile = useIsMobile()
+  const isMedia = MEDIA_TYPES.has(messageType)
+
+  const maxWidth = isMobile
+    ? (isMedia ? "max-w-[90%]" : "max-w-[80%]")
+    : (isMedia ? "max-w-[60%]" : "max-w-[50%]")
 
   return (
     <div className={`flex gap-2 ${isOutbound ? "flex-row-reverse" : ""}`}>
       <Avatar className={`flex shadow-sm items-center justify-center w-10 h-10 shrink-0 ${isBotMessage ? 'bg-[#d4f1ff]' : ''}`}>
         {isBotMessage
-          ? 
+          ?
           <BotIcon className="w-6 h-6"/>
-          : 
+          :
           <>
             <AvatarImage src="https://github.com/shadcn.png" />
             <AvatarFallback>CN</AvatarFallback>
@@ -36,7 +45,7 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
         }
       </Avatar>
       <div
-        className={`px-4 py-2 rounded-lg shadow-sm text-sm max-w-[50%] min-w-0 ${
+        className={`px-4 py-2 rounded-lg shadow-sm text-sm ${maxWidth} min-w-0 ${
           isOutbound ? "bg-[#d4f1ff]" : "bg-white"
         }`}
       >
