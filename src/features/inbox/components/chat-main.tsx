@@ -63,24 +63,27 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false }:
           {isPending && messages.length === 0 ? (
             <MessagesLoading />
           ) : isError ? (
-            <MessagesError />
-          ) : messages.length === 0 ? (
-            <MessagesEmpty />
-          ) : (
-            messages.map((message, index) => {
-              const prevMessage = messages[index - 1]
-              const currentDay = new Date(message.sentAt).toDateString()
-              const prevDay = prevMessage ? new Date(prevMessage.sentAt).toDateString() : null
-              const showSeparator = currentDay !== prevDay
+              <MessagesError />
+            ) : messages.length === 0 ? (
+                <MessagesEmpty />
+              ) : (
+                  messages.map((message, index) => {
+                    const prevMessage = messages[index - 1]
+                    const currentDay = new Date(message.sentAt).toDateString()
+                    const prevDay = prevMessage ? new Date(prevMessage.sentAt).toDateString() : null
+                    const showSeparator = currentDay !== prevDay
 
-              return (
-                <div key={message.id} className="flex flex-col gap-4">
-                  {showSeparator && <DateSeparator date={new Date(message.sentAt)} />}
-                  <MessageBubble message={message} />
-                </div>
-              )
-            })
-          )}
+                    return (
+                      <div key={message.id} className="flex flex-col gap-4">
+                        {showSeparator && <DateSeparator date={new Date(message.sentAt)} />}
+                        <MessageBubble 
+                          message={message} 
+                          customerId={conversation?.customerId}
+                        />
+                      </div>
+                    )
+                  })
+                )}
           <div ref={bottomRef} />
         </div>
         <div className="px-4 pb-4 shrink-0">

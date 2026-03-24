@@ -4,12 +4,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import type { CachedMessage } from "@/lib/db/schema"
 import type { MessageChannel, MessageMedia, MessageReferral } from "@/types/message.type"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { BotIcon } from "lucide-react"
+import { BotIcon, UserIcon } from "lucide-react"
 import { AudioPlayer } from "./audio-player"
 import { ImageViewer } from "./image-viewer"
+import { getAvatarBackgroundColor } from "@/utils/colors"
 
 interface MessageBubbleProps {
-  message: CachedMessage
+  message: CachedMessage;
+  customerId?: string;
 }
 
 enum ReferralType {
@@ -20,7 +22,7 @@ enum ReferralType {
 
 const MEDIA_TYPES = new Set(["AUDIO", "IMAGE", "VIDEO", "DOCUMENT"])
 
-export const MessageBubble = ({ message }: MessageBubbleProps) => {
+export const MessageBubble = ({ message, customerId }: MessageBubbleProps) => {
   const { direction, body, messageType, sentAt, sender } = message
   const isOutbound = direction === "OUTBOUND"
   const isBotMessage = sender.type === 'BOT';
@@ -38,10 +40,9 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
           ?
           <BotIcon className="w-6 h-6"/>
           :
-          <>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </>
+          <Avatar className={`${getAvatarBackgroundColor(customerId || 'undefined')} flex justify-center items-center w-12 h-12`}>
+            <UserIcon className="text-white"/>
+          </Avatar>
         }
       </Avatar>
       <div
