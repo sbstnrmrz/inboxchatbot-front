@@ -209,7 +209,7 @@ export function TagsManagerModal() {
           className="p-1 rounded hover:bg-secondary-white text-gray-500"
           title="Gestionar etiquetas"
         >
-          <TagsIcon className="w-4 h-4" />
+          <TagsIcon className="w-5 h-5" />
         </button>
       </DialogTrigger>
       <DialogContent className="max-w-sm">

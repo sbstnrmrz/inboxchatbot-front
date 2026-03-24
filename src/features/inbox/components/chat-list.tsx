@@ -7,6 +7,7 @@ import { useLiveConversations } from '../hooks/useLiveConversations';
 import { logger } from '@/lib/logger';
 import type { ConversationChannel } from '@/types/conversation.type';
 import { ChannelFilters } from './ChannelFilters';
+import { TagFilters } from './TagFilters';
 import { TagsManagerModal } from './tags-manager-modal';
 
 const SCROLL_CONTAINER_ID = 'chat-list-scroll';
@@ -30,11 +31,18 @@ export const ChatList = ({
 }: ChatListProps) => {
   const { conversations, isLoading } = useLiveConversations();
   const [channelFilter, setChannelFilter] = useState<ChannelFilterValue>("ALL");
+  const [tagFilter, setTagFilter] = useState<string>("ALL");
 
   const filteredConversations = useMemo(() => {
-    if (channelFilter === "ALL") return conversations;
-    return conversations.filter(conv => conv.channel === channelFilter);
-  }, [conversations, channelFilter]);
+    let result = conversations;
+    if (channelFilter !== "ALL") {
+      result = result.filter(conv => conv.channel === channelFilter);
+    }
+    if (tagFilter !== "ALL") {
+      result = result.filter(conv => conv.tags?.includes(tagFilter));
+    }
+    return result;
+  }, [conversations, channelFilter, tagFilter]);
 
   useEffect(() => {
     logger.debug('cached conversations', conversations);
@@ -54,14 +62,15 @@ export const ChatList = ({
 
   return (
     <>
-      <div className="flex items-center px-4 py-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">
-        <span className='text-sm mr-2'>Filtrar por</span>
-        <ChannelFilters value={channelFilter} onValueChange={setChannelFilter} />
+      <div className="
+        flex items-center gap-1 px-2 py-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden
+        overflow-x-auto">
         <div className="ml-auto">
           <TagsManagerModal />
         </div>
+        <TagFilters value={tagFilter} onValueChange={setTagFilter} />
+        <ChannelFilters value={channelFilter} onValueChange={setChannelFilter} />
       </div>
-
       <div
         id={SCROLL_CONTAINER_ID}
         className='flex flex-col w-full h-full p-2 overflow-y-auto gap-2'
