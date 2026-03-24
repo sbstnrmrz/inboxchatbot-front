@@ -12,11 +12,13 @@ export interface Conversation {
   status: ConversationStatus
   /** Populated Message object when fetched from API */
   lastMessage?: Message
-  lastMessageAt?: Date 
+  lastMessageAt?: Date
   unreadCount: number
   requestingAgent: boolean
   botEnabled: boolean
   botDisabledAt?: string
+  /** Array of tag IDs applied to this conversation */
+  tags?: string[]
   createdAt?: string
   updatedAt?: string
 }

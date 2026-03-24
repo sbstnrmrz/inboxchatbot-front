@@ -56,6 +56,8 @@ export interface CachedConversation {
   unreadCount: number
   requestingAgent: boolean
   botEnabled: boolean
+  /** Tag IDs applied to this conversation */
+  tags?: string[]
   /** Unix ms */
   cachedAt: number
 }

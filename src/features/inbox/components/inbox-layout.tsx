@@ -16,6 +16,7 @@ import { useConversationReadEvent } from '@/features/inbox/hooks/useConversation
 import { useConversationEvents } from '@/features/inbox/hooks/useConversationEvents';
 import { useRequestAgentEvent } from '@/features/inbox/hooks/useRequestAgentEvent';
 import { useDismissAgentEvent } from '@/features/inbox/hooks/useDismissAgentEvent';
+import { useTagEvents } from '@/features/inbox/hooks/useTagEvents';
 import { ChatLayout } from './chat-layout';
 import { ChatMain } from './chat-main';
 import { ChatList } from './chat-list';
@@ -54,6 +55,9 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
 
   // Listen for dismiss_agent events — clears requestingAgent flag in IndexedDB.
   useDismissAgentEvent({ socket });
+
+  // Listen for tag events — keeps tags and conversation tag assignments in sync.
+  useTagEvents({ socket });
 
   const isMobile = useIsMobile()
 

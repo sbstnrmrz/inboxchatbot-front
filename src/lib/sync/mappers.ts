@@ -75,6 +75,7 @@ export function mapConversationToCache(conversation: Conversation): CachedConver
     unreadCount: conversation.unreadCount,
     requestingAgent: conversation.requestingAgent,
     botEnabled: conversation.botEnabled,
+    tags: conversation.tags,
     cachedAt: Date.now(),
   }
 }

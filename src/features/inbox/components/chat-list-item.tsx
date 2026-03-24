@@ -1,13 +1,15 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
 import type { CachedConversation, CachedMessage } from "@/lib/db";
 import { messagesRepository } from "@/lib/db/repositories/messages.repository";
 import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer";
 import type { MessageType } from "@/types/message.type";
-import { MicIcon, ImageIcon, VideoIcon, FileIcon, MapPinIcon, SmileIcon, HandIcon, BanIcon, UserIcon, PlusIcon } from "lucide-react";
+import { MicIcon, ImageIcon, VideoIcon, FileIcon, MapPinIcon, SmileIcon, HandIcon, BanIcon, UserIcon } from "lucide-react";
 import { getAvatarBackgroundColor } from "@/utils/colors";
+import { useTags } from "@/features/inbox/hooks/useTags";
+import { ConversationTagsDropdown } from "./conversation-tags-dropdown";
 
 interface ChatListItemProps {
   conversation: CachedConversation;
@@ -19,6 +21,9 @@ export function ChatListItem({ conversation, isSelected, onClick }: ChatListItem
   const {id, customerId, lastMessageId, unreadCount, channel } = conversation;
 
   const customer = useLiveCustomer(customerId);
+  const { data: allTags } = useTags();
+  const conversationTagIds = conversation.tags ?? [];
+  const conversationTags = allTags?.filter((t) => conversationTagIds.includes(t._id)) ?? [];
 
   const lastMessage = useLiveQuery(
     () =>
@@ -53,19 +58,24 @@ export function ChatListItem({ conversation, isSelected, onClick }: ChatListItem
         </div>
       </div>
       <div className="flex text-sm text-white mt-1 justify-between items-center">
-        <div className="flex gap-1 items-center justify-center min-w-0 overflow-hidden">
+        <div className="flex gap-1 items-center justify-between min-w-0 overflow-hidden flex-1">
           <div className="flex gap-1 text-xs font-semibold overflow-x-auto min-w-0">
-            <div className="py-1 px-2 bg-amber-400 rounded-full">
-              Urgente 
-            </div>
+            {conversationTags.map((tag) => (
+              <div
+                key={tag._id}
+                className="py-1 px-2 rounded-full shrink-0"
+                style={{ backgroundColor: tag.color }}
+              >
+                {tag.name}
+              </div>
+            ))}
           </div>
-          <PlusIcon className="shrink-0 rounded-full w-5 h-5 text-gray-500 hover:bg-white"
-            onClick={e => {
-              e.stopPropagation();
-            }}
+          <ConversationTagsDropdown
+            conversationId={id}
+            activeTags={conversationTagIds}
           />
         </div>
-        <ChatStatuses 
+        <ChatStatuses
           requestingAgent={conversation.requestingAgent}
           isBlocked={customer?.isBlocked || false}
         />

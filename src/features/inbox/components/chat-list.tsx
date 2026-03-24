@@ -7,6 +7,7 @@ import { useLiveConversations } from '../hooks/useLiveConversations';
 import { logger } from '@/lib/logger';
 import type { ConversationChannel } from '@/types/conversation.type';
 import { ChannelFilters } from './ChannelFilters';
+import { TagsManagerModal } from './tags-manager-modal';
 
 const SCROLL_CONTAINER_ID = 'chat-list-scroll';
 
@@ -56,6 +57,9 @@ export const ChatList = ({
       <div className="flex items-center px-4 py-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">
         <span className='text-sm mr-2'>Filtrar por</span>
         <ChannelFilters value={channelFilter} onValueChange={setChannelFilter} />
+        <div className="ml-auto">
+          <TagsManagerModal />
+        </div>
       </div>
 
       <div

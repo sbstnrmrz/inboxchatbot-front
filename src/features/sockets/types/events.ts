@@ -28,3 +28,11 @@ export enum MessageEvent {
   TranscriptReceived = 'transcript_received',
   WaitingBotResponse = 'waiting_bot_response',
 }
+
+export enum TagEvent {
+  Created = 'tag_created',
+  Updated = 'tag_updated',
+  Deleted = 'tag_deleted',
+  ConversationTagAdded = 'conversation_tag_added',
+  ConversationTagRemoved = 'conversation_tag_removed',
+}
