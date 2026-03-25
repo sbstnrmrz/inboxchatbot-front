@@ -61,11 +61,11 @@ export const MessageInput = ({
   const { ref: registerRef, ...registerRest } = register("body");
 
   return (
-    <div className="w-full mx-auto bg-primary-white">
+    <div className="w-full mx-auto">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div
           className={`relative flex flex-col bg-primary-white md:rounded-lg shadow-sm ${
-            botEnabled ? "bg-muted/50 " : "bg-white "
+            botEnabled ? "bg-muted/50 " : "bg-white dark:bg-card "
           }`}
         >
           {/* Textarea */}
@@ -90,10 +90,10 @@ export const MessageInput = ({
                 handleSubmit(onSubmit);
               }
             }}
-            className={`text-black w-full resize-none bg-transparent px-4 pt-4 pb-2 focus:outline-none min-h-[52px] max-h-[200px] ${
+            className={`text-foreground w-full resize-none bg-transparent px-4 pt-4 pb-2 focus:outline-none min-h-[52px] max-h-[200px] ${
               isRecording || botEnabled
                 ? "text-muted-foreground placeholder:text-muted-foreground/60 cursor-not-allowed"
-                : "text-black placeholder:text-muted-foreground"
+                : "text-foreground placeholder:text-muted-foreground"
             }`}
           />
 

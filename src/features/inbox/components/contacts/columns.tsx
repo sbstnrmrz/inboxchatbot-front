@@ -1,14 +1,16 @@
 import { type ColumnDef, type FilterFn, type Row } from "@tanstack/react-table"
 import { ArrowUpDown, SquareArrowOutUpRight } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import type { CustomerAdditionalDetails } from "@/features/inbox/api/customers-additional.queries"
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon"
 import { InstagramIcon } from "@/components/icons/InstagramIcon"
 import parsePhoneNumber from 'libphonenumber-js'
-import { useNavigate, Link } from "@tanstack/react-router"
+import { useNavigate } from "@tanstack/react-router"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { useLiveQuery } from "dexie-react-hooks"
+import { conversationsRepository } from "@/lib/db/repositories/conversations.repository"
+import { useTags } from "@/features/inbox/hooks/useTags"
 
 export type ChannelFilter = "all" | "whatsapp" | "instagram"
 
@@ -42,6 +44,35 @@ function ChannelBadges({ customer }: { customer: CustomerAdditionalDetails }) {
       {!customer.whatsappInfo && !customer.instagramInfo && (
         <span className="text-muted-foreground text-xs">—</span>
       )}
+    </div>
+  )
+}
+
+function TagsCell({ conversationId }: { conversationId: string }) {
+  const conversation = useLiveQuery(
+    () => conversationsRepository.getById(conversationId),
+    [conversationId],
+  )
+  const { data: allTags } = useTags()
+
+  const tagIds = conversation?.tags ?? []
+  const tags = allTags?.filter((t) => tagIds.includes(t._id)) ?? []
+
+  if (tags.length === 0) {
+    return <span className="text-muted-foreground text-xs">—</span>
+  }
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {tags.map((tag) => (
+        <span
+          key={tag._id}
+          className="px-2 py-0.5 rounded-full text-xs font-semibold text-white"
+          style={{ backgroundColor: tag.color }}
+        >
+          {tag.name}
+        </span>
+      ))}
     </div>
   )
 }
@@ -113,11 +144,17 @@ export const contactsColumns: ColumnDef<CustomerAdditionalDetails>[] = [
     enableSorting: false,
   },
   {
+    id: "tags",
+    header: "Etiquetas",
+    cell: ({ row }) => <TagsCell conversationId={row.original.conversationId} />,
+    enableSorting: false,
+  },
+  {
     id: "email",
     header: "Email",
-    cell: () => (
-      <span className="text-muted-foreground text-xs italic">Sin email</span>
-    ),
+    cell: ({ row }) => row.original.email
+      ? <span>{row.original.email}</span>
+      : <span className="text-muted-foreground text-xs">—</span>,
     enableSorting: false,
   },
   {

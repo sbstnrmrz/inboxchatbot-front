@@ -65,9 +65,9 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
     if (selectedConversationId && showContactDetails) {
       return (
         <div className="flex flex-col h-screen">
-          <div className="flex items-center gap-2 px-4 h-[52px] bg-white border-b border-secondary-white shrink-0">
+          <div className="flex items-center gap-2 px-4 h-[52px] bg-white dark:bg-card border-b border-secondary-white shrink-0">
             <button className="p-1 hover:bg-secondary-white rounded-sm" onClick={() => setShowContactDetails(false)}>
-              <ArrowLeftIcon className="stroke-black w-5 h-5" />
+              <ArrowLeftIcon className="stroke-foreground w-5 h-5" />
             </button>
             <span className="font-semibold">Detalles del contacto</span>
           </div>
@@ -97,7 +97,7 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
 
     return (
       <div className="flex flex-col h-screen">
-        <div className="flex items-center px-4 h-[52px] bg-white border-b border-secondary-white shrink-0">
+        <div className="flex items-center px-4 h-[52px] bg-white dark:bg-card border-b border-secondary-white shrink-0">
           <h1 className="text-lg font-semibold">Chats</h1>
         </div>
         <div className="flex items-center p-2 bg-primary-white border-b border-secondary-white shrink-0">
@@ -163,8 +163,8 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
 function NoChatSelected() {
   return (
     <div className='flex flex-col m-auto gap-4 items-center justify-between'>
-      <MessageCircleMoreIcon className='text-gray-500' size={148}/>
-      <span className='text-lg text-gray-500'>Selecciona un chat</span>
+      <MessageCircleMoreIcon className='text-gray-500 dark:text-gray-400' size={148}/>
+      <span className='text-lg text-gray-500 dark:text-gray-400'>Selecciona un chat</span>
     </div>
   )
 }

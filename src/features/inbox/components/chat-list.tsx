@@ -108,7 +108,7 @@ export const ChatList = ({
 
 function ChatLoading() {
   return (
-    <div className='flex flex-col gap-2 h-full my-auto items-center justify-center text-gray-500'>
+    <div className='flex flex-col gap-2 h-full my-auto items-center justify-center text-gray-500 dark:text-gray-400'>
       <Spinner className='size-16' />
       <span>Cargando chats</span>
     </div>
@@ -117,7 +117,7 @@ function ChatLoading() {
 
 function EmptyConversations() {
   return (
-    <div className='flex flex-col gap-2 h-full my-auto items-center justify-center text-gray-500'>
+    <div className='flex flex-col gap-2 h-full my-auto items-center justify-center text-gray-500 dark:text-gray-400'>
       <span>No existen conversaciones</span>
     </div>
   );

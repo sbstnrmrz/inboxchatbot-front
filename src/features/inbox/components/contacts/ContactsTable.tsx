@@ -132,6 +132,7 @@ export function ContactsTable() {
                 >
                   {col.id === "name" ? "Nombre"
                     : col.id === "channels" ? "Canales"
+                    : col.id === "tags" ? "Etiquetas"
                     : col.id === "messageCount" ? "Mensajes"
                     : col.id}
                 </DropdownMenuCheckboxItem>

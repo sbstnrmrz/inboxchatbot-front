@@ -38,7 +38,7 @@ export function ChatListItem({ conversation, isSelected, onClick }: ChatListItem
       onClick={() => {
         onClick(id)
       }}
-      className={`cursor-pointer w-full p-2 rounded-lg hover:bg-secondary-white ${isSelected ? "bg-secondary-white" : "bg-white shadow-sm"}`}
+      className={`cursor-pointer w-full p-2 rounded-lg hover:bg-secondary-white dark:hover:bg-muted ${isSelected ? "bg-secondary-white dark:bg-muted" : "bg-white dark:bg-card shadow-sm"}`}
     >
       <div className="flex gap-2 items-center">
         <Avatar className={`${getAvatarBackgroundColor(customerId || id)} flex justify-center items-center w-12 h-12`}>
@@ -127,7 +127,7 @@ function ChatItemHeader({
   return (
     <div className="w-full flex justify-between gap-2 items-center">
       <span className="font-semibold truncate">{customerName}</span>
-      <span className="text-xs text-gray-500 text-nowrap">{formatted}</span>
+      <span className="text-xs text-gray-500 dark:text-gray-400 text-nowrap">{formatted}</span>
     </div>
   );
 }
@@ -157,9 +157,9 @@ function ChatItemLastMessage({
 
   const ChannelIcon =
     channel === "INSTAGRAM" ? (
-      <InstagramIcon className="w-4 h-4 shrink-0 text-gray-400" />
+      <InstagramIcon className="w-4 h-4 shrink-0 fill-black dark:fill-white" />
     ) : (
-      <WhatsappIcon className="w-4 h-4 shrink-0 text-gray-400" />
+      <WhatsappIcon className="w-4 h-4 shrink-0 fill-black dark:fill-white" />
     );
 
   return (
@@ -167,12 +167,12 @@ function ChatItemLastMessage({
       <div className="flex items-center gap-1 min-w-0">
         {ChannelIcon}
         {mediaLabel && !message?.body ? (
-          <span className="flex items-center gap-1 text-sm text-gray-500 shrink-0">
+          <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 shrink-0">
             {mediaLabel.icon}
             {mediaLabel.label}
           </span>
         ) : (
-          <span className="text-sm text-gray-500 truncate">{text}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400 truncate">{text}</span>
         )}
       </div>
       {unreadCount > 0 && (

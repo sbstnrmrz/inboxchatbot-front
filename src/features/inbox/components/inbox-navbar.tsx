@@ -7,8 +7,8 @@ import { useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { LogOutIcon, MessageSquareIcon, MoonIcon, SunIcon, UsersIcon } from "lucide-react"
 
 const navItems = [
-  {label: 'Chats', icon: <MessageSquareIcon className="text-black w-5 h-5"/>, link: '/inbox'},
-  {label: 'Contacts', icon: <UsersIcon className="text-black w-5 h-5"/>, link: '/inbox/contacts'},
+  {label: 'Chats', icon: <MessageSquareIcon className="text-foreground w-5 h-5"/>, link: '/inbox'},
+  {label: 'Contacts', icon: <UsersIcon className="text-foreground w-5 h-5"/>, link: '/inbox/contacts'},
 ]
 
 export const InboxNavBar = () => {
@@ -24,7 +24,7 @@ export const InboxNavBar = () => {
   }
 
   return (
-    <div className='flex flex-col w-[52px] h-screen bg-white border-r border-r-secondary-white '>
+    <div className='flex flex-col w-[52px] h-screen bg-white dark:bg-card border-r border-r-secondary-white '>
       <div className='h-[52px]'>
       </div>
       <div className='flex items-center flex-col gap-2'>
@@ -41,8 +41,8 @@ export const InboxNavBar = () => {
                   {item.icon}
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right" className="shadow-xl bg-white">
-                <p className="text-black">{item.label}</p>
+              <TooltipContent side="right" className="shadow-xl">
+                <p>{item.label}</p>
               </TooltipContent>
             </Tooltip>
           )
@@ -50,7 +50,7 @@ export const InboxNavBar = () => {
       </div>
       <div className='mt-auto'>
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex cursor-pointer w-full h-[52px] bg-white shadow-2xl  hover:bg-primary-white" asChild>
+          <DropdownMenuTrigger className="flex cursor-pointer w-full h-[52px] bg-white dark:bg-card shadow-2xl hover:bg-primary-white" asChild>
             <div className="flex justify-center items-center w-full">
               <Avatar className="w-10 h-10">
                 <AvatarImage src="https://github.com/shadcn.png" />

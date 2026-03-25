@@ -151,7 +151,7 @@ export function AudioPlayer({ channel, mediaId }: AudioPlayerProps) {
                       width={2}
                       height={height}
                       rx={1}
-                      className={played ? "fill-[#0d9488]" : "fill-gray-300"}
+                      className={played ? "fill-[#0d9488] dark:fill-teal-400" : "fill-gray-300 dark:fill-gray-600"}
                     />
                   )
                 })}
@@ -172,7 +172,7 @@ export function AudioPlayer({ channel, mediaId }: AudioPlayerProps) {
             </div>
 
             {/* Timestamps */}
-            <div className="flex justify-between text-[10px] text-gray-500 leading-none px-0.5">
+            <div className="flex justify-between text-[10px] text-gray-500 dark:text-gray-400 leading-none px-0.5">
               <span>{formatTime(currentTime)}</span>
               <span>{formatTime(duration)}</span>
             </div>

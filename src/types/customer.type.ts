@@ -15,6 +15,7 @@ export interface Customer {
   name: string
   whatsappInfo?: CustomerWhatsAppInfo
   instagramInfo?: CustomerInstagramInfo
+  email?: string
   isBlocked: boolean
   createdAt?: string
   updatedAt?: string

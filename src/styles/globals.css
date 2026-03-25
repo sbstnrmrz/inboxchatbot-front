@@ -4,6 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --primary-white: #f5f5f5;
+  --secondary-white: #dcdcdc;
   --background: #f5f5f5;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -40,6 +42,8 @@
 }
 
 .dark {
+  --primary-white: #262626;
+  --secondary-white: #333333;
   --background: #1a1a1a;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.145 0 0);
@@ -56,8 +60,8 @@
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
+  --border: oklch(0.38 0 0);
+  --input: oklch(0.38 0 0);
   --ring: oklch(0.439 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -75,8 +79,8 @@
 }
 
 @theme inline {
-  --color-primary-white: #f5f5f5;
-  --color-secondary-white: #dcdcdc;
+  --color-primary-white: var(--primary-white);
+  --color-secondary-white: var(--secondary-white);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

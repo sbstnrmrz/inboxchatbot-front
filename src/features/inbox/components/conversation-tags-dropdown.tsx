@@ -47,7 +47,7 @@ export function ConversationTagsDropdown({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="shrink-0 rounded-full w-5 h-5 flex items-center justify-center text-gray-500 hover:bg-white"
+          className="shrink-0 cursor-pointer rounded-full w-5 h-5 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-secondary-white"
           onClick={(e) => e.stopPropagation()}
         >
           {isPending ? (
@@ -79,7 +79,7 @@ export function ConversationTagsDropdown({
               onCheckedChange={(checked) => handleToggle(tag._id, checked)}
               onSelect={(e) => e.preventDefault()}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 cursor-pointer">
                 <div
                   className="w-3 h-3 rounded-full shrink-0"
                   style={{ backgroundColor: tag.color }}
@@ -89,7 +89,7 @@ export function ConversationTagsDropdown({
             </DropdownMenuCheckboxItem>
           ))
         ) : (
-          <p className="text-xs text-gray-400 px-2 py-1.5">No hay etiquetas</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 px-2 py-1.5">No hay etiquetas</p>
         )}
       </DropdownMenuContent>
     </DropdownMenu>

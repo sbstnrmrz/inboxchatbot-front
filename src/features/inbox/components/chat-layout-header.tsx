@@ -35,18 +35,18 @@ export const ChatLayoutHeader = ({ conversationId, onShowContactDetails, onBack 
   const isRequestingAgent = conversation?.requestingAgent ?? false
 
   return (
-    <div className="flex items-center px-4 py-1 w-full h-[52px] border-b-1 bg-white shadow-sm">
+    <div className="flex items-center px-4 py-1 w-full h-[52px] border-b-1 bg-primary-white dark:bg-muted shadow-sm">
       <div className="flex items-center gap-2 w-full justify-between">
         <div className="flex items-center gap-2">
           {onBack && (
             <button className="p-1 hover:bg-secondary-white rounded-sm" onClick={onBack}>
-              <ArrowLeftIcon className="stroke-black w-5 h-5" />
+              <ArrowLeftIcon className="stroke-foreground w-5 h-5" />
             </button>
           )}
           <Avatar className={`${getAvatarBackgroundColor(conversation?.customerId ?? conversationId)} flex justify-center items-center w-10 h-10`}>
             <UserIcon className="text-white" />
           </Avatar>
-          <span className="text-black font-medium">{displayName}</span>
+          <span className="text-foreground font-medium">{displayName}</span>
         </div>
 
         <div className="flex items-center gap-1">
@@ -58,7 +58,7 @@ export const ChatLayoutHeader = ({ conversationId, onShowContactDetails, onBack 
                   disabled={dismissAgent.isPending}
                   onClick={() => dismissAgent.mutate()}
                 >
-                  <HandIcon className="stroke-black w-5 h-5" />
+                  <HandIcon className="stroke-foreground w-5 h-5" />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="top">
@@ -70,7 +70,7 @@ export const ChatLayoutHeader = ({ conversationId, onShowContactDetails, onBack 
             className="p-1 hover:bg-secondary-white rounded-sm"
             onClick={() => onShowContactDetails(prev => !prev)}
           >
-            <InfoIcon className="stroke-black w-5 h-5" />
+            <InfoIcon className="stroke-foreground w-5 h-5" />
           </button>
           <ChatOptionsDropdown customer={customer} />
         </div>
@@ -97,7 +97,7 @@ function ChatOptionsDropdown({ customer }: { customer: CachedCustomer | undefine
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="p-1 hover:bg-secondary-white rounded-sm">
-          <EllipsisVerticalIcon className="stroke-black w-5 h-5" />
+          <EllipsisVerticalIcon className="stroke-foreground w-5 h-5" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

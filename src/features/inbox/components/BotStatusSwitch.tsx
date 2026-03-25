@@ -14,7 +14,7 @@ export const BotStatusSwitch = ({
 }: BotStatusSwitch) => {
   return (
     <div className="flex items-center gap-2">
-      <BotIcon className={`${botEnabled ? 'stroke-green-600' : 'stroke-black/50'}`}/>
+      <BotIcon className={`${botEnabled ? 'stroke-green-600' : 'stroke-foreground/50'}`}/>
       <Switch 
         className="data-[state=checked]:bg-green-600 cursor-pointer"
         checked={botEnabled}

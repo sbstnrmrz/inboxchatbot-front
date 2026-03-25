@@ -28,13 +28,13 @@ export function ChannelFilters({ value, onValueChange }: Props) {
           <SelectItem className="cursor-pointer" value="ALL">Todos</SelectItem>
           <SelectItem className="cursor-pointer" value={'WHATSAPP'}>
             <div className="flex items-center gap-2">
-              <WhatsappIcon/>
+              <WhatsappIcon className="dark:fill-white fill-black"/>
               <span>WhatsApp</span>
             </div>
           </SelectItem>
           <SelectItem className="cursor-pointer" value={'INSTAGRAM'}>
             <div className="flex items-center gap-2">
-              <InstagramIcon/>
+              <InstagramIcon className="dark:fill-white fill-black"/>
               <span>Instagram</span>
             </div>
           </SelectItem>

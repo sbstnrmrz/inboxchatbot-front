@@ -35,7 +35,7 @@ export const MessageBubble = ({ message, customerId }: MessageBubbleProps) => {
 
   return (
     <div className={`flex gap-2 ${isOutbound ? "flex-row-reverse" : ""}`}>
-      <Avatar className={`flex shadow-sm items-center justify-center w-10 h-10 shrink-0 ${isBotMessage ? 'bg-[#d4f1ff]' : ''}`}>
+      <Avatar className={`flex shadow-sm items-center justify-center w-10 h-10 shrink-0 ${isBotMessage ? 'bg-[#d4f1ff] dark:bg-blue-900/40' : ''}`}>
         {isBotMessage
           ?
           <BotIcon className="w-6 h-6"/>
@@ -47,7 +47,7 @@ export const MessageBubble = ({ message, customerId }: MessageBubbleProps) => {
       </Avatar>
       <div
         className={`px-4 py-2 rounded-lg shadow-sm text-sm ${maxWidth} min-w-0 ${
-          isOutbound ? "bg-[#d4f1ff]" : "bg-white"
+          isOutbound ? "bg-[#d4f1ff] dark:bg-blue-900/40" : "bg-white dark:bg-card"
         }`}
       >
         <ReferralLabel referral={message.referral}/>
@@ -96,7 +96,7 @@ function MessageContent({
   }
 
   const label = mediaLabels[messageType] ?? "Mensaje"
-  return <p className="text-gray-500 italic">{label}</p>
+  return <p className="text-gray-500 dark:text-gray-400 italic">{label}</p>
 }
 
 function MessageTimestamp({ sentAt }: { sentAt: number }) {
@@ -107,7 +107,7 @@ function MessageTimestamp({ sentAt }: { sentAt: number }) {
   }).format(new Date(sentAt))
 
   return (
-    <span className="flex justify-end text-gray-500 text-xs mt-1">
+    <span className="flex justify-end text-gray-500 dark:text-gray-400 text-xs mt-1">
       {formatted}
     </span>
   )
@@ -125,7 +125,7 @@ function ReferralLabel({referral}: {referral?: MessageReferral}) {
         :
         <InstagramIcon className="w-4 h-4"/>
       }
-      <span className="text-gray-500">Referido</span>
+      <span className="text-gray-500 dark:text-gray-400">Referido</span>
     </div>
   )
 }
