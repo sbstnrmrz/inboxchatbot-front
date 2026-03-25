@@ -62,12 +62,11 @@ export const ChatList = ({
 
   return (
     <>
-      <div className="
-        flex items-center gap-1 px-2 py-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden
-        overflow-x-auto">
-        <div className="ml-auto">
-          <TagsManagerModal />
-        </div>
+      <div 
+        className="flex items-center gap-1 px-2 py-3 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden
+        overflow-x-auto overflow-y-hidden"
+      >
+        <TagsManagerModal />
         <TagFilters value={tagFilter} onValueChange={setTagFilter} />
         <ChannelFilters value={channelFilter} onValueChange={setChannelFilter} />
       </div>

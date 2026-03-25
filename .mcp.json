@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "better-auth": {
+      "type": "http",
+      "url": "https://mcp.inkeep.com/better-auth/mcp"
+    },
+    "tanstack": {
+      "command": "npx",
+      "args": ["@tanstack/cli", "mcp"]
+    },
+    "zod": {
+      "type": "http",
+      "url": "https://mcp.inkeep.com/zod/mcp"
+    }
+  }
+}
