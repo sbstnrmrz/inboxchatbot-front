@@ -2,7 +2,7 @@
  * useTagEvents — listens for real-time tag socket events.
  *
  * Handles:
- *  - tag_created / tag_updated / tag_deleted: invalidates the tags query
+ *  - tag_created / tag_updated / tag_deleted: updates the tags query cache directly
  *  - conversation_tag_added / conversation_tag_removed: patches the conversation
  *    in IndexedDB with the updated tags array
  */
@@ -25,24 +25,32 @@ export function useTagEvents({ socket }: UseTagEventsOptions) {
   useEffect(() => {
     if (!socket) return
 
-    const handleTagCreated = (_data: Tag) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tags.all() })
+    const handleTagCreated = (data: Tag) => {
+      queryClient.setQueryData<Tag[]>(queryKeys.tags.all(), (prev) =>
+        prev ? [...prev, data] : [data],
+      )
     }
 
-    const handleTagUpdated = (_data: Tag) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tags.all() })
+    const handleTagUpdated = (data: Tag) => {
+      queryClient.setQueryData<Tag[]>(queryKeys.tags.all(), (prev) =>
+        prev?.map((t) => (t._id === data._id ? data : t)),
+      )
     }
 
-    const handleTagDeleted = (_data: { tagId: string }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tags.all() })
+    const handleTagDeleted = (data: { tagId: string }) => {
+      queryClient.setQueryData<Tag[]>(queryKeys.tags.all(), (prev) =>
+        prev?.filter((t) => t._id !== data.tagId),
+      )
     }
 
     const handleConversationTagAdded = async (data: { conversationId: string; tags: string[] }) => {
       await conversationsRepository.patch(data.conversationId, { tags: data.tags })
+      queryClient.invalidateQueries({ queryKey: queryKeys.tags.all() })
     }
 
     const handleConversationTagRemoved = async (data: { conversationId: string; tags: string[] }) => {
       await conversationsRepository.patch(data.conversationId, { tags: data.tags })
+      queryClient.invalidateQueries({ queryKey: queryKeys.tags.all() })
     }
 
     socket.on(TagEvent.Created, handleTagCreated)

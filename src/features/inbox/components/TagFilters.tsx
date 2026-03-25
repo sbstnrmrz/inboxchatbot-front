@@ -15,20 +15,19 @@ interface Props {
 
 export function TagFilters({ value, onValueChange }: Props) {
   const { data: tags } = useTags()
-
-  if (!tags || tags.length === 0) return null
+  const isEmpty = !tags || tags.length === 0
 
   return (
-    <Select value={value} onValueChange={onValueChange}>
+    <Select value={value} onValueChange={onValueChange} disabled={isEmpty}>
       <SelectTrigger className="w-full max-w-48 cursor-pointer">
-        <SelectValue placeholder="Todas las etiquetas" />
+        <SelectValue placeholder={isEmpty ? "No hay etiquetas" : "Todas las etiquetas"} />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup className="cursor-pointer">
           <SelectItem className="cursor-pointer" value="ALL">
             Todas las etiquetas
           </SelectItem>
-          {tags.map((tag) => (
+          {tags?.map((tag) => (
             <SelectItem key={tag._id} className="cursor-pointer" value={tag._id}>
               <div className="flex items-center gap-2">
                 <div
