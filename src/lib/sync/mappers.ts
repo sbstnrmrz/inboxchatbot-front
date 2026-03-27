@@ -23,6 +23,8 @@ export function mapCustomerToCache(customer: Customer): CachedCustomer {
     name: customer.name,
     whatsappId: customer.whatsappInfo?.id,
     instagramAccountId: customer.instagramInfo?.accountId,
+    instagramUsername: customer.instagramInfo?.username,
+    email: customer.email,
     isBlocked: customer.isBlocked,
     cachedAt: Date.now(),
   }

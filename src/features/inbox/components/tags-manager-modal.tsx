@@ -206,7 +206,7 @@ export function TagsManagerModal() {
       <DialogTrigger asChild>
         <button
           type="button"
-          className="p-1 rounded hover:bg-secondary-white text-gray-500"
+          className="p-1 cursor-pointer rounded hover:bg-secondary-white text-gray-500"
           title="Gestionar etiquetas"
         >
           <TagsIcon className="w-5 h-5" />

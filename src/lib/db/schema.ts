@@ -33,6 +33,8 @@ export interface CachedCustomer {
   whatsappId?: string
   /** Flattened from instagramInfo.accountId — indexed for fast lookup */
   instagramAccountId?: string
+  instagramUsername?: string
+  email?: string
   isBlocked: boolean
   /** Unix ms — used to detect stale cache */
   cachedAt: number

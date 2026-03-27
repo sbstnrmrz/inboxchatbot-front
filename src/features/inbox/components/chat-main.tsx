@@ -4,13 +4,16 @@ import { useLiveMessages } from "@/features/inbox/hooks/useLiveMessages"
 import { useToggleBot } from "@/features/inbox/hooks/useToggleBot"
 import { useLiveConversations } from "@/features/inbox/hooks/useLiveConversations"
 import { useSendMessage } from "@/features/inbox/hooks/useSendMessage"
+import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer"
 import { useAuth } from "@/features/auth/context"
 import { MessageBubble } from "./message-bubble"
 import { MessageInput } from "./message-input"
 import { Spinner } from "@/components/ui/spinner"
 import type { Socket } from "socket.io-client"
-import { MessageSquareIcon, PhoneIcon, UserIcon } from "lucide-react"
-import { WhatsappIcon } from "@/components/icons/WhatsappIcon"
+import { AtSignIcon, MailIcon, PhoneIcon, UserIcon } from "lucide-react"
+import type { CachedCustomer } from "@/lib/db"
+import type { ConversationChannel } from "@/types/conversation.type"
+import parsePhoneNumber from "libphonenumber-js"
 
 export interface ChatMainProps {
   conversationId: string;
@@ -97,13 +100,9 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false }:
         </div>
       </div>
       {showContactDetails &&
-        <div className="w-[20%] shrink-0 flex flex-col p-4 bg-white dark:bg-card">
-          <div className="">
-            <span className="font-semibold">Detalles del contacto</span>
-          </div>
-          <div className="flex flex-col gap-2 mt-4">
-            <ContactDetails/>
-          </div>
+        <div className="w-[20%] shrink-0 flex flex-col p-4 bg-white dark:bg-card border-l border-border">
+          <span className="font-semibold mb-4">Detalles del contacto</span>
+          <ContactDetails customerId={conversation?.customerId} channel={channel} />
         </div>
       }
     </div>
@@ -161,22 +160,50 @@ function DateSeparator({ date }: { date: Date }) {
   )
 }
 
-function ContactDetails() {
+function ContactDetails({ customerId, channel }: { customerId?: string; channel: ConversationChannel }) {
+  const customer = useLiveCustomer(customerId)
+
+  const phone = customer?.whatsappId
+    ? parsePhoneNumber("+" + customer.whatsappId)?.formatInternational() ?? customer.whatsappId
+    : null
+
   const items = [
-    {label: 'Nombre', value: 'John Doe', icon: <UserIcon className="w-5 h-5"/>},
-    {label: 'Nombre', value: 'John Doe', icon: <UserIcon className="w-5 h-5"/>},
-    {label: 'Nombre', value: 'John Doe', icon: <UserIcon className="w-5 h-5"/>},
+    {
+      label: "Nombre",
+      value: customer?.name ?? "—",
+      icon: <UserIcon className="w-4 h-4 shrink-0 text-muted-foreground" />,
+    },
+    ...(channel === "WHATSAPP" ? [{
+      label: "Teléfono",
+      value: phone ?? "—",
+      icon: <PhoneIcon className="w-4 h-4 shrink-0 text-muted-foreground" />,
+    }] : []),
+    ...(channel === "INSTAGRAM" ? [{
+      label: "Instagram",
+      value: customer?.instagramUsername ? `@${customer.instagramUsername}` : "—",
+      icon: <AtSignIcon className="w-4 h-4 shrink-0 text-muted-foreground" />,
+    }] : []),
+    {
+      label: "Email",
+      value: customer?.email ?? "Sin email",
+      icon: <MailIcon className="w-4 h-4 shrink-0 text-muted-foreground" />,
+    },
   ]
 
-  return items.map((item) => {
-    return (
-      <div className="flex items-center gap-2">
-        {item.icon}
-        <div className="flex flex-col text-sm">
-          <span className="font-semibold">{item.label}</span>
-          <span>{item.value}</span>
+  return (
+    <div className="flex flex-col gap-3">
+      {items.map((item) => (
+        <div key={item.label} className="flex items-start gap-2">
+          <div className="mt-0.5">{item.icon}</div>
+          <div className="flex flex-col text-sm min-w-0">
+            <span className="text-xs text-muted-foreground">{item.label}</span>
+            {item.label === 'Instagram' 
+              ? <a href={`https://www.instagram.com/${item.value}`}>{item.value}</a> 
+              : <span className="truncate">{item.value}</span>
+            }
+          </div>
         </div>
-      </div>
-    )
-  })
+      ))}
+    </div>
+  )
 }
