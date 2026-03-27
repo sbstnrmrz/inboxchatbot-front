@@ -87,7 +87,7 @@ export const MessageInput = ({
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
-                handleSubmit(onSubmit);
+                handleSubmit(onSubmit)();
               }
             }}
             className={`text-foreground w-full resize-none bg-transparent px-4 pt-4 pb-2 focus:outline-none min-h-[52px] max-h-[200px] ${
