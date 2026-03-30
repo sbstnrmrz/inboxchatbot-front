@@ -12,17 +12,18 @@ import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer"
 import { useBlockCustomer } from "@/features/inbox/hooks/useBlockCustomer"
 import { useDismissAgent } from "@/features/inbox/hooks/useDismissAgent"
 import type { CachedCustomer } from "@/lib/db"
-import { ArrowLeftIcon, EllipsisVerticalIcon, HandIcon, InfoIcon, ShieldCheckIcon, ShieldOffIcon, UserIcon } from "lucide-react"
+import { ArrowLeftIcon, EllipsisVerticalIcon, HandIcon, InfoIcon, SearchIcon, ShieldCheckIcon, ShieldOffIcon, UserIcon } from "lucide-react"
 import { getAvatarBackgroundColor } from "@/utils/colors"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface ChatLayoutHeaderProps {
   conversationId: string;
   onShowContactDetails: Dispatch<SetStateAction<boolean>>;
+  onToggleSearch?: () => void;
   onBack?: () => void;
 }
 
-export const ChatLayoutHeader = ({ conversationId, onShowContactDetails, onBack }: ChatLayoutHeaderProps) => {
+export const ChatLayoutHeader = ({ conversationId, onShowContactDetails, onToggleSearch, onBack }: ChatLayoutHeaderProps) => {
   const conversation = useLiveQuery(
     () => conversationsRepository.getById(conversationId),
     [conversationId],
@@ -50,6 +51,19 @@ export const ChatLayoutHeader = ({ conversationId, onShowContactDetails, onBack 
         </div>
 
         <div className="flex items-center gap-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="cursor-pointer p-1 hover:bg-secondary-white rounded-sm"
+                onClick={() => onToggleSearch?.()}
+              >
+                <SearchIcon className="stroke-foreground w-5 h-5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>Buscar mensaje</p>
+            </TooltipContent>
+          </Tooltip>
           {isRequestingAgent && (
             <Tooltip>
               <TooltipTrigger asChild>

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { useMessages } from "@/features/inbox/hooks/useMessages"
 import { useLiveMessages } from "@/features/inbox/hooks/useLiveMessages"
 import { useToggleBot } from "@/features/inbox/hooks/useToggleBot"
@@ -19,9 +19,12 @@ export interface ChatMainProps {
   conversationId: string;
   socket: Socket | null;
   showContactDetails: boolean;
+  messageSearchQuery?: string;
+  currentMatchIndex?: number;
+  onMatchCountChange?: (count: number) => void;
 }
 
-export const ChatMain = ({ conversationId, socket, showContactDetails = false }: ChatMainProps) => {
+export const ChatMain = ({ conversationId, socket, showContactDetails = false, messageSearchQuery = "", currentMatchIndex = 0, onMatchCountChange }: ChatMainProps) => {
   const { session } = useAuth()
   const tenantId = ((session?.user as any)?.tenantId as string) ?? ""
   const senderId = session?.user?.id ?? ""
@@ -31,6 +34,24 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false }:
 
   // Reactive read from IndexedDB — updates automatically as sync writes data
   const messages = useLiveMessages(conversationId)
+
+  const matchingIds = useMemo(() => {
+    if (!messageSearchQuery) return []
+    const q = messageSearchQuery.toLowerCase()
+    return messages.filter((m) => m.body?.toLowerCase().includes(q)).map((m) => m.id)
+  }, [messages, messageSearchQuery])
+
+  useEffect(() => {
+    onMatchCountChange?.(matchingIds.length)
+  }, [matchingIds.length])
+
+  const messageRefs = useRef<Map<string, HTMLElement>>(new Map())
+
+  useEffect(() => {
+    if (!messageSearchQuery || matchingIds.length === 0) return
+    const el = messageRefs.current.get(matchingIds[currentMatchIndex])
+    el?.scrollIntoView({ behavior: "smooth", block: "center" })
+  }, [currentMatchIndex, matchingIds, messageSearchQuery])
 
   // Read botEnabled and channel from the live conversation in IndexedDB
   const { conversations } = useLiveConversations()
@@ -56,8 +77,9 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false }:
   // Scroll to bottom sentinel whenever messages change or conversation switches
   const bottomRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
+    if (messageSearchQuery) return
     bottomRef.current?.scrollIntoView({ behavior: "instant" })
-  }, [conversationId, messages.length])
+  }, [conversationId, messages.length, messageSearchQuery])
 
   return (
     <div className="flex flex-1 min-h-0 text-foreground">
@@ -77,11 +99,20 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false }:
                     const showSeparator = currentDay !== prevDay
 
                     return (
-                      <div key={message.id} className="flex flex-col gap-4">
+                      <div
+                        key={message.id}
+                        className="flex flex-col gap-4"
+                        ref={(el) => {
+                          if (el) messageRefs.current.set(message.id, el)
+                          else messageRefs.current.delete(message.id)
+                        }}
+                      >
                         {showSeparator && <DateSeparator date={new Date(message.sentAt)} />}
-                        <MessageBubble 
-                          message={message} 
+                        <MessageBubble
+                          message={message}
                           customerId={conversation?.customerId}
+                          searchQuery={messageSearchQuery || undefined}
+                          isCurrentMatch={matchingIds[currentMatchIndex] === message.id}
                         />
                       </div>
                     )

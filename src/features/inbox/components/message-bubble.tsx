@@ -12,6 +12,8 @@ import { getAvatarBackgroundColor } from "@/utils/colors"
 interface MessageBubbleProps {
   message: CachedMessage;
   customerId?: string;
+  searchQuery?: string;
+  isCurrentMatch?: boolean;
 }
 
 enum ReferralType {
@@ -22,7 +24,7 @@ enum ReferralType {
 
 const MEDIA_TYPES = new Set(["AUDIO", "IMAGE", "VIDEO", "DOCUMENT"])
 
-export const MessageBubble = ({ message, customerId }: MessageBubbleProps) => {
+export const MessageBubble = ({ message, customerId, searchQuery, isCurrentMatch }: MessageBubbleProps) => {
   const { direction, body, messageType, sentAt, sender } = message
   const isOutbound = direction === "OUTBOUND"
   const isBotMessage = sender.type === 'BOT';
@@ -48,10 +50,10 @@ export const MessageBubble = ({ message, customerId }: MessageBubbleProps) => {
       <div
         className={`px-4 py-2 rounded-lg shadow-sm text-sm ${maxWidth} min-w-0 ${
           isOutbound ? "bg-[#d4f1ff] dark:bg-blue-900/40" : "bg-white dark:bg-card"
-        }`}
+        } ${isCurrentMatch ? "ring-2 ring-blue-400 dark:ring-blue-500" : ""}`}
       >
         <ReferralLabel referral={message.referral}/>
-        <MessageContent body={body} messageType={messageType} media={message.media} channel={message.channel} />
+        <MessageContent body={body} messageType={messageType} media={message.media} channel={message.channel} searchQuery={searchQuery} />
         <MessageTimestamp sentAt={sentAt} />
       </div>
     </div>
@@ -60,16 +62,32 @@ export const MessageBubble = ({ message, customerId }: MessageBubbleProps) => {
 
 
 
+function highlightText(text: string, query: string) {
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const parts = text.split(new RegExp(`(${escaped})`, "gi"))
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === query.toLowerCase()
+          ? <mark key={i} className="bg-yellow-300 dark:bg-yellow-700 rounded-sm px-0.5">{part}</mark>
+          : part
+      )}
+    </>
+  )
+}
+
 function MessageContent({
   body,
   messageType,
   media,
   channel,
+  searchQuery,
 }: {
   body?: string
   messageType: CachedMessage["messageType"]
   media?: MessageMedia
   channel: MessageChannel
+  searchQuery?: string
 }) {
   // Audio messages: render the player if we have a mediaId
   if (messageType === "AUDIO" && media?.whatsappMediaId) {
@@ -82,7 +100,7 @@ function MessageContent({
   }
 
   if (body) {
-    return <p className="wrap-break-word whitespace-pre-wrap">{body}</p>
+    return <p className="wrap-break-word whitespace-pre-wrap">{searchQuery ? highlightText(body, searchQuery) : body}</p>
   }
 
   const mediaLabels: Partial<Record<CachedMessage["messageType"], string>> = {

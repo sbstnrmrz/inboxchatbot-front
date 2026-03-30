@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeftIcon, MessageCircleMoreIcon } from 'lucide-react';
+import { ArrowLeftIcon, ChevronDownIcon, ChevronUpIcon, MessageCircleMoreIcon, SearchIcon, XIcon } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -23,6 +23,8 @@ import { ChatList } from './chat-list';
 import { ChatLayoutHeader } from './chat-layout-header';
 import { logger } from '@/lib/logger';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Field } from '@/components/ui/field';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 
 interface InboxLayoutProps {
   conversationId?: string 
@@ -33,7 +35,31 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(conversationId || null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const { session, isPending } = useAuth();
-  const [showContactDetails, setShowContactDetails] = useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false)
+  const [showMessageSearch, setShowMessageSearch] = useState(false)
+  const [messageSearchQuery, setMessageSearchQuery] = useState("")
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(0)
+  const [matchCount, setMatchCount] = useState(0)
+
+  const handleSelectConversation = (id: string | null) => {
+    setSelectedConversationId(id)
+    setShowMessageSearch(false)
+    setMessageSearchQuery("")
+    setCurrentMatchIndex(0)
+    setMatchCount(0)
+  }
+
+  const handleToggleSearch = () => {
+    setShowMessageSearch(prev => !prev)
+    setMessageSearchQuery("")
+    setCurrentMatchIndex(0)
+    setMatchCount(0)
+  }
+
+  const handleSearchQueryChange = (query: string) => {
+    setMessageSearchQuery(query)
+    setCurrentMatchIndex(0)
+  };
   logger.debug('selected conversationId: ' + selectedConversationId);
 
   // Trigger initial sync as soon as the session is confirmed
@@ -84,7 +110,7 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
           <ChatLayoutHeader
             conversationId={selectedConversationId}
             onShowContactDetails={setShowContactDetails}
-            onBack={() => { setSelectedConversationId(null); setShowContactDetails(false) }}
+            onBack={() => { handleSelectConversation(null); setShowContactDetails(false) }}
           />
           <ChatMain
             conversationId={selectedConversationId}
@@ -104,7 +130,7 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
           <SearchFilter value={searchQuery} onChange={setSearchQuery} />
         </div>
         <ChatList
-          onChatSelected={setSelectedConversationId}
+          onChatSelected={handleSelectConversation}
           selectedConversationId={selectedConversationId}
           hasNextPage={hasNextPage}
           fetchNextPage={fetchNextPage}
@@ -128,7 +154,7 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
           <SearchFilter value={searchQuery} onChange={setSearchQuery} />
         </div>
         <ChatList
-          onChatSelected={setSelectedConversationId}
+          onChatSelected={handleSelectConversation}
           selectedConversationId={selectedConversationId}
           hasNextPage={hasNextPage}
           fetchNextPage={fetchNextPage}
@@ -146,14 +172,60 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
           <NoChatSelected/>
           :
           <ChatLayout>
-            <ChatLayoutHeader 
-              conversationId={selectedConversationId} 
+            <ChatLayoutHeader
+              conversationId={selectedConversationId}
               onShowContactDetails={setShowContactDetails}
+              onToggleSearch={handleToggleSearch}
             />
+            {showMessageSearch && (
+              <div className='flex items-center gap-1 p-1 w-full'>
+                <Field className="flex-1">
+                  <InputGroup>
+                    <InputGroupInput
+                      id="search-input"
+                      placeholder="Texto del mensaje"
+                      value={messageSearchQuery}
+                      onChange={(e) => handleSearchQueryChange(e.target.value)}
+                      autoFocus
+                    />
+                    <InputGroupAddon align="inline-start">
+                      <SearchIcon className="text-muted-foreground" />
+                    </InputGroupAddon>
+                    {messageSearchQuery && (
+                      <InputGroupAddon align="inline-end">
+                        <button onClick={() => handleSearchQueryChange("")} className="cursor-pointer text-muted-foreground hover:text-foreground">
+                          <XIcon className="size-4" />
+                        </button>
+                      </InputGroupAddon>
+                    )}
+                  </InputGroup>
+                </Field>
+                {messageSearchQuery && matchCount > 0 && (
+                  <>
+                    <span className="text-xs text-muted-foreground shrink-0">{currentMatchIndex + 1}/{matchCount}</span>
+                    <button
+                      className="p-1 hover:bg-secondary-white rounded-sm cursor-pointer"
+                      onClick={() => setCurrentMatchIndex(i => (i - 1 + matchCount) % matchCount)}
+                    >
+                      <ChevronUpIcon className="size-4 text-muted-foreground" />
+                    </button>
+                    <button
+                      className="p-1 hover:bg-secondary-white rounded-sm cursor-pointer"
+                      onClick={() => setCurrentMatchIndex(i => (i + 1) % matchCount)}
+                    >
+                      <ChevronDownIcon className="size-4 text-muted-foreground" />
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
             <ChatMain
-              conversationId={selectedConversationId} 
-              socket={socket} 
+              conversationId={selectedConversationId}
+              socket={socket}
               showContactDetails={showContactDetails}
+              messageSearchQuery={messageSearchQuery}
+              currentMatchIndex={currentMatchIndex}
+              onMatchCountChange={setMatchCount}
             />
           </ChatLayout>
         }
