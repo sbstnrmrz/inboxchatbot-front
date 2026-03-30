@@ -20,8 +20,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/features/auth/context"
+import { getBaseLoginUrl } from "@/features/auth/utils/getRedirectPath"
 import { useTheme } from "@/hooks/use-theme"
-import { useNavigate } from "@tanstack/react-router"
 import type { User } from "better-auth"
 import { EllipsisVertical, LogOutIcon, MoonIcon, SunIcon } from "lucide-react"
 
@@ -32,12 +32,11 @@ interface Props {
 export function InboxLayoutFooter({user}: Props) {
   const { isMobile } = useSidebar()
   const { signOut, isPending } = useAuth();
-  const navigate = useNavigate();
   const {theme, toggleTheme} = useTheme();
 
   const handleLogout = async() => {
     await signOut();
-    navigate({to: '/auth/login'})
+    window.location.href = getBaseLoginUrl();
   }
 
   return (

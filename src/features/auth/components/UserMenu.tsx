@@ -1,13 +1,12 @@
 import { useAuth } from "@/features/auth/context"
+import { getBaseLoginUrl } from "@/features/auth/utils/getRedirectPath"
 import { Button } from "@/components/ui/button"
-import { useNavigate } from "@tanstack/react-router"
 import { LogOut, MoonIcon, SunIcon, User } from "lucide-react"
 import { toast } from "sonner"
 import { useTheme } from "next-themes"
 
 export function UserMenu() {
   const { session, signOut, isAuthenticated } = useAuth()
-  const navigate = useNavigate()
   const {theme, setTheme} = useTheme();
 
   if (!isAuthenticated || !session) {
@@ -18,7 +17,7 @@ export function UserMenu() {
     try {
       await signOut()
       toast.success("Sesión cerrada exitosamente")
-      navigate({ to: "/auth/login" })
+      window.location.href = getBaseLoginUrl()
     } catch (error) {
       console.error("Error al cerrar sesión:", error)
       toast.error("Error al cerrar sesión")

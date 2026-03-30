@@ -22,3 +22,13 @@ export function getTenantInboxUrl(slug: string): string {
   const protocol = new URL(env.VITE_API_URL).protocol
   return `${protocol}//${slug}.${env.VITE_BASE_DOMAIN}/inbox`
 }
+
+/**
+ * Returns the login URL on the base domain so that after logout the browser
+ * is sent away from any tenant subdomain.
+ * Ejemplo: VITE_BASE_DOMAIN="localtest.me" → "http://localtest.me/auth/login"
+ */
+export function getBaseLoginUrl(): string {
+  const protocol = new URL(env.VITE_API_URL).protocol
+  return `${protocol}//${env.VITE_BASE_DOMAIN}/auth/login`
+}

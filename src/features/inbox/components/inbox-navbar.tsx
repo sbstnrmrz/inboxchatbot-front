@@ -2,8 +2,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/features/auth/context";
+import { getBaseLoginUrl } from "@/features/auth/utils/getRedirectPath";
 import { useTheme } from "@/hooks/use-theme";
-import { useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { LogOutIcon, MessageSquareIcon, MoonIcon, SunIcon, UsersIcon } from "lucide-react"
 
 const navItems = [
@@ -20,7 +21,7 @@ export const InboxNavBar = () => {
 
   const handleLogout = async() => {
     await signOut();
-    navigate({to: '/auth/login'})
+    window.location.href = getBaseLoginUrl();
   }
 
   return (

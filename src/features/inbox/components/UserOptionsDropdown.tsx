@@ -3,28 +3,19 @@ import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/features/auth/context"
-import { useNavigate } from "@tanstack/react-router"
-import {
-  BadgeCheckIcon,
-  BellIcon,
-  CreditCardIcon,
-  EllipsisVerticalIcon,
-  LogOutIcon,
-} from "lucide-react"
+import { getBaseLoginUrl } from "@/features/auth/utils/getRedirectPath"
+import { EllipsisVerticalIcon, LogOutIcon } from "lucide-react"
 
 export function UserOptionsDropdown() {
   const {signOut, isPending} = useAuth();
-  const navigate = useNavigate();
 
   const handleLogout = async() => {
-    await signOut(); 
-    navigate({to: '/auth/login'});
+    await signOut();
+    window.location.href = getBaseLoginUrl();
   }
 
   return (

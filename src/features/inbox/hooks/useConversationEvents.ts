@@ -34,10 +34,9 @@ export function useConversationEvents({ socket }: UseConversationEventsOptions) 
     const handleConversationCreated = async (data: Conversation) => {
       logger.debug("[useConversationEvents] conversation_created", data)
 
-      // Sync conversation into IndexedDB
-      await syncConversation(data).catch(console.error)
-
-      // Fetch the customer if not already cached
+      // Fetch and cache the customer BEFORE syncing the conversation so that
+      // when Dexie reactivity fires and the list item renders for the first
+      // time, the customer name is already available in IndexedDB.
       const cached = await customersRepository.getById(data.customerId).catch(() => undefined)
       if (!cached) {
         await customersQueries
@@ -45,6 +44,9 @@ export function useConversationEvents({ socket }: UseConversationEventsOptions) 
           .then((customer) => syncCustomer(customer))
           .catch((err) => logger.error("[useConversationEvents] failed to fetch customer", err))
       }
+
+      // Sync conversation into IndexedDB (triggers reactive UI update)
+      await syncConversation(data).catch(console.error)
 
       // Refresh conversations query so TanStack Query cache stays in sync
       queryClient.invalidateQueries({ queryKey: queryKeys.conversations.all() })
