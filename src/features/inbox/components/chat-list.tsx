@@ -4,6 +4,8 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { ChatListItem } from './chat-list-item';
 import { Spinner } from '@/components/ui/spinner';
 import { useLiveConversations } from '../hooks/useLiveConversations';
+import { useConversationSearch } from '../hooks/useConversationSearch';
+import { useDebounce } from '@/hooks/use-debounce';
 import { logger } from '@/lib/logger';
 import type { ConversationChannel } from '@/types/conversation.type';
 import { ChannelFilters } from './ChannelFilters';
@@ -18,6 +20,7 @@ interface ChatListProps {
   hasNextPage?: boolean;
   fetchNextPage?: (options?: FetchNextPageOptions) => void;
   isFetchingNextPage?: boolean;
+  searchQuery?: string;
 }
 
 type ChannelFilterValue = ConversationChannel | "ALL";
@@ -28,13 +31,22 @@ export const ChatList = ({
   hasNextPage,
   fetchNextPage,
   isFetchingNextPage,
+  searchQuery = "",
 }: ChatListProps) => {
-  const { conversations, isLoading } = useLiveConversations();
+  const debouncedSearch = useDebounce(searchQuery);
+  const isSearchActive = debouncedSearch.trim().length > 0;
+
+  const { conversations, isLoading: isLiveLoading } = useLiveConversations();
+  const { data: searchResults, isPending: isSearchPending } = useConversationSearch(debouncedSearch);
+
+  const isLoading = isSearchActive ? isSearchPending && !searchResults : isLiveLoading;
+  const baseConversations = isSearchActive ? (searchResults ?? []) : conversations;
+
   const [channelFilter, setChannelFilter] = useState<ChannelFilterValue>("ALL");
   const [tagFilter, setTagFilter] = useState<string>("ALL");
 
   const filteredConversations = useMemo(() => {
-    let result = conversations;
+    let result = baseConversations;
     if (channelFilter !== "ALL") {
       result = result.filter(conv => conv.channel === channelFilter);
     }
@@ -42,7 +54,7 @@ export const ChatList = ({
       result = result.filter(conv => conv.tags?.includes(tagFilter));
     }
     return result;
-  }, [conversations, channelFilter, tagFilter]);
+  }, [baseConversations, channelFilter, tagFilter]);
 
   useEffect(() => {
     logger.debug('cached conversations', conversations);
@@ -82,7 +94,7 @@ export const ChatList = ({
           <InfiniteScroll
             dataLength={filteredConversations.length}
             next={() => fetchNextPage?.()}
-            hasMore={hasNextPage ?? false}
+            hasMore={!isSearchActive && (hasNextPage ?? false)}
             loader={
               <div className="flex justify-center py-2">
                 <Spinner className="size-5" />

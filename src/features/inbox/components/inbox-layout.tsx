@@ -109,6 +109,7 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
           hasNextPage={hasNextPage}
           fetchNextPage={fetchNextPage}
           isFetchingNextPage={isFetchingNextPage}
+          searchQuery={searchQuery}
         />
       </div>
     )
@@ -132,6 +133,7 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
           hasNextPage={hasNextPage}
           fetchNextPage={fetchNextPage}
           isFetchingNextPage={isFetchingNextPage}
+          searchQuery={searchQuery}
         />
         <SidebarContent>
         </SidebarContent>

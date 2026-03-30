@@ -16,6 +16,8 @@ export interface ConversationsListParams {
   /** Cursor: return conversations with lastMessageAt before this ISO timestamp */
   before?: string
   limit?: number
+  /** Full-text search query */
+  search?: string
 }
 
 export const conversationsQueries = {
@@ -27,6 +29,7 @@ export const conversationsQueries = {
     const searchParams = new URLSearchParams()
     if (params?.before) searchParams.set("before", params.before)
     if (params?.limit) searchParams.set("limit", String(params.limit))
+    if (params?.search) searchParams.set("search", params.search)
     const query = searchParams.toString()
     return apiClient.get<Conversation[]>(
       query ? `/conversations?${query}` : "/conversations",
