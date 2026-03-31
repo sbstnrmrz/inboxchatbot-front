@@ -127,7 +127,7 @@ export const contactsColumns: ColumnDef<CustomerAdditionalDetails>[] = [
     id: "phone",
     header: "Teléfono",
     cell: ({ row }) => row.original.whatsappInfo?.id 
-      ? getFlagEmoji(parsePhoneNumber('+' + row.original.whatsappInfo.id)?.country as string) + ' ' +  parsePhoneNumber('+' + row.original.whatsappInfo.id)?.formatInternational() 
+      ? (parsePhoneNumber('+' + row.original.whatsappInfo.id)?.country ? getFlagEmoji(parsePhoneNumber('+' + row.original.whatsappInfo.id)!.country as string) + ' ' : '') +  (parsePhoneNumber('+' + row.original.whatsappInfo.id)?.formatInternational() ?? row.original.whatsappInfo.id)
       : '-',
     enableSorting: false,
   },
@@ -194,7 +194,8 @@ export const contactsColumns: ColumnDef<CustomerAdditionalDetails>[] = [
   },
 ]
 
-function getFlagEmoji(countryCode: string) {
+function getFlagEmoji(countryCode: string | undefined) {
+  if (!countryCode) return '';
   return countryCode
     .toUpperCase()
     .replace(/./g, (char) => 
