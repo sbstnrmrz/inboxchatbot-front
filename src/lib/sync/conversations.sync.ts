@@ -10,8 +10,11 @@ import { messagesRepository } from "@/lib/db/repositories/messages.repository"
 import {
   mapConversationToCache,
   mapConversationsToCache,
+  mapCustomerToCache,
+  mapCustomersToCache,
   mapMessageToCache,
 } from "@/lib/sync/mappers"
+import { customersRepository } from "@/lib/db/repositories/customers.repository"
 import type { CachedConversation } from "@/lib/db/schema"
 import type { Conversation } from "@/types/conversation.type"
 import { db } from "@/lib/db/database"
@@ -56,6 +59,10 @@ export async function syncConversations(conversations: Conversation[]): Promise<
       await db.messages.bulkPut(lastMessages)
     }
   })
+
+  // Sync inline customers outside the conversations transaction
+  const customers = mapCustomersToCache(conversations.map((c) => c.customer))
+  await customersRepository.upsertMany(customers)
 }
 
 /**
@@ -82,6 +89,10 @@ export async function syncConversationsPage(conversations: Conversation[]): Prom
       await db.messages.bulkPut(lastMessages)
     }
   })
+
+  // Sync inline customers
+  const customers = mapCustomersToCache(conversations.map((c) => c.customer))
+  await customersRepository.upsertMany(customers)
 }
 
 /**
@@ -89,6 +100,10 @@ export async function syncConversationsPage(conversations: Conversation[]): Prom
  * Also persists its lastMessage if populated.
  */
 export async function syncConversation(conversation: Conversation): Promise<void> {
+  // Sync the customer first so it's in IndexedDB before Dexie reactivity fires
+  // from the conversation write and the chat list item renders.
+  await customersRepository.upsert(mapCustomerToCache(conversation.customer))
+
   const cached = mapConversationToCache(conversation)
   await conversationsRepository.upsert(cached)
 

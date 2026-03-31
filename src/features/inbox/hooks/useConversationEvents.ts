@@ -13,10 +13,7 @@ import { useEffect } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import type { Socket } from "socket.io-client"
 import { SocketEvents } from "@/features/sockets/types/events"
-import { syncConversation, patchConversation, removeConversation } from "@/lib/sync/conversations.sync"
-import { syncCustomer } from "@/lib/sync/customers.sync"
-import { customersRepository } from "@/lib/db/repositories/customers.repository"
-import { customersQueries } from "@/features/inbox/api/customers.queries"
+import { syncConversation, removeConversation } from "@/lib/sync/conversations.sync"
 import { queryKeys } from "@/lib/query-keys"
 import { logger } from "@/lib/logger"
 import type { Conversation } from "@/types/conversation.type"
@@ -34,21 +31,10 @@ export function useConversationEvents({ socket }: UseConversationEventsOptions) 
     const handleConversationCreated = async (data: Conversation) => {
       logger.debug("[useConversationEvents] conversation_created", data)
 
-      // Fetch and cache the customer BEFORE syncing the conversation so that
-      // when Dexie reactivity fires and the list item renders for the first
-      // time, the customer name is already available in IndexedDB.
-      const cached = await customersRepository.getById(data.customerId).catch(() => undefined)
-      if (!cached) {
-        await customersQueries
-          .getById(data.customerId)
-          .then((customer) => syncCustomer(customer))
-          .catch((err) => logger.error("[useConversationEvents] failed to fetch customer", err))
-      }
-
-      // Sync conversation into IndexedDB (triggers reactive UI update)
+      // syncConversation now handles caching the inline customer first,
+      // so the chat list item renders with the name already available.
       await syncConversation(data).catch(console.error)
 
-      // Refresh conversations query so TanStack Query cache stays in sync
       queryClient.invalidateQueries({ queryKey: queryKeys.conversations.all() })
     }
 

@@ -1,4 +1,5 @@
 import type { Message } from "@/types/message.type"
+import type { Customer } from "@/types/customer.type"
 
 export type ConversationChannel = "WHATSAPP" | "INSTAGRAM"
 
@@ -7,7 +8,7 @@ export type ConversationStatus = "OPEN" | "PENDING" | "CLOSED"
 export interface Conversation {
   _id: string
   tenantId: string
-  customerId: string
+  customer: Customer
   channel: ConversationChannel
   status: ConversationStatus
   /** Populated Message object when fetched from API */

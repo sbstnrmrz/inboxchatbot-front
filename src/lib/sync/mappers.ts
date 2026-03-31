@@ -68,7 +68,7 @@ export function mapConversationToCache(conversation: Conversation): CachedConver
   return {
     id: conversation._id,
     tenantId: conversation.tenantId,
-    customerId: conversation.customerId,
+    customerId: conversation.customer._id,
     channel: conversation.channel,
     status: conversation.status,
     lastMessageId: conversation.lastMessage?._id,

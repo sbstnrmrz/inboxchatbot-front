@@ -20,11 +20,8 @@ import { Socket } from "socket.io-client"
 import { MessageEvent } from "@/features/sockets/types/events"
 import { syncMessage } from "@/lib/sync"
 import { syncConversation } from "@/lib/sync/conversations.sync"
-import { syncCustomer } from "@/lib/sync/customers.sync"
 import { conversationsRepository } from "@/lib/db/repositories/conversations.repository"
-import { customersRepository } from "@/lib/db/repositories/customers.repository"
 import { conversationsQueries } from "@/features/inbox/api/conversations.queries"
-import { customersQueries } from "@/features/inbox/api/customers.queries"
 import { queryKeys } from "@/lib/query-keys"
 import { logger } from "@/lib/logger"
 import type { Message } from "@/types/message.type"
@@ -59,19 +56,8 @@ export function useMessageEvents({ socket }: UseMessageEventsOptions) {
           })
 
         if (conversation) {
-          // Cache customer BEFORE syncing the conversation so that when Dexie
-          // reactivity fires the list item already has the customer name.
-          const cachedCustomer = await customersRepository
-            .getById(conversation.customerId)
-            .catch(() => undefined)
-
-          if (!cachedCustomer) {
-            await customersQueries
-              .getById(conversation.customerId)
-              .then((customer) => syncCustomer(customer))
-              .catch((err) => logger.error("[useMessageEvents] failed to fetch customer", err))
-          }
-
+          // syncConversation caches the inline customer first, then the
+          // conversation, so the list item renders with the name from the start.
           await syncConversation(conversation).catch(console.error)
         }
       }
