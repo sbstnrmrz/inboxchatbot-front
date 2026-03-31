@@ -59,8 +59,8 @@ export function useMessageEvents({ socket }: UseMessageEventsOptions) {
           })
 
         if (conversation) {
-          await syncConversation(conversation).catch(console.error)
-
+          // Cache customer BEFORE syncing the conversation so that when Dexie
+          // reactivity fires the list item already has the customer name.
           const cachedCustomer = await customersRepository
             .getById(conversation.customerId)
             .catch(() => undefined)
@@ -71,6 +71,8 @@ export function useMessageEvents({ socket }: UseMessageEventsOptions) {
               .then((customer) => syncCustomer(customer))
               .catch((err) => logger.error("[useMessageEvents] failed to fetch customer", err))
           }
+
+          await syncConversation(conversation).catch(console.error)
         }
       }
 

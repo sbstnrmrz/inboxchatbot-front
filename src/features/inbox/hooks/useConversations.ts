@@ -11,7 +11,10 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { queryKeys } from "@/lib/query-keys"
 import { conversationsQueries } from "@/features/inbox/api/conversations.queries"
+import { customersQueries } from "@/features/inbox/api/customers.queries"
 import { syncConversations, syncConversationsPage } from "@/lib/sync"
+import { syncCustomer } from "@/lib/sync/customers.sync"
+import { customersRepository } from "@/lib/db/repositories/customers.repository"
 import type { Conversation } from "@/types/conversation.type"
 
 const PAGE_SIZE = 10
@@ -33,9 +36,31 @@ export function useConversations({ enabled = true }: UseConversationsOptions = {
       console.log('[useConversations] fetched', conversations.length, 'conversations')
 
       if (pageParam === undefined) {
-        syncConversations(conversations).catch(console.error)
+        await syncConversations(conversations)
       } else {
-        syncConversationsPage(conversations).catch(console.error)
+        await syncConversationsPage(conversations)
+      }
+
+      // After syncing conversations, fetch any customers not yet in IndexedDB.
+      // This covers the case where a new conversation (with a new customer)
+      // appears via this refetch before the socket event handler had a chance
+      // to cache the customer.
+      const missingIds = (
+        await Promise.all(
+          conversations.map(async (c) => {
+            if (!c.customerId) return null
+            const cached = await customersRepository.getById(c.customerId).catch(() => undefined)
+            return cached ? null : c.customerId
+          }),
+        )
+      ).filter((id): id is string => id !== null)
+
+      if (missingIds.length > 0) {
+        await Promise.allSettled(
+          missingIds.map((id) =>
+            customersQueries.getById(id).then((c) => syncCustomer(c)).catch(() => {}),
+          ),
+        )
       }
 
       return conversations

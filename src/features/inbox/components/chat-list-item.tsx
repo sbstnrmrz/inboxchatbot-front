@@ -46,7 +46,7 @@ export function ChatListItem({ conversation, isSelected, onClick }: ChatListItem
         </Avatar>
         <div className="w-full min-w-0 flex flex-col justify-center">
           <ChatItemHeader
-            customerName={customer?.name ?? customerId}
+            customerName={customer?.name ?? ""}
             lastMessageAt={conversation.lastMessageAt}
           />
           <ChatItemLastMessage
