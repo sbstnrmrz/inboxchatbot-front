@@ -19,7 +19,9 @@ function calcCost(provider: string, channels: LlmUsageTotals[keyof LlmUsageTotal
   if (!rates || !channels) return 0
   return Object.values(channels).reduce((sum, ch) => {
     if (!ch) return sum
-    return sum + ((ch.inputTokens * rates.input) + (ch.outputTokens * rates.output)) / 1_000_000
+    const inputCost  = (ch.inputTokens  / 1_000_000) * rates.input
+    const outputCost = (ch.outputTokens / 1_000_000) * rates.output
+    return sum + inputCost + outputCost
   }, 0)
 }
 

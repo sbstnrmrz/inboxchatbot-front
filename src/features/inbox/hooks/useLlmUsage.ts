@@ -84,11 +84,7 @@ export function useLlmUsageByRange(from: Date, to: Date) {
   const results = useQueries({
     queries: dates.map((date) => ({
       queryKey: queryKeys.llmUsage.totals({ date }),
-      queryFn: async () => {
-        const res = await llmUsageQueries.totals({ date })
-        console.log(`[llm-usage] ${date}`, res)
-        return res
-      },
+      queryFn: () => llmUsageQueries.totals({ date }),
     })),
   })
 
