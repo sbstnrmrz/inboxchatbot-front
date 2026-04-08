@@ -58,6 +58,91 @@ function formatCost(usd: number) {
   return usd.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 4 })
 }
 
+function SectionHeader({ title }: { title: string }) {
+  return <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{title}</h2>
+}
+
+function OverviewTab() {
+  const msgToday  = useMessageCountToday()
+  const msgWeek   = useMessageCountThisWeek()
+  const msgMonth  = useMessageCountThisMonth()
+
+  const cusToday  = useCustomerCountToday()
+  const cusWeek   = useCustomerCountThisWeek()
+  const cusMonth  = useCustomerCountThisMonth()
+
+  const tokToday  = useLlmUsageToday()
+  const tokWeek   = useLlmUsageThisWeek()
+  const tokMonth  = useLlmUsageThisMonth()
+
+  return (
+    <div className="flex flex-col gap-8 mt-4">
+      <div className="flex flex-col gap-3">
+        <SectionHeader title="Mensajes" />
+        <div className="grid grid-cols-3 gap-4">
+          <StatsCard
+            description="Mensajes hoy"
+            title={msgToday.isLoading ? "—" : String(msgToday.data?.total ?? 0)}
+            channels={{ whatsapp: msgToday.data?.whatsapp, instagram: msgToday.data?.instagram }}
+          />
+          <StatsCard
+            description="Mensajes esta semana"
+            title={msgWeek.isLoading ? "—" : String(msgWeek.data?.total ?? 0)}
+            channels={{ whatsapp: msgWeek.data?.whatsapp, instagram: msgWeek.data?.instagram }}
+          />
+          <StatsCard
+            description="Mensajes este mes"
+            title={msgMonth.isLoading ? "—" : String(msgMonth.data?.total ?? 0)}
+            channels={{ whatsapp: msgMonth.data?.whatsapp, instagram: msgMonth.data?.instagram }}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <SectionHeader title="Clientes" />
+        <div className="grid grid-cols-3 gap-4">
+          <StatsCard
+            description="Nuevos hoy"
+            title={cusToday.isLoading ? "—" : String(cusToday.data?.total ?? 0)}
+            channels={{ whatsapp: cusToday.data?.whatsapp, instagram: cusToday.data?.instagram }}
+          />
+          <StatsCard
+            description="Nuevos esta semana"
+            title={cusWeek.isLoading ? "—" : String(cusWeek.data?.total ?? 0)}
+            channels={{ whatsapp: cusWeek.data?.whatsapp, instagram: cusWeek.data?.instagram }}
+          />
+          <StatsCard
+            description="Nuevos este mes"
+            title={cusMonth.isLoading ? "—" : String(cusMonth.data?.total ?? 0)}
+            channels={{ whatsapp: cusMonth.data?.whatsapp, instagram: cusMonth.data?.instagram }}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <SectionHeader title="Tokens" />
+        <div className="grid grid-cols-3 gap-4">
+          <StatsCard
+            description="Costo hoy"
+            title={tokToday.isLoading ? "—" : formatCost(calcTotalCost(tokToday.data))}
+            footer={tokToday.isLoading ? undefined : formatTokens(calcTotalTokens(tokToday.data))}
+          />
+          <StatsCard
+            description="Costo esta semana"
+            title={tokWeek.isLoading ? "—" : formatCost(calcTotalCost(tokWeek.data))}
+            footer={tokWeek.isLoading ? undefined : formatTokens(calcTotalTokens(tokWeek.data))}
+          />
+          <StatsCard
+            description="Costo este mes"
+            title={tokMonth.isLoading ? "—" : formatCost(calcTotalCost(tokMonth.data))}
+            footer={tokMonth.isLoading ? undefined : formatTokens(calcTotalTokens(tokMonth.data))}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function TokensTab() {
   const totals = useLlmUsageTotals()
   const today  = useLlmUsageToday()
@@ -183,16 +268,7 @@ export function StatisticsPage() {
         </TabsList>
 
         <TabsContent value="overview">
-          <div className="grid grid-cols-3 gap-4 mt-4">
-            <StatsCard
-              description="Tokens de OpenAI"
-              title="$243435"
-            />
-            <StatsCard
-              description="Tokens de Gemini"
-              title="$243435"
-            />
-          </div>
+          <OverviewTab />
         </TabsContent>
 
         <TabsContent value="messages">

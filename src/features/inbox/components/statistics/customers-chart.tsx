@@ -89,7 +89,6 @@ export function CustomersChart() {
                 fill="url(#fillCustomerInstagram)"
                 stroke="var(--chart-2)"
                 strokeWidth={2}
-                stackId="a"
               />
               <Area
                 dataKey="whatsapp"
@@ -97,7 +96,6 @@ export function CustomersChart() {
                 fill="url(#fillCustomerWhatsapp)"
                 stroke="var(--chart-1)"
                 strokeWidth={2}
-                stackId="a"
               />
             </AreaChart>
           </ChartContainer>
