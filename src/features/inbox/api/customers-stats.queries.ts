@@ -7,7 +7,9 @@ export interface CustomerCountParams {
 }
 
 export interface CustomerCountResponse {
-  count: number
+  total: number
+  whatsapp?: number
+  instagram?: number
 }
 
 export const customerStatsQueries = {

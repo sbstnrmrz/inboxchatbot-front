@@ -7,7 +7,9 @@ export interface MessageCountParams {
 }
 
 export interface MessageCountResponse {
-  count: number
+  total: number
+  whatsapp?: number
+  instagram?: number
 }
 
 export const messageStatsQueries = {

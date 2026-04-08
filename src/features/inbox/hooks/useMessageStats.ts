@@ -67,7 +67,9 @@ function getDatesInRange(from: Date, to: Date): string[] {
 
 export interface DailyMessageCount {
   date: string
-  count: number
+  total: number
+  whatsapp: number
+  instagram: number
 }
 
 export function useMessageCountByRange(from: Date, to: Date) {
@@ -85,7 +87,9 @@ export function useMessageCountByRange(from: Date, to: Date) {
 
   const data: DailyMessageCount[] = dates.map((date, i) => ({
     date,
-    count: results[i].data?.count ?? 0,
+    total:     results[i].data?.total     ?? 0,
+    whatsapp:  results[i].data?.whatsapp  ?? 0,
+    instagram: results[i].data?.instagram ?? 0,
   }))
 
   return { data, isLoading, isError }

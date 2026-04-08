@@ -18,6 +18,44 @@ function toLocalISO(date: Date): string {
   return `${y}-${m}-${d}`
 }
 
+function getMonday(date: Date): Date {
+  const d = new Date(date)
+  const day = d.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  d.setDate(d.getDate() + diff)
+  return d
+}
+
+function getFirstOfMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), 1)
+}
+
+export function useLlmUsageToday() {
+  const today = toLocalISO(new Date())
+  return useQuery({
+    queryKey: queryKeys.llmUsage.totals({ date: today }),
+    queryFn: () => llmUsageQueries.totals({ date: today }),
+  })
+}
+
+export function useLlmUsageThisWeek() {
+  const from = toLocalISO(getMonday(new Date()))
+  const to = toLocalISO(new Date())
+  return useQuery({
+    queryKey: queryKeys.llmUsage.totals({ from, to }),
+    queryFn: () => llmUsageQueries.totals({ from, to }),
+  })
+}
+
+export function useLlmUsageThisMonth() {
+  const from = toLocalISO(getFirstOfMonth(new Date()))
+  const to = toLocalISO(new Date())
+  return useQuery({
+    queryKey: queryKeys.llmUsage.totals({ from, to }),
+    queryFn: () => llmUsageQueries.totals({ from, to }),
+  })
+}
+
 function getDatesInRange(from: Date, to: Date): string[] {
   const dates: string[] = []
   const current = new Date(from.getFullYear(), from.getMonth(), from.getDate())
