@@ -35,6 +35,11 @@ const links = [
     path: "/users",
     icon: Users,
   },
+  {
+    title: "Users",
+    path: "/users",
+    icon: Users,
+  },
 ]
 
 export function NavMain() {

@@ -36,4 +36,19 @@ export const queryKeys = {
   tags: {
     all: () => ["tags"] as const,
   },
+
+  messageStats: {
+    count: (params?: { date?: string; from?: string; to?: string }) =>
+      ["messageStats", "count", params ?? {}] as const,
+  },
+
+  customerStats: {
+    count: (params?: { date?: string; from?: string; to?: string }) =>
+      ["customerStats", "count", params ?? {}] as const,
+  },
+
+  llmUsage: {
+    totals: (params?: { date?: string; from?: string; to?: string }) =>
+      ["llmUsage", "totals", params ?? {}] as const,
+  },
 } as const
