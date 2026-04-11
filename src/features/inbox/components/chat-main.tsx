@@ -101,6 +101,7 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false, m
                     return (
                       <div
                         key={message.id}
+                        id={message.execId ?? ""}
                         className="flex flex-col gap-4"
                         ref={(el) => {
                           if (el) messageRefs.current.set(message.id, el)

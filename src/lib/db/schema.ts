@@ -78,6 +78,7 @@ export interface CachedMessage {
   body?: string
   media?: MessageMedia
   externalId?: string
+  execId?: string
   status: MessageStatus
   /** Unix ms — channel timestamp, mirrors server sentAt */
   sentAt: number

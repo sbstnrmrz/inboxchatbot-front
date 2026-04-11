@@ -102,6 +102,7 @@ export function mapMessageToCache(message: Message): CachedMessage {
     body: message.body,
     media: message.media,
     externalId: message.externalId,
+    execId: message.execId,
     status: message.status,
     sentAt: new Date(message.sentAt).getTime(),
     deliveredAt: message.deliveredAt

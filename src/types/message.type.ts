@@ -71,6 +71,7 @@ export interface Message {
   body?: string
   media?: MessageMedia
   externalId?: string
+  execId?: string
   status: MessageStatus
   /** Channel timestamp (not server time) */
 
