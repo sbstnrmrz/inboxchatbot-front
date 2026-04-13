@@ -12,6 +12,8 @@ export const BotStatusSwitch = ({
   onToggleBotEnabled, 
   isTogglingBot
 }: BotStatusSwitch) => {
+  
+
   return (
     <div className="flex items-center gap-2">
       <BotIcon className={`${botEnabled ? 'stroke-green-600' : 'stroke-foreground/50'}`}/>

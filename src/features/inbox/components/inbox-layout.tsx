@@ -25,6 +25,9 @@ import { logger } from '@/lib/logger';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Field } from '@/components/ui/field';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { BotStatusSwitch } from './BotStatusSwitch';
+import { useTenantBotStatus, useToggleTenantBot } from '@/features/inbox/hooks/useTenantBotStatus';
+import { useBotToggledEvent } from '@/features/inbox/hooks/useBotToggledEvent';
 
 interface InboxLayoutProps {
   conversationId?: string 
@@ -85,6 +88,12 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
   // Listen for tag events — keeps tags and conversation tag assignments in sync.
   useTagEvents({ socket });
 
+  // Listen for bot_toggled events — keeps tenant bot status in sync across tabs/agents.
+  useBotToggledEvent({ socket });
+
+  const { data: botStatusData } = useTenantBotStatus()
+  const { mutate: toggleTenantBot, isPending: isTogglingBot } = useToggleTenantBot()
+
   const isMobile = useIsMobile()
 
   if (isMobile) {
@@ -123,8 +132,15 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
 
     return (
       <div className="flex flex-col h-screen">
-        <div className="flex items-center px-4 h-[52px] bg-white dark:bg-card border-b border-secondary-white shrink-0">
+        <div className="flex items-center justify-between px-4 h-[52px] bg-white dark:bg-card border-b border-secondary-white shrink-0">
           <h1 className="text-lg font-semibold">Chats</h1>
+          <div className="flex items-center gap-2">
+            <BotStatusSwitch
+              botEnabled={botStatusData?.botEnabled ?? false}
+              onToggleBotEnabled={() => toggleTenantBot()}
+              isTogglingBot={isTogglingBot}
+            />
+          </div>
         </div>
         <div className="flex items-center p-2 bg-primary-white border-b border-secondary-white shrink-0">
           <SearchFilter value={searchQuery} onChange={setSearchQuery} />
@@ -146,8 +162,15 @@ export function InboxLayout({conversationId}: InboxLayoutProps) {
       {/* Vista desktop - sidebar + chat */}
       <Sidebar collapsible="icon" className="flex border-r">
         <SidebarHeader className='bg-primary-white border-b border-secondary-white min-h-[52px] justify-center'>
-          <div className="flex w-full items-center ">
+          <div className="flex w-full items-center justify-between">
             <h1 className=" text-lg font-semibold group-data-[collapsible=icon]:hidden">Chats</h1>
+            <div className="flex items-center gap-2">
+              <BotStatusSwitch
+                botEnabled={botStatusData?.botEnabled ?? false}
+                onToggleBotEnabled={() => toggleTenantBot()}
+                isTogglingBot={isTogglingBot}
+              />
+            </div>
           </div>
         </SidebarHeader>
         <div className="flex items-center p-2 bg-primary-white border-b border-secondary-white group-data-[collapsible=icon]:hidden">

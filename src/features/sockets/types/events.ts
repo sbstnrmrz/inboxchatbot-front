@@ -36,3 +36,7 @@ export enum TagEvent {
   ConversationTagAdded = 'conversation_tag_added',
   ConversationTagRemoved = 'conversation_tag_removed',
 }
+
+export enum TenantEvent {
+  BotToggled = 'bot_toggled',
+}
