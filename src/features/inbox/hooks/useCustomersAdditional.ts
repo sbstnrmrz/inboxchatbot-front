@@ -18,5 +18,6 @@ export function useCustomersAdditional({ enabled = true }: UseCustomersAdditiona
     queryKey: queryKeys.customers.additional(),
     enabled,
     queryFn: customersAdditionalQueries.list,
+    staleTime: 0,
   })
 }
