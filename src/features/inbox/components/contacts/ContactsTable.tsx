@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   flexRender,
   getCoreRowModel,
@@ -31,7 +31,17 @@ import { useCustomersAdditional } from "@/features/inbox/hooks/useCustomersAddit
 import { contactsColumns, type ChannelFilter } from "./columns"
 
 export function ContactsTable() {
-  const { data: customers = [], isPending, isError } = useCustomersAdditional()
+  const [searchInput, setSearchInput] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchInput), 400)
+    return () => clearTimeout(timer)
+  }, [searchInput])
+
+  const { data: customers = [], isPending, isError } = useCustomersAdditional({
+    search: debouncedSearch || undefined,
+  })
 
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -79,8 +89,8 @@ export function ContactsTable() {
         {/* Text search */}
         <Input
           placeholder="Buscar contacto..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           className="bg-white max-w-sm"
         />
 

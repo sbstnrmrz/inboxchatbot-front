@@ -11,13 +11,14 @@ import { customersAdditionalQueries } from "@/features/inbox/api/customers-addit
 
 interface UseCustomersAdditionalOptions {
   enabled?: boolean
+  search?: string
 }
 
-export function useCustomersAdditional({ enabled = true }: UseCustomersAdditionalOptions = {}) {
+export function useCustomersAdditional({ enabled = true, search }: UseCustomersAdditionalOptions = {}) {
   return useQuery({
-    queryKey: queryKeys.customers.additional(),
+    queryKey: queryKeys.customers.additional(search),
     enabled,
-    queryFn: customersAdditionalQueries.list,
+    queryFn: () => customersAdditionalQueries.list({ search }),
     staleTime: 0,
   })
 }

@@ -13,7 +13,17 @@ export interface CustomerAdditionalDetails extends Customer {
   conversationId: string;
 }
 
+export interface CustomersAdditionalParams {
+  search?: string
+}
+
 export const customersAdditionalQueries = {
-  list: (): Promise<CustomerAdditionalDetails[]> =>
-    apiClient.get<CustomerAdditionalDetails[]>("/customers/additional"),
+  list: (params?: CustomersAdditionalParams): Promise<CustomerAdditionalDetails[]> => {
+    const searchParams = new URLSearchParams()
+    if (params?.search) searchParams.set("search", params.search)
+    const query = searchParams.toString()
+    return apiClient.get<CustomerAdditionalDetails[]>(
+      query ? `/customers/additional?${query}` : "/customers/additional",
+    )
+  },
 }

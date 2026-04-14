@@ -179,9 +179,7 @@ export const contactsColumns: ColumnDef<CustomerAdditionalDetails>[] = [
       return (
         <Tooltip>
           <TooltipTrigger asChild>
-            <>
-              <GoToConversationButton conversationId={row.original.conversationId}/>
-            </>
+            <GoToConversationButton conversationId={row.original.conversationId}/>
           </TooltipTrigger>
           <TooltipContent side="top">
             <p>Ir a la conversacion</p>
