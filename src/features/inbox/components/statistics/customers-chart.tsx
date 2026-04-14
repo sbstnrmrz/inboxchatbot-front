@@ -1,4 +1,3 @@
-import { useState } from "react"
 import type { DateRange } from "react-day-picker"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,7 +9,6 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { DateRangePicker } from "./date-range-picker"
 import { useCustomerCountByRange } from "@/features/inbox/hooks/useCustomerStats"
 
 const chartConfig = {
@@ -24,20 +22,16 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-function defaultRange(): DateRange {
-  const to = new Date()
-  const from = new Date()
-  from.setDate(from.getDate() - 29)
-  return { from, to }
-}
-
 function formatDate(dateStr: string) {
   const [year, month, day] = dateStr.split("-")
   return `${day}/${month}/${year.slice(2)}`
 }
 
-export function CustomersChart() {
-  const [range, setRange] = useState<DateRange | undefined>(defaultRange)
+interface CustomersChartProps {
+  range: DateRange | undefined
+}
+
+export function CustomersChart({ range }: CustomersChartProps) {
   const { data, isLoading } = useCustomerCountByRange(
     range?.from ?? new Date(),
     range?.to ?? new Date(),
@@ -47,12 +41,9 @@ export function CustomersChart() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-start justify-between">
-        <div>
-          <CardTitle>Clientes por día</CardTitle>
-          <CardDescription>Nuevos clientes por canal</CardDescription>
-        </div>
-        <DateRangePicker value={range} onChange={setRange} />
+      <CardHeader>
+        <CardTitle>Clientes por día</CardTitle>
+        <CardDescription>Nuevos clientes por canal</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (

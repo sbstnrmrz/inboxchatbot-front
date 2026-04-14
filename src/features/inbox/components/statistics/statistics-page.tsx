@@ -24,6 +24,7 @@ import {
   useCustomerCountToday,
   useCustomerCountThisWeek,
   useCustomerCountThisMonth,
+  useCustomerCountByRange,
 } from "@/features/inbox/hooks/useCustomerStats";
 
 const PRICING: Record<string, { input: number; output: number }> = {
@@ -195,10 +196,27 @@ function TokensTab() {
   )
 }
 
+function defaultCustomersRange(): DateRange {
+  const to = new Date()
+  const from = new Date()
+  from.setDate(from.getDate() - 29)
+  return { from, to }
+}
+
 function CustomersTab() {
   const today = useCustomerCountToday()
   const week = useCustomerCountThisWeek()
   const month = useCustomerCountThisMonth()
+
+  const [range, setRange] = useState<DateRange | undefined>(defaultCustomersRange)
+  const { data: rangeData, isLoading: rangeLoading } = useCustomerCountByRange(
+    range?.from ?? new Date(),
+    range?.to ?? new Date(),
+  )
+
+  const rangeTotal = rangeData.reduce((sum, d) => sum + d.total, 0)
+  const rangeWhatsapp = rangeData.reduce((sum, d) => sum + d.whatsapp, 0)
+  const rangeInstagram = rangeData.reduce((sum, d) => sum + d.instagram, 0)
 
   return (
     <div className="flex flex-col gap-6 mt-4">
@@ -219,7 +237,19 @@ function CustomersTab() {
           channels={{ whatsapp: month.data?.whatsapp, instagram: month.data?.instagram }}
         />
       </div>
-      <CustomersChart />
+      <div className="flex flex-col gap-4">
+        <DateRangePicker value={range} onChange={setRange} />
+        <div className="grid grid-cols-4 gap-4">
+          <StatsCard
+            description="Total en el rango"
+            title={rangeLoading ? "—" : String(rangeTotal)}
+            channels={{ whatsapp: rangeLoading ? undefined : rangeWhatsapp, instagram: rangeLoading ? undefined : rangeInstagram }}
+          />
+          <div className="col-span-3">
+            <CustomersChart range={range} />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
