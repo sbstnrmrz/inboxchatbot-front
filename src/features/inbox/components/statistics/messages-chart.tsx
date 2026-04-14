@@ -1,4 +1,3 @@
-import { useState } from "react"
 import type { DateRange } from "react-day-picker"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,7 +9,6 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { DateRangePicker } from "./date-range-picker"
 import { useMessageCountByRange } from "@/features/inbox/hooks/useMessageStats"
 
 const chartConfig = {
@@ -24,20 +22,16 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-function defaultRange(): DateRange {
-  const to = new Date()
-  const from = new Date()
-  from.setDate(from.getDate() - 29)
-  return { from, to }
-}
-
 function formatDate(dateStr: string) {
   const [year, month, day] = dateStr.split("-")
   return `${day}/${month}/${year.slice(2)}`
 }
 
-export function MessagesChart() {
-  const [range, setRange] = useState<DateRange | undefined>(defaultRange)
+interface MessagesChartProps {
+  range: DateRange | undefined
+}
+
+export function MessagesChart({ range }: MessagesChartProps) {
   const { data, isLoading } = useMessageCountByRange(
     range?.from ?? new Date(),
     range?.to ?? new Date(),
@@ -47,12 +41,9 @@ export function MessagesChart() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-start justify-between">
-        <div>
-          <CardTitle>Mensajes por día</CardTitle>
-          <CardDescription>Mensajes recibidos por canal</CardDescription>
-        </div>
-        <DateRangePicker value={range} onChange={setRange} />
+      <CardHeader>
+        <CardTitle>Mensajes por día</CardTitle>
+        <CardDescription>Mensajes recibidos por canal</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (

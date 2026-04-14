@@ -1,6 +1,9 @@
+import { useState } from "react";
+import type { DateRange } from "react-day-picker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatsCard } from "./stats-card";
 import { MessagesChart } from "./messages-chart";
+import { DateRangePicker } from "./date-range-picker";
 import { CustomersChart } from "./customers-chart";
 import { LlmUsageCard } from "./llm-usage-card";
 import { LlmUsageChart } from "./llm-usage-chart";
@@ -15,6 +18,7 @@ import {
   useMessageCountToday,
   useMessageCountThisWeek,
   useMessageCountThisMonth,
+  useMessageCountByRange,
 } from "@/features/inbox/hooks/useMessageStats";
 import {
   useCustomerCountToday,
@@ -220,10 +224,27 @@ function CustomersTab() {
   )
 }
 
+function defaultRange(): DateRange {
+  const to = new Date()
+  const from = new Date()
+  from.setDate(from.getDate() - 29)
+  return { from, to }
+}
+
 function MessagesTab() {
   const today = useMessageCountToday()
   const week = useMessageCountThisWeek()
   const month = useMessageCountThisMonth()
+
+  const [range, setRange] = useState<DateRange | undefined>(defaultRange)
+  const { data: rangeData, isLoading: rangeLoading } = useMessageCountByRange(
+    range?.from ?? new Date(),
+    range?.to ?? new Date(),
+  )
+
+  const rangeTotal = rangeData.reduce((sum, d) => sum + d.total, 0)
+  const rangeWhatsapp = rangeData.reduce((sum, d) => sum + d.whatsapp, 0)
+  const rangeInstagram = rangeData.reduce((sum, d) => sum + d.instagram, 0)
 
   return (
     <div className="flex flex-col gap-6 mt-4">
@@ -244,7 +265,19 @@ function MessagesTab() {
           channels={{ whatsapp: month.data?.whatsapp, instagram: month.data?.instagram }}
         />
       </div>
-      <MessagesChart />
+      <div className="flex flex-col gap-4">
+        <DateRangePicker value={range} onChange={setRange} />
+        <div className="grid grid-cols-4 gap-4">
+          <StatsCard
+            description="Total en el rango"
+            title={rangeLoading ? "—" : String(rangeTotal)}
+            channels={{ whatsapp: rangeLoading ? undefined : rangeWhatsapp, instagram: rangeLoading ? undefined : rangeInstagram }}
+          />
+          <div className="col-span-3">
+            <MessagesChart range={range} />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -1,4 +1,3 @@
-import { useState } from "react"
 import type { DateRange } from "react-day-picker"
 import { CalendarIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -17,8 +16,6 @@ interface DateRangePickerProps {
 }
 
 export function DateRangePicker({ value, onChange, className }: DateRangePickerProps) {
-  const [open, setOpen] = useState(false)
-
   const label =
     value?.from && value?.to
       ? `${formatDate(value.from)} — ${formatDate(value.to)}`
@@ -27,7 +24,7 @@ export function DateRangePicker({ value, onChange, className }: DateRangePickerP
         : "Seleccionar rango"
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -39,12 +36,11 @@ export function DateRangePicker({ value, onChange, className }: DateRangePickerP
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="end">
         <Calendar
+          autoFocus
           mode="range"
+          defaultMonth={value?.from}
           selected={value}
-          onSelect={(range) => {
-            onChange(range)
-            if (range?.from && range?.to) setOpen(false)
-          }}
+          onSelect={onChange}
           disabled={{ after: new Date() }}
           numberOfMonths={2}
         />
