@@ -30,8 +30,6 @@ import {
 import { useCustomersAdditional } from "@/features/inbox/hooks/useCustomersAdditional"
 import { contactsColumns, type ChannelFilter } from "./columns"
 
-
-
 export function ContactsTable() {
   const { data: customers = [], isPending, isError } = useCustomersAdditional()
 
@@ -72,7 +70,7 @@ export function ContactsTable() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col flex-1 min-h-0">
       {/* Toolbar */}
       <div className="flex items-center gap-2 py-4">
         {/* Text search */}
@@ -80,13 +78,13 @@ export function ContactsTable() {
           placeholder="Buscar contacto..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
-          className="max-w-sm"
+          className="bg-white max-w-sm"
         />
 
         {/* Channel filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">
+            <Button className="bg-white" variant="outline">
               Canal <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -115,7 +113,7 @@ export function ContactsTable() {
         {/* Column visibility */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="bg-white ml-auto">
               Columnas <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -142,8 +140,8 @@ export function ContactsTable() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-md border">
-        <Table>
+      <div className="w-full rounded-md border flex-1 overflow-auto min-h-0 bg-white">
+        <Table className="w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -193,6 +191,7 @@ export function ContactsTable() {
         </div>
         <div className="space-x-2">
           <Button
+            className="bg-white"
             variant="outline"
             size="sm"
             onClick={() => table.previousPage()}
@@ -201,6 +200,7 @@ export function ContactsTable() {
             Anterior
           </Button>
           <Button
+            className="bg-white"
             variant="outline"
             size="sm"
             onClick={() => table.nextPage()}
