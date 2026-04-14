@@ -238,7 +238,7 @@ function CustomersTab() {
         />
       </div>
       <div className="flex flex-col gap-4">
-        <DateRangePicker value={range} onChange={setRange} />
+        <DateRangePicker className="bg-white" value={range} onChange={setRange} />
         <div className="grid grid-cols-4 gap-4">
           <StatsCard
             description="Total en el rango"
@@ -296,7 +296,7 @@ function MessagesTab() {
         />
       </div>
       <div className="flex flex-col gap-4">
-        <DateRangePicker value={range} onChange={setRange} />
+        <DateRangePicker className="bg-white" value={range} onChange={setRange} />
         <div className="grid grid-cols-4 gap-4">
           <StatsCard
             description="Total en el rango"
