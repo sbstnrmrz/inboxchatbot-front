@@ -30,7 +30,8 @@ export const queryKeys = {
     all: () => ["customers"] as const,
     list: () => ["customers", "list"] as const,
     detail: (id: string) => ["customers", id] as const,
-    additional: (search?: string) => ["customers", "additional", search ?? ""] as const,
+    additional: (params?: { search?: string; page?: number; limit?: number }) =>
+      ["customers", "additional", params?.search ?? "", params?.page ?? 1, params?.limit ?? 20] as const,
   },
 
   tags: {

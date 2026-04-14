@@ -3,7 +3,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
   type ColumnFiltersState,
@@ -30,18 +29,29 @@ import {
 import { useCustomersAdditional } from "@/features/inbox/hooks/useCustomersAdditional"
 import { contactsColumns, type ChannelFilter } from "./columns"
 
+const PAGE_SIZE = 20
+
 export function ContactsTable() {
   const [searchInput, setSearchInput] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(searchInput), 400)
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput)
+      setPage(1)
+    }, 400)
     return () => clearTimeout(timer)
   }, [searchInput])
 
-  const { data: customers = [], isPending, isError } = useCustomersAdditional({
+  const { data, isPending, isError } = useCustomersAdditional({
     search: debouncedSearch || undefined,
+    page,
+    limit: PAGE_SIZE,
   })
+
+  const customers = data?.data ?? []
+  const totalPages = data?.totalPages ?? 1
 
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -59,10 +69,7 @@ export function ContactsTable() {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: { pageSize: 20 },
-    },
+    manualPagination: true,
     state: {
       sorting,
       columnFilters,
@@ -200,19 +207,19 @@ export function ContactsTable() {
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
           {table.getFilteredSelectedRowModel().rows.length} de{" "}
-          {table.getFilteredRowModel().rows.length} fila(s) seleccionada(s).
+          {data?.total ?? 0} fila(s) seleccionada(s).
         </div>
         <div className="flex items-center gap-3">
           <span className="text-muted-foreground text-sm">
-            Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
+            Página {page} de {totalPages}
           </span>
           <div className="space-x-2">
             <Button
               className="bg-white"
               variant="outline"
               size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
+              onClick={() => setPage((p) => p - 1)}
+              disabled={page <= 1}
             >
               Anterior
             </Button>
@@ -220,8 +227,8 @@ export function ContactsTable() {
               className="bg-white"
               variant="outline"
               size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
+              onClick={() => setPage((p) => p + 1)}
+              disabled={page >= totalPages}
             >
               Siguiente
             </Button>

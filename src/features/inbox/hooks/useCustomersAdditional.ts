@@ -12,13 +12,15 @@ import { customersAdditionalQueries } from "@/features/inbox/api/customers-addit
 interface UseCustomersAdditionalOptions {
   enabled?: boolean
   search?: string
+  page?: number
+  limit?: number
 }
 
-export function useCustomersAdditional({ enabled = true, search }: UseCustomersAdditionalOptions = {}) {
+export function useCustomersAdditional({ enabled = true, search, page = 1, limit = 20 }: UseCustomersAdditionalOptions = {}) {
   return useQuery({
-    queryKey: queryKeys.customers.additional(search),
+    queryKey: queryKeys.customers.additional({ search, page, limit }),
     enabled,
-    queryFn: () => customersAdditionalQueries.list({ search }),
+    queryFn: () => customersAdditionalQueries.list({ search, page, limit }),
     staleTime: 0,
   })
 }

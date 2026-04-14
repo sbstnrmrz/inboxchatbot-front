@@ -15,14 +15,26 @@ export interface CustomerAdditionalDetails extends Customer {
 
 export interface CustomersAdditionalParams {
   search?: string
+  page?: number
+  limit?: number
+}
+
+export interface CustomersAdditionalResponse {
+  data: CustomerAdditionalDetails[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
 }
 
 export const customersAdditionalQueries = {
-  list: (params?: CustomersAdditionalParams): Promise<CustomerAdditionalDetails[]> => {
+  list: (params?: CustomersAdditionalParams): Promise<CustomersAdditionalResponse> => {
     const searchParams = new URLSearchParams()
     if (params?.search) searchParams.set("search", params.search)
+    if (params?.page) searchParams.set("page", String(params.page))
+    if (params?.limit) searchParams.set("limit", String(params.limit))
     const query = searchParams.toString()
-    return apiClient.get<CustomerAdditionalDetails[]>(
+    return apiClient.get<CustomersAdditionalResponse>(
       query ? `/customers/additional?${query}` : "/customers/additional",
     )
   },
