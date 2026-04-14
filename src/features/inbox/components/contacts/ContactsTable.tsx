@@ -205,10 +205,10 @@ export function ContactsTable() {
 
       {/* Footer: selection count + pagination */}
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
+        {/* <div className="text-muted-foreground flex-1 text-sm">
           {table.getFilteredSelectedRowModel().rows.length} de{" "}
           {data?.total ?? 0} fila(s) seleccionada(s).
-        </div>
+        </div> */}
         <div className="flex items-center gap-3">
           <span className="text-muted-foreground text-sm">
             Página {page} de {totalPages}

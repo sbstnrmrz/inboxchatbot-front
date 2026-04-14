@@ -79,7 +79,7 @@ function TagsCell({ conversationId }: { conversationId: string }) {
 
 // Static array — module-level so the reference never changes between renders.
 export const contactsColumns: ColumnDef<CustomerAdditionalDetails>[] = [
-  {
+  /* {
     id: "select",
     header: ({ table }) => (
       <Checkbox
@@ -100,7 +100,7 @@ export const contactsColumns: ColumnDef<CustomerAdditionalDetails>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
-  },
+  }, */
   {
     accessorKey: "name",
     header: ({ column }) => (
