@@ -98,13 +98,13 @@ export function ContactsTable() {
           placeholder="Buscar contacto..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="bg-white max-w-sm"
+          className="bg-white dark:bg-card max-w-sm"
         />
 
         {/* Channel filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button className="bg-white" variant="outline">
+            <Button className="bg-white dark:bg-card" variant="outline">
               Canal <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -133,7 +133,7 @@ export function ContactsTable() {
         {/* Column visibility */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="bg-white ml-auto">
+            <Button variant="outline" className="bg-white dark:bg-card ml-auto">
               Columnas <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -160,9 +160,9 @@ export function ContactsTable() {
       </div>
 
       {/* Table */}
-      <div className="w-full rounded-md border flex-1 overflow-auto min-h-0 bg-white">
-        <Table className="w-full">
-          <TableHeader className="bg-white">
+      <div className="w-full rounded-md border flex-1 overflow-auto min-h-0 ">
+        <Table className="w-full bg-white dark:bg-card">
+          <TableHeader className="bg-white dark:bg-card">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -215,7 +215,7 @@ export function ContactsTable() {
           </span>
           <div className="space-x-2">
             <Button
-              className="bg-white"
+              className="bg-white dark:bg-card"
               variant="outline"
               size="sm"
               onClick={() => setPage((p) => p - 1)}
@@ -224,7 +224,7 @@ export function ContactsTable() {
               Anterior
             </Button>
             <Button
-              className="bg-white"
+              className="bg-white dark:bg-card"
               variant="outline"
               size="sm"
               onClick={() => setPage((p) => p + 1)}
