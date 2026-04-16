@@ -320,7 +320,7 @@ export function AdminStatisticsPage() {
   const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null)
 
   return (
-    <div className="flex flex-col p-8 w-full min-h-full overflow-y-auto">
+    <div className="flex flex-col p-6 w-full min-h-full overflow-y-auto">
       <div className="mb-6 flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Estadísticas</h1>

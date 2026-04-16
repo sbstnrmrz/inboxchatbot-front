@@ -29,7 +29,7 @@ function DashboardLayout() {
     <SidebarProvider className="h-svh overflow-hidden">
       <DashboardSidebar />
       <SidebarInset className="overflow-y-auto">
-        <header className="flex bg-white border-b border-secondary-white shadow-xs h-10 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        <header className="flex bg-white dark:bg-[#1a1a1a] border-b border-secondary-white shadow-xs h-10 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator

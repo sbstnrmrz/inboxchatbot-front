@@ -163,7 +163,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
       <SidebarContent>
         <NavMain />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="w-full justify-center">
         <NavUser user={data.user} />
       </SidebarFooter>
       <SidebarRail />

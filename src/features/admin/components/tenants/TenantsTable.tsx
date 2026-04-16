@@ -31,9 +31,9 @@ export function TenantsTable() {
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
+    <div className="rounded-md border overflow-hidden">
+      <Table className="bg-white dark:bg-card">
+        <TableHeader className="bg-white dark:bg-card">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
