@@ -1,6 +1,6 @@
 "use client"
 
-import { Building2, Building2Icon, ChevronRight, IdCard, Map, Users, type LucideIcon } from "lucide-react"
+import { Building2, Building2Icon, ChartNoAxesCombined, ChevronRight, IdCard, Map, Users, type LucideIcon } from "lucide-react"
 
 import {
   Collapsible,
@@ -26,19 +26,19 @@ const links = [
     icon: Building2,
   },
   {
-    title: "Memberships",
+    title: "Membresías",
     path: "/memberships",
     icon: IdCard,
   },
   {
-    title: "Users",
+    title: "Usuarios",
     path: "/users",
     icon: Users,
   },
   {
-    title: "Users",
-    path: "/users",
-    icon: Users,
+    title: "Estadísticas",
+    path: "/statistics",
+    icon: ChartNoAxesCombined,
   },
 ]
 

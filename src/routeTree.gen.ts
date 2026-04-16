@@ -21,6 +21,7 @@ import { Route as InboxContactsIndexRouteImport } from './routes/inbox/contacts/
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin/dashboard/index'
 import { Route as AdminDashboardUsersIndexRouteImport } from './routes/admin/dashboard/users/index'
 import { Route as AdminDashboardTenantsIndexRouteImport } from './routes/admin/dashboard/tenants/index'
+import { Route as AdminDashboardStatisticsIndexRouteImport } from './routes/admin/dashboard/statistics/index'
 
 const InboxRoute = InboxRouteImport.update({
   id: '/inbox',
@@ -84,6 +85,12 @@ const AdminDashboardTenantsIndexRoute =
     path: '/tenants/',
     getParentRoute: () => AdminDashboardRoute,
   } as any)
+const AdminDashboardStatisticsIndexRoute =
+  AdminDashboardStatisticsIndexRouteImport.update({
+    id: '/statistics/',
+    path: '/statistics/',
+    getParentRoute: () => AdminDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
   '/inbox/contacts/': typeof InboxContactsIndexRoute
   '/inbox/statistics/': typeof InboxStatisticsIndexRoute
+  '/admin/dashboard/statistics/': typeof AdminDashboardStatisticsIndexRoute
   '/admin/dashboard/tenants/': typeof AdminDashboardTenantsIndexRoute
   '/admin/dashboard/users/': typeof AdminDashboardUsersIndexRoute
 }
@@ -108,6 +116,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AdminDashboardIndexRoute
   '/inbox/contacts': typeof InboxContactsIndexRoute
   '/inbox/statistics': typeof InboxStatisticsIndexRoute
+  '/admin/dashboard/statistics': typeof AdminDashboardStatisticsIndexRoute
   '/admin/dashboard/tenants': typeof AdminDashboardTenantsIndexRoute
   '/admin/dashboard/users': typeof AdminDashboardUsersIndexRoute
 }
@@ -123,6 +132,7 @@ export interface FileRoutesById {
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
   '/inbox/contacts/': typeof InboxContactsIndexRoute
   '/inbox/statistics/': typeof InboxStatisticsIndexRoute
+  '/admin/dashboard/statistics/': typeof AdminDashboardStatisticsIndexRoute
   '/admin/dashboard/tenants/': typeof AdminDashboardTenantsIndexRoute
   '/admin/dashboard/users/': typeof AdminDashboardUsersIndexRoute
 }
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard/'
     | '/inbox/contacts/'
     | '/inbox/statistics/'
+    | '/admin/dashboard/statistics/'
     | '/admin/dashboard/tenants/'
     | '/admin/dashboard/users/'
   fileRoutesByTo: FileRoutesByTo
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/inbox/contacts'
     | '/inbox/statistics'
+    | '/admin/dashboard/statistics'
     | '/admin/dashboard/tenants'
     | '/admin/dashboard/users'
   id:
@@ -165,6 +177,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard/'
     | '/inbox/contacts/'
     | '/inbox/statistics/'
+    | '/admin/dashboard/statistics/'
     | '/admin/dashboard/tenants/'
     | '/admin/dashboard/users/'
   fileRoutesById: FileRoutesById
@@ -264,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardTenantsIndexRouteImport
       parentRoute: typeof AdminDashboardRoute
     }
+    '/admin/dashboard/statistics/': {
+      id: '/admin/dashboard/statistics/'
+      path: '/statistics'
+      fullPath: '/admin/dashboard/statistics/'
+      preLoaderRoute: typeof AdminDashboardStatisticsIndexRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
   }
 }
 
@@ -283,12 +303,14 @@ const InboxRouteWithChildren = InboxRoute._addFileChildren(InboxRouteChildren)
 
 interface AdminDashboardRouteChildren {
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
+  AdminDashboardStatisticsIndexRoute: typeof AdminDashboardStatisticsIndexRoute
   AdminDashboardTenantsIndexRoute: typeof AdminDashboardTenantsIndexRoute
   AdminDashboardUsersIndexRoute: typeof AdminDashboardUsersIndexRoute
 }
 
 const AdminDashboardRouteChildren: AdminDashboardRouteChildren = {
   AdminDashboardIndexRoute: AdminDashboardIndexRoute,
+  AdminDashboardStatisticsIndexRoute: AdminDashboardStatisticsIndexRoute,
   AdminDashboardTenantsIndexRoute: AdminDashboardTenantsIndexRoute,
   AdminDashboardUsersIndexRoute: AdminDashboardUsersIndexRoute,
 }
