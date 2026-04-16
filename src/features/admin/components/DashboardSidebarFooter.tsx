@@ -1,12 +1,10 @@
 "use client"
 
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
-  Sparkles,
+  MoonIcon,
+  SunIcon,
 } from "lucide-react"
 
 import {
@@ -17,10 +15,8 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -31,6 +27,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/features/auth/context"
 import { useNavigate } from "@tanstack/react-router"
+import { useTheme } from "@/hooks/use-theme"
 
 export function NavUser({
   user,
@@ -44,6 +41,7 @@ export function NavUser({
   const { isMobile } = useSidebar();
   const {signOut} = useAuth();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <SidebarMenu>
@@ -83,7 +81,13 @@ export function NavUser({
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuItem 
+            <DropdownMenuItem
+              onClick={toggleTheme}
+            >
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+              {theme === "dark" ? "Modo claro" : "Modo oscuro"}
+            </DropdownMenuItem>
+            <DropdownMenuItem
               onClick={async() => {
                 await signOut();
                 navigate({ to: "/auth/login" })

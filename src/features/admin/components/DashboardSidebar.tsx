@@ -159,7 +159,6 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain />

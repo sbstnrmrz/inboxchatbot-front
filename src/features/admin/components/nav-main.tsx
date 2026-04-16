@@ -48,7 +48,6 @@ export function NavMain() {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {links.map((item) => (
           <SidebarMenuItem>
