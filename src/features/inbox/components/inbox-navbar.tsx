@@ -5,11 +5,12 @@ import { useAuth } from "@/features/auth/context";
 import { getBaseLoginUrl } from "@/features/auth/utils/getRedirectPath";
 import { useTheme } from "@/hooks/use-theme";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { LogOutIcon, MessageSquareIcon, MoonIcon, SunIcon, UsersIcon, ChartNoAxesCombinedIcon } from "lucide-react"
+import { LogOutIcon, ClipboardClockIcon, MessageSquareIcon, MoonIcon, SunIcon, UsersIcon, ChartNoAxesCombinedIcon } from "lucide-react"
 
 const navItems = [
   {label: 'Chats', icon: <MessageSquareIcon className="text-foreground w-5 h-5"/>, link: '/inbox'},
   {label: 'Contactos', icon: <UsersIcon className="text-foreground w-5 h-5"/>, link: '/inbox/contacts'},
+  {label: 'Agendamientos', icon: <ClipboardClockIcon className="text-foreground w-5 h-5"/>, link: '/inbox/bookings'},
   {label: 'Estadísticas', icon: <ChartNoAxesCombinedIcon className="text-foreground w-5 h-5"/>, link: '/inbox/statistics'},
 ]
 

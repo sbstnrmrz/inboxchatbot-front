@@ -52,4 +52,18 @@ export const queryKeys = {
     totals: (params?: { date?: string; from?: string; to?: string }) =>
       ["llmUsage", "totals", params ?? {}] as const,
   },
+
+  bookings: {
+    all: () => ["bookings"] as const,
+    list: (params?: { page?: number; limit?: number; status?: string }) =>
+      ["bookings", "list", params?.status ?? "", params?.page ?? 1, params?.limit ?? 20] as const,
+  },
+
+  bookingStats: {
+    all: () => ["bookingStats"] as const,
+    count: (params?: { date?: string; from?: string; to?: string }) =>
+      ["bookingStats", "count", params ?? {}] as const,
+    countCreated: (params?: { date?: string; from?: string; to?: string }) =>
+      ["bookingStats", "countCreated", params ?? {}] as const,
+  },
 } as const

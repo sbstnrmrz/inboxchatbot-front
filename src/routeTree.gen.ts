@@ -18,6 +18,7 @@ import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as InboxStatisticsIndexRouteImport } from './routes/inbox/statistics/index'
 import { Route as InboxContactsIndexRouteImport } from './routes/inbox/contacts/index'
+import { Route as InboxBookingsIndexRouteImport } from './routes/inbox/bookings/index'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin/dashboard/index'
 import { Route as AdminDashboardUsersIndexRouteImport } from './routes/admin/dashboard/users/index'
 import { Route as AdminDashboardTenantsIndexRouteImport } from './routes/admin/dashboard/tenants/index'
@@ -68,6 +69,11 @@ const InboxContactsIndexRoute = InboxContactsIndexRouteImport.update({
   path: '/contacts/',
   getParentRoute: () => InboxRoute,
 } as any)
+const InboxBookingsIndexRoute = InboxBookingsIndexRouteImport.update({
+  id: '/bookings/',
+  path: '/bookings/',
+  getParentRoute: () => InboxRoute,
+} as any)
 const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/auth/': typeof AuthIndexRoute
   '/inbox/': typeof InboxIndexRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
+  '/inbox/bookings/': typeof InboxBookingsIndexRoute
   '/inbox/contacts/': typeof InboxContactsIndexRoute
   '/inbox/statistics/': typeof InboxStatisticsIndexRoute
   '/admin/dashboard/statistics/': typeof AdminDashboardStatisticsIndexRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthIndexRoute
   '/inbox': typeof InboxIndexRoute
   '/admin/dashboard': typeof AdminDashboardIndexRoute
+  '/inbox/bookings': typeof InboxBookingsIndexRoute
   '/inbox/contacts': typeof InboxContactsIndexRoute
   '/inbox/statistics': typeof InboxStatisticsIndexRoute
   '/admin/dashboard/statistics': typeof AdminDashboardStatisticsIndexRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/auth/': typeof AuthIndexRoute
   '/inbox/': typeof InboxIndexRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
+  '/inbox/bookings/': typeof InboxBookingsIndexRoute
   '/inbox/contacts/': typeof InboxContactsIndexRoute
   '/inbox/statistics/': typeof InboxStatisticsIndexRoute
   '/admin/dashboard/statistics/': typeof AdminDashboardStatisticsIndexRoute
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/inbox/'
     | '/admin/dashboard/'
+    | '/inbox/bookings/'
     | '/inbox/contacts/'
     | '/inbox/statistics/'
     | '/admin/dashboard/statistics/'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/inbox'
     | '/admin/dashboard'
+    | '/inbox/bookings'
     | '/inbox/contacts'
     | '/inbox/statistics'
     | '/admin/dashboard/statistics'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/inbox/'
     | '/admin/dashboard/'
+    | '/inbox/bookings/'
     | '/inbox/contacts/'
     | '/inbox/statistics/'
     | '/admin/dashboard/statistics/'
@@ -256,6 +268,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InboxContactsIndexRouteImport
       parentRoute: typeof InboxRoute
     }
+    '/inbox/bookings/': {
+      id: '/inbox/bookings/'
+      path: '/bookings'
+      fullPath: '/inbox/bookings/'
+      preLoaderRoute: typeof InboxBookingsIndexRouteImport
+      parentRoute: typeof InboxRoute
+    }
     '/admin/dashboard/': {
       id: '/admin/dashboard/'
       path: '/'
@@ -289,12 +308,14 @@ declare module '@tanstack/react-router' {
 
 interface InboxRouteChildren {
   InboxIndexRoute: typeof InboxIndexRoute
+  InboxBookingsIndexRoute: typeof InboxBookingsIndexRoute
   InboxContactsIndexRoute: typeof InboxContactsIndexRoute
   InboxStatisticsIndexRoute: typeof InboxStatisticsIndexRoute
 }
 
 const InboxRouteChildren: InboxRouteChildren = {
   InboxIndexRoute: InboxIndexRoute,
+  InboxBookingsIndexRoute: InboxBookingsIndexRoute,
   InboxContactsIndexRoute: InboxContactsIndexRoute,
   InboxStatisticsIndexRoute: InboxStatisticsIndexRoute,
 }

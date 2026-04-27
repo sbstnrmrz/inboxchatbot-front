@@ -5,6 +5,7 @@ import { StatsCard } from "./stats-card";
 import { MessagesChart } from "./messages-chart";
 import { DateRangePicker } from "./date-range-picker";
 import { CustomersChart } from "./customers-chart";
+import { BookingsChart } from "./bookings-chart";
 import { LlmUsageCard } from "./llm-usage-card";
 import { LlmUsageChart } from "./llm-usage-chart";
 import {
@@ -25,7 +26,16 @@ import {
   useCustomerCountThisWeek,
   useCustomerCountThisMonth,
   useCustomerCountByRange,
-} from "@/features/inbox/hooks/useCustomerStats";
+} from "@/features/inbox/hooks/useCustomerStats"
+import {
+  useBookingCountToday,
+  useBookingCountThisWeek,
+  useBookingCountThisMonth,
+  useBookingCountByRange,
+  useBookingCreatedToday,
+  useBookingCreatedThisWeek,
+  useBookingCreatedThisMonth,
+} from "@/features/inbox/hooks/useBookingStats";
 
 const PRICING: Record<string, { input: number; output: number }> = {
   openai: { input: 1.75, output: 14 },
@@ -76,6 +86,10 @@ function OverviewTab() {
   const cusWeek   = useCustomerCountThisWeek()
   const cusMonth  = useCustomerCountThisMonth()
 
+  const bkCreatedToday = useBookingCreatedToday()
+  const bkCreatedWeek  = useBookingCreatedThisWeek()
+  const bkCreatedMonth = useBookingCreatedThisMonth()
+
   const tokToday  = useLlmUsageToday()
   const tokWeek   = useLlmUsageThisWeek()
   const tokMonth  = useLlmUsageThisMonth()
@@ -121,6 +135,25 @@ function OverviewTab() {
             title={cusMonth.isLoading ? "—" : String(cusMonth.data?.total ?? 0)}
             channels={{ whatsapp: cusMonth.data?.whatsapp, instagram: cusMonth.data?.instagram }}
           />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <SectionHeader title="Agendamientos" />
+        <div className="grid grid-cols-3 gap-4">
+          <StatsCard
+            description="Creados hoy"
+            title={bkCreatedToday.isLoading ? "—" : String(bkCreatedToday.data?.total ?? 0)}
+          />
+          <StatsCard
+            description="Creados esta semana"
+            title={bkCreatedWeek.isLoading ? "—" : String(bkCreatedWeek.data?.total ?? 0)}
+          />
+          <StatsCard
+            description="Creados este mes"
+            title={bkCreatedMonth.isLoading ? "—" : String(bkCreatedMonth.data?.total ?? 0)}
+          />
+
         </div>
       </div>
 
@@ -312,6 +345,82 @@ function MessagesTab() {
   )
 }
 
+function defaultBookingsRange(): DateRange {
+  const from = new Date()
+  const to = new Date()
+  to.setDate(to.getDate() + 29)
+  return { from, to }
+}
+
+function BookingsTab() {
+  const today = useBookingCountToday()
+  const week  = useBookingCountThisWeek()
+  const month = useBookingCountThisMonth()
+
+  const createdToday = useBookingCreatedToday()
+  const createdWeek  = useBookingCreatedThisWeek()
+  const createdMonth = useBookingCreatedThisMonth()
+
+  const [range, setRange] = useState<DateRange | undefined>(defaultBookingsRange)
+  const { data: rangeData, isLoading: rangeLoading } = useBookingCountByRange(
+    range?.from ?? new Date(),
+    range?.to ?? new Date(),
+  )
+
+  const rangeTotal = rangeData.reduce((sum, d) => sum + d.total, 0)
+
+  return (
+    <div className="flex flex-col gap-6 mt-4">
+      <div className="flex flex-col gap-3">
+        <SectionHeader title="Próximos" />
+        <div className="grid grid-cols-3 gap-4">
+          <StatsCard
+            description="Agendamientos hoy"
+            title={today.isLoading ? "—" : String(today.data?.total ?? 0)}
+          />
+          <StatsCard
+            description="Restantes esta semana"
+            title={week.isLoading ? "—" : String(week.data?.total ?? 0)}
+          />
+          <StatsCard
+            description="Restantes este mes"
+            title={month.isLoading ? "—" : String(month.data?.total ?? 0)}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <SectionHeader title="Creados" />
+        <div className="grid grid-cols-3 gap-4">
+          <StatsCard
+            description="Creados hoy"
+            title={createdToday.isLoading ? "—" : String(createdToday.data?.total ?? 0)}
+          />
+          <StatsCard
+            description="Creados esta semana"
+            title={createdWeek.isLoading ? "—" : String(createdWeek.data?.total ?? 0)}
+          />
+          <StatsCard
+            description="Creados este mes"
+            title={createdMonth.isLoading ? "—" : String(createdMonth.data?.total ?? 0)}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col gap-4">
+        <DateRangePicker className="bg-white" value={range} onChange={setRange} />
+        <div className="grid grid-cols-4 gap-4">
+          <StatsCard
+            description="Total en el rango"
+            title={rangeLoading ? "—" : String(rangeTotal)}
+          />
+          <div className="col-span-3">
+            <BookingsChart range={range} />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function StatisticsPage() {
   return (
     <div className="flex flex-col p-8 w-full min-h-full overflow-y-auto">
@@ -327,6 +436,7 @@ export function StatisticsPage() {
           <TabsTrigger value="overview">Resumen</TabsTrigger>
           <TabsTrigger value="messages">Mensajes</TabsTrigger>
           <TabsTrigger value="customers">Clientes</TabsTrigger>
+          <TabsTrigger value="bookings">Agendamientos</TabsTrigger>
           <TabsTrigger value="tokens">Tokens</TabsTrigger>
         </TabsList>
 
@@ -340,6 +450,10 @@ export function StatisticsPage() {
 
         <TabsContent value="customers">
           <CustomersTab />
+        </TabsContent>
+
+        <TabsContent value="bookings">
+          <BookingsTab />
         </TabsContent>
 
         <TabsContent value="tokens">
