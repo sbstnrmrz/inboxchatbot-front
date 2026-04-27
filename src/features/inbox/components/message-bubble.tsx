@@ -53,7 +53,7 @@ export const MessageBubble = ({ message, customerId, searchQuery, isCurrentMatch
         } ${isCurrentMatch ? "ring-2 ring-blue-400 dark:ring-blue-500" : ""}`}
       >
         <ReferralLabel referral={message.referral}/>
-        <MessageContent body={body} messageType={messageType} media={message.media} channel={message.channel} searchQuery={searchQuery} />
+        <MessageContent body={body} messageType={messageType} media={message.media} channel={message.channel} messageId={message.id} searchQuery={searchQuery} />
         <MessageTimestamp sentAt={sentAt} />
       </div>
     </div>
@@ -81,22 +81,24 @@ function MessageContent({
   messageType,
   media,
   channel,
+  messageId,
   searchQuery,
 }: {
   body?: string
   messageType: CachedMessage["messageType"]
   media?: MessageMedia
   channel: MessageChannel
+  messageId: string
   searchQuery?: string
 }) {
-  // Audio messages: render the player if we have a mediaId
-  if (messageType === "AUDIO" && media?.whatsappMediaId) {
-    return <AudioPlayer channel={channel} mediaId={media.whatsappMediaId} />
+  // Audio messages: render the player if we have a messageId
+  if (messageType === "AUDIO" && messageId) {
+    return <AudioPlayer channel={channel} mediaId={messageId} />
   }
 
   // Image messages: render the viewer + optional lightbox
-  if (messageType === "IMAGE" && media?.whatsappMediaId) {
-    return <ImageViewer channel={channel} mediaId={media.whatsappMediaId} caption={media.caption} />
+  if (messageType === "IMAGE" && messageId) {
+    return <ImageViewer channel={channel} mediaId={messageId} caption={media?.caption} />
   }
 
   if (body) {

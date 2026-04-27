@@ -8,12 +8,15 @@ import {
   sendMessageSchema,
   type SendMessageFormData,
 } from "@/features/inbox/schemas/message.schema";
+import { FilesUploadDropdown } from "./files-upload-dropdown";
 
 export interface MessageInputProps {
   botEnabled: boolean;
   isTogglingBot: boolean;
   onToggleBot: () => void;
   onSend: (body: string) => void;
+  onFileSelected: (file: File) => void;
+  isUploading?: boolean;
   isSending?: boolean;
 }
 
@@ -22,6 +25,8 @@ export const MessageInput = ({
   isTogglingBot,
   onToggleBot,
   onSend,
+  onFileSelected,
+  isUploading = false,
   isSending = false,
 }: MessageInputProps) => {
   const {
@@ -108,6 +113,8 @@ export const MessageInput = ({
           <div className="flex items-center justify-between px-3 pb-3">
             {/* Left buttons */}
             <div className="flex items-center gap-1">
+              <FilesUploadDropdown isUploading={isUploading} onFileSelected={onFileSelected}/>
+
               {isRecording ? (
                 <ButtonWithIcon
                   type="button"

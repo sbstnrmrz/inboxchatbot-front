@@ -13,5 +13,5 @@ export function getFileUrl(
   messageType: string,
   mediaId: string,
 ): string {
-  return `${BASE_URL}/files/${channel}/${messageType}/${mediaId}`
+  return `${BASE_URL}/files/${channel.toLowerCase()}/${messageType.toLowerCase()}/${mediaId}`
 }

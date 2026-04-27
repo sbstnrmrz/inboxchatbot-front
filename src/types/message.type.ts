@@ -58,6 +58,7 @@ export interface SendMessageDto {
   conversationId: string
   messageType: MessageType
   body: string
+  media?: MessageMedia
 }
 
 export interface Message {

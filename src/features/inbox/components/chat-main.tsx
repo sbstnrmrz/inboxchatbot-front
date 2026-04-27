@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useMessages } from "@/features/inbox/hooks/useMessages"
 import { useLiveMessages } from "@/features/inbox/hooks/useLiveMessages"
 import { useToggleBot } from "@/features/inbox/hooks/useToggleBot"
 import { useLiveConversations } from "@/features/inbox/hooks/useLiveConversations"
 import { useSendMessage } from "@/features/inbox/hooks/useSendMessage"
+import { useUploadFile } from "@/features/inbox/hooks/useUploadFile"
 import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer"
 import { useAuth } from "@/features/auth/context"
 import { MessageBubble } from "./message-bubble"
@@ -11,6 +12,7 @@ import { MessageInput } from "./message-input"
 import { Spinner } from "@/components/ui/spinner"
 import type { Socket } from "socket.io-client"
 import { AtSignIcon, MailIcon, PhoneIcon, UserIcon } from "lucide-react"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import type { CachedCustomer } from "@/lib/db"
 import type { ConversationChannel } from "@/types/conversation.type"
 import parsePhoneNumber from "libphonenumber-js"
@@ -70,8 +72,16 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false, m
     senderId,
   })
 
+  const { mutate: uploadFile, isPending: isUploading } = useUploadFile()
+  const [uploadingFile, setUploadingFile] = useState<File | null>(null)
+
   const handleSend = (body: string) => {
     send({ conversationId, messageType: "TEXT", body })
+  }
+
+  const handleFileSelected = (file: File) => {
+    setUploadingFile(file)
+    uploadFile({ file, conversationId }, { onSettled: () => setUploadingFile(null) })
   }
 
   // Scroll to bottom sentinel whenever messages change or conversation switches
@@ -119,6 +129,7 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false, m
                     )
                   })
                 )}
+          {uploadingFile && <UploadingImageBubble file={uploadingFile} />}
           <div ref={bottomRef} />
         </div>
         <div className="px-4 pb-4 shrink-0">
@@ -127,6 +138,8 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false, m
             isTogglingBot={isTogglingBot}
             onToggleBot={() => toggleBot()}
             onSend={handleSend}
+            onFileSelected={handleFileSelected}
+            isUploading={isUploading}
             isSending={isSending}
           />
         </div>
@@ -188,6 +201,30 @@ function DateSeparator({ date }: { date: Date }) {
       <span className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
       <span className="text-xs text-gray-400 dark:text-gray-500 font-medium shrink-0 capitalize">{label}</span>
       <span className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+    </div>
+  )
+}
+
+function UploadingImageBubble({ file }: { file: File }) {
+  const src = useMemo(() => URL.createObjectURL(file), [file])
+  useEffect(() => () => URL.revokeObjectURL(src), [src])
+
+  return (
+    <div className="flex gap-2 flex-row-reverse">
+      <Avatar className="flex shadow-sm items-center justify-center w-10 h-10 shrink-0">
+        <AvatarFallback><UserIcon className="w-5 h-5" /></AvatarFallback>
+      </Avatar>
+      <div className="px-4 py-2 rounded-lg shadow-sm text-sm max-w-[60%] min-w-0 bg-[#d4f1ff] dark:bg-blue-900/40">
+        <div className="relative">
+          <img src={src} alt="" className="rounded max-w-full object-cover opacity-50" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Spinner className="size-8" />
+          </div>
+        </div>
+        <span className="flex justify-end text-gray-500 dark:text-gray-400 text-xs mt-1">
+          {new Intl.DateTimeFormat("es-VE", { hour: "numeric", minute: "2-digit", hour12: true }).format(new Date())}
+        </span>
+      </div>
     </div>
   )
 }
