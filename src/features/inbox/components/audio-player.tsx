@@ -28,18 +28,23 @@ export function AudioPlayer({ channel, mediaId }: AudioPlayerProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
 
-  // Fetch the audio as a blob so the session cookie is sent (cross-origin)
+  // Fetch the audio as a blob so the session cookie is sent (cross-origin).
+  // Retries with backoff because the backend may still be downloading the media
+  // from WhatsApp/Instagram when the socket event arrives.
   useEffect(() => {
     let cancelled = false
     const url = getFileUrl(channel, "AUDIO", mediaId)
+    const MAX_RETRIES = 4
+    const BASE_DELAY_MS = 1500
 
-    fetch(url, { credentials: "include" })
-      .then((res) => {
+    async function attemptFetch(attempt: number): Promise<void> {
+      if (cancelled) return
+      try {
+        const res = await fetch(url, { credentials: "include" })
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.blob()
-      })
-      .then((blob) => {
+        const blob = await res.blob()
         if (cancelled) return
+
         const objectUrl = URL.createObjectURL(blob)
         blobUrlRef.current = objectUrl
 
@@ -65,13 +70,19 @@ export function AudioPlayer({ channel, mediaId }: AudioPlayerProps) {
 
         // In some browsers loadedmetadata fires before canplaythrough
         if (audio.readyState >= 3) setIsLoading(false)
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setHasError(true)
-          setIsLoading(false)
+      } catch {
+        if (cancelled) return
+        if (attempt < MAX_RETRIES) {
+          const delay = BASE_DELAY_MS * 2 ** attempt
+          await new Promise((resolve) => setTimeout(resolve, delay))
+          return attemptFetch(attempt + 1)
         }
-      })
+        setHasError(true)
+        setIsLoading(false)
+      }
+    }
+
+    attemptFetch(0)
 
     return () => {
       cancelled = true
