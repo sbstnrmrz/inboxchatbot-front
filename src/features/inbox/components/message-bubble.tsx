@@ -14,6 +14,7 @@ interface MessageBubbleProps {
   customerId?: string;
   searchQuery?: string;
   isCurrentMatch?: boolean;
+  localBlobUrl?: string;
 }
 
 enum ReferralType {
@@ -24,7 +25,7 @@ enum ReferralType {
 
 const MEDIA_TYPES = new Set(["AUDIO", "IMAGE", "VIDEO", "DOCUMENT"])
 
-export const MessageBubble = ({ message, customerId, searchQuery, isCurrentMatch }: MessageBubbleProps) => {
+export const MessageBubble = ({ message, customerId, searchQuery, isCurrentMatch, localBlobUrl }: MessageBubbleProps) => {
   const { direction, body, messageType, sentAt, sender } = message
   const isOutbound = direction === "OUTBOUND"
   const isBotMessage = sender.type === 'BOT';
@@ -53,7 +54,7 @@ export const MessageBubble = ({ message, customerId, searchQuery, isCurrentMatch
         } ${isCurrentMatch ? "ring-2 ring-blue-400 dark:ring-blue-500" : ""}`}
       >
         <ReferralLabel referral={message.referral}/>
-        <MessageContent body={body} messageType={messageType} media={message.media} channel={message.channel} messageId={message.id} searchQuery={searchQuery} />
+        <MessageContent body={body} messageType={messageType} media={message.media} channel={message.channel} messageId={message.id} searchQuery={searchQuery} localBlobUrl={localBlobUrl} />
         <MessageTimestamp sentAt={sentAt} />
       </div>
     </div>
@@ -83,6 +84,7 @@ function MessageContent({
   channel,
   messageId,
   searchQuery,
+  localBlobUrl,
 }: {
   body?: string
   messageType: CachedMessage["messageType"]
@@ -90,15 +92,14 @@ function MessageContent({
   channel: MessageChannel
   messageId: string
   searchQuery?: string
+  localBlobUrl?: string
 }) {
-  // Audio messages: render the player if we have a messageId
   if (messageType === "AUDIO" && messageId) {
     return <AudioPlayer channel={channel} mediaId={messageId} />
   }
 
-  // Image messages: render the viewer + optional lightbox
   if (messageType === "IMAGE" && messageId) {
-    return <ImageViewer channel={channel} mediaId={messageId} caption={media?.caption} />
+    return <ImageViewer channel={channel} mediaId={messageId} caption={media?.caption} localBlobUrl={localBlobUrl} />
   }
 
   if (body) {

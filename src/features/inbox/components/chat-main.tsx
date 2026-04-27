@@ -5,6 +5,7 @@ import { useToggleBot } from "@/features/inbox/hooks/useToggleBot"
 import { useLiveConversations } from "@/features/inbox/hooks/useLiveConversations"
 import { useSendMessage } from "@/features/inbox/hooks/useSendMessage"
 import { useUploadFile } from "@/features/inbox/hooks/useUploadFile"
+import { getFileUrl } from "@/lib/api/files"
 import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer"
 import { useAuth } from "@/features/auth/context"
 import { MessageBubble } from "./message-bubble"
@@ -74,15 +75,60 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false, m
 
   const { mutate: uploadFile, isPending: isUploading } = useUploadFile()
   const [uploadingFile, setUploadingFile] = useState<File | null>(null)
+  const pendingBlobRef = useRef<string | null>(null)
+  const fetchedInboundIds = useRef<Set<string>>(new Set())
+  const [blobUrlById, setBlobUrlById] = useState<Map<string, string>>(new Map())
+
+  // Reset inbound tracking and revoke stored blob URLs when conversation changes
+  useEffect(() => {
+    fetchedInboundIds.current.clear()
+    return () => {
+      blobUrlById.forEach((url) => URL.revokeObjectURL(url))
+    }
+  }, [conversationId])
 
   const handleSend = (body: string) => {
     send({ conversationId, messageType: "TEXT", body })
   }
 
   const handleFileSelected = (file: File) => {
+    pendingBlobRef.current = URL.createObjectURL(file)
     setUploadingFile(file)
-    uploadFile({ file, conversationId }, { onSettled: () => setUploadingFile(null) })
+    uploadFile({ file, conversationId }, {
+      onSettled: () => setUploadingFile(null),
+      onError: () => {
+        if (pendingBlobRef.current) {
+          URL.revokeObjectURL(pendingBlobRef.current)
+          pendingBlobRef.current = null
+        }
+      },
+    })
   }
+
+  // When a new IMAGE message arrives via socket, populate blobUrlById so ImageViewer
+  // can display it instantly without waiting for its own server fetch.
+  useEffect(() => {
+    const lastMsg = messages[messages.length - 1]
+    if (!lastMsg || lastMsg.messageType !== "IMAGE") return
+
+    // OUTBOUND: claim the blob URL captured at upload time
+    if (lastMsg.direction === "OUTBOUND" && pendingBlobRef.current) {
+      const blobUrl = pendingBlobRef.current
+      pendingBlobRef.current = null
+      setBlobUrlById((prev) => new Map(prev).set(lastMsg.id, blobUrl))
+      return
+    }
+
+    // INBOUND: fire-and-forget fetch; ImageViewer's retry is the fallback if this fails
+    if (lastMsg.direction === "INBOUND" && !fetchedInboundIds.current.has(lastMsg.id)) {
+      fetchedInboundIds.current.add(lastMsg.id)
+      const url = getFileUrl(lastMsg.channel, "IMAGE", lastMsg.id)
+      fetch(url, { credentials: "include" })
+        .then((res) => { if (!res.ok) throw new Error(); return res.blob() })
+        .then((blob) => setBlobUrlById((prev) => new Map(prev).set(lastMsg.id, URL.createObjectURL(blob))))
+        .catch(() => {})
+    }
+  }, [messages])
 
   // Scroll to bottom sentinel whenever messages change or conversation switches
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -124,6 +170,7 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false, m
                           customerId={conversation?.customerId}
                           searchQuery={messageSearchQuery || undefined}
                           isCurrentMatch={matchingIds[currentMatchIndex] === message.id}
+                          localBlobUrl={blobUrlById.get(message.id)}
                         />
                       </div>
                     )

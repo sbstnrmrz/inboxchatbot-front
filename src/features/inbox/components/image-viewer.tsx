@@ -8,20 +8,32 @@ interface ImageViewerProps {
   channel: MessageChannel
   mediaId: string
   caption?: string
+  localBlobUrl?: string
 }
 
-export function ImageViewer({ channel, mediaId, caption }: ImageViewerProps) {
+export function ImageViewer({ channel, mediaId, caption, localBlobUrl }: ImageViewerProps) {
   const blobUrlRef = useRef<string | null>(null)
 
-  const [blobUrl, setBlobUrl] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [blobUrl, setBlobUrl] = useState<string | null>(localBlobUrl ?? null)
+  const [isLoading, setIsLoading] = useState(!localBlobUrl)
   const [hasError, setHasError] = useState(false)
   const [lightboxOpen, setLightboxOpen] = useState(false)
+
+  // If localBlobUrl arrives after mount (inbound fetch completed while retrying),
+  // apply it immediately and cancel the ongoing server fetch via the dep below.
+  useEffect(() => {
+    if (!localBlobUrl) return
+    setBlobUrl(localBlobUrl)
+    setIsLoading(false)
+    setHasError(false)
+  }, [localBlobUrl])
 
   // Fetch image as blob so the session cookie is sent (cross-origin).
   // Retries with backoff because the backend may still be downloading the media
   // from WhatsApp/Instagram when the socket event arrives.
+  // Skipped when a localBlobUrl is provided; re-evaluated if localBlobUrl arrives late.
   useEffect(() => {
+    if (localBlobUrl) return
     let cancelled = false
     const url = getFileUrl(channel, "IMAGE", mediaId)
     const MAX_RETRIES = 4
@@ -63,7 +75,7 @@ export function ImageViewer({ channel, mediaId, caption }: ImageViewerProps) {
         setTimeout(() => URL.revokeObjectURL(urlToRevoke), 0)
       }
     }
-  }, [channel, mediaId])
+  }, [channel, mediaId, localBlobUrl])
 
   // Close lightbox on Escape key
   useEffect(() => {
