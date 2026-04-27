@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { ImageOff, Loader2, X } from "lucide-react"
+import { ImageOff, X } from "lucide-react"
 import { getFileUrl } from "@/lib/api/files"
 import type { MessageChannel } from "@/types/message.type"
 
@@ -18,29 +18,39 @@ export function ImageViewer({ channel, mediaId, caption }: ImageViewerProps) {
   const [hasError, setHasError] = useState(false)
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
-  // Fetch image as blob so the session cookie is sent (cross-origin)
+  // Fetch image as blob so the session cookie is sent (cross-origin).
+  // Retries with backoff because the backend may still be downloading the media
+  // from WhatsApp/Instagram when the socket event arrives.
   useEffect(() => {
     let cancelled = false
     const url = getFileUrl(channel, "IMAGE", mediaId)
+    const MAX_RETRIES = 4
+    const BASE_DELAY_MS = 1500
 
-    fetch(url, { credentials: "include" })
-      .then((res) => {
+    async function attemptFetch(attempt: number): Promise<void> {
+      if (cancelled) return
+      try {
+        const res = await fetch(url, { credentials: "include" })
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.blob()
-      })
-      .then((blob) => {
+        const blob = await res.blob()
         if (cancelled) return
         const objectUrl = URL.createObjectURL(blob)
         blobUrlRef.current = objectUrl
         setBlobUrl(objectUrl)
         setIsLoading(false)
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setHasError(true)
-          setIsLoading(false)
+      } catch {
+        if (cancelled) return
+        if (attempt < MAX_RETRIES) {
+          const delay = BASE_DELAY_MS * 2 ** attempt
+          await new Promise((resolve) => setTimeout(resolve, delay))
+          return attemptFetch(attempt + 1)
         }
-      })
+        setHasError(true)
+        setIsLoading(false)
+      }
+    }
+
+    attemptFetch(0)
 
     return () => {
       cancelled = true
