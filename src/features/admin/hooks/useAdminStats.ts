@@ -194,6 +194,105 @@ export function useAdminLlmUsageThisMonth(tenantId: string | null) {
   })
 }
 
+// ─── Booking count hooks (upcoming — forward-looking) ─────────────────────────
+
+function getSunday(date: Date): Date {
+  const d = new Date(date)
+  const day = d.getDay()
+  d.setDate(d.getDate() + (day === 0 ? 0 : 7 - day))
+  return d
+}
+
+function getLastOfMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0)
+}
+
+export interface DailyBookingCount {
+  date: string
+  total: number
+}
+
+export function useAdminBookingCountToday(tenantId: string | null) {
+  const today = toLocalISO(new Date())
+  return useQuery({
+    queryKey: adminStatsQueryKeys.bookingCount({ tenantId: tenantId ?? "", date: today }),
+    queryFn: () => adminStatsQueries.bookingCount(tenantId!, { date: today }),
+    enabled: tenantId !== null,
+  })
+}
+
+export function useAdminBookingCountThisWeek(tenantId: string | null) {
+  const from = toLocalISO(new Date())
+  const to = toLocalISO(getSunday(new Date()))
+  return useQuery({
+    queryKey: adminStatsQueryKeys.bookingCount({ tenantId: tenantId ?? "", from, to }),
+    queryFn: () => adminStatsQueries.bookingCount(tenantId!, { from, to }),
+    enabled: tenantId !== null,
+  })
+}
+
+export function useAdminBookingCountThisMonth(tenantId: string | null) {
+  const from = toLocalISO(new Date())
+  const to = toLocalISO(getLastOfMonth(new Date()))
+  return useQuery({
+    queryKey: adminStatsQueryKeys.bookingCount({ tenantId: tenantId ?? "", from, to }),
+    queryFn: () => adminStatsQueries.bookingCount(tenantId!, { from, to }),
+    enabled: tenantId !== null,
+  })
+}
+
+export function useAdminBookingCountByRange(tenantId: string | null, from: Date, to: Date) {
+  const dates = tenantId ? getDatesInRange(from, to) : []
+
+  const results = useQueries({
+    queries: dates.map((date) => ({
+      queryKey: adminStatsQueryKeys.bookingCount({ tenantId: tenantId!, date }),
+      queryFn: () => adminStatsQueries.bookingCount(tenantId!, { date }),
+    })),
+  })
+
+  const isLoading = results.some((r) => r.isLoading)
+  const isError = results.some((r) => r.isError)
+
+  const data: DailyBookingCount[] = dates.map((date, i) => ({
+    date,
+    total: results[i].data?.total ?? 0,
+  }))
+
+  return { data, isLoading, isError }
+}
+
+// ─── Booking created hooks (backward-looking) ─────────────────────────────────
+
+export function useAdminBookingCreatedToday(tenantId: string | null) {
+  const today = toLocalISO(new Date())
+  return useQuery({
+    queryKey: adminStatsQueryKeys.bookingCreatedCount({ tenantId: tenantId ?? "", date: today }),
+    queryFn: () => adminStatsQueries.bookingCreatedCount(tenantId!, { date: today }),
+    enabled: tenantId !== null,
+  })
+}
+
+export function useAdminBookingCreatedThisWeek(tenantId: string | null) {
+  const from = toLocalISO(getMonday(new Date()))
+  const to = toLocalISO(new Date())
+  return useQuery({
+    queryKey: adminStatsQueryKeys.bookingCreatedCount({ tenantId: tenantId ?? "", from, to }),
+    queryFn: () => adminStatsQueries.bookingCreatedCount(tenantId!, { from, to }),
+    enabled: tenantId !== null,
+  })
+}
+
+export function useAdminBookingCreatedThisMonth(tenantId: string | null) {
+  const from = toLocalISO(getFirstOfMonth(new Date()))
+  const to = toLocalISO(new Date())
+  return useQuery({
+    queryKey: adminStatsQueryKeys.bookingCreatedCount({ tenantId: tenantId ?? "", from, to }),
+    queryFn: () => adminStatsQueries.bookingCreatedCount(tenantId!, { from, to }),
+    enabled: tenantId !== null,
+  })
+}
+
 function sumChannelTokens(channels?: LlmUsageTotals[keyof LlmUsageTotals]): number {
   if (!channels) return 0
   return Object.values(channels).reduce((sum, ch) => sum + (ch?.totalTokens ?? 0), 0)

@@ -7,4 +7,10 @@ export const adminStatsQueryKeys = {
 
   llmUsage: (params: { tenantId: string; date?: string; from?: string; to?: string }) =>
     ["admin", "llmUsage", "totals", params] as const,
+
+  bookingCount: (params: { tenantId: string; date?: string; from?: string; to?: string }) =>
+    ["admin", "bookingStats", "count", params] as const,
+
+  bookingCreatedCount: (params: { tenantId: string; date?: string; from?: string; to?: string }) =>
+    ["admin", "bookingStats", "countCreated", params] as const,
 }

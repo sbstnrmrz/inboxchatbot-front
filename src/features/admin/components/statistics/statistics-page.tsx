@@ -14,6 +14,7 @@ import { LlmUsageCard } from "@/features/inbox/components/statistics/llm-usage-c
 import { AdminMessagesChart } from "./admin-messages-chart"
 import { AdminCustomersChart } from "./admin-customers-chart"
 import { AdminLlmUsageChart } from "./admin-llm-usage-chart"
+import { AdminBookingsChart } from "./admin-bookings-chart"
 import { useTenants } from "@/features/admin/hooks/useTenants"
 import {
   useAdminMessageCountToday,
@@ -28,6 +29,13 @@ import {
   useAdminLlmUsageToday,
   useAdminLlmUsageThisWeek,
   useAdminLlmUsageThisMonth,
+  useAdminBookingCountToday,
+  useAdminBookingCountThisWeek,
+  useAdminBookingCountThisMonth,
+  useAdminBookingCountByRange,
+  useAdminBookingCreatedToday,
+  useAdminBookingCreatedThisWeek,
+  useAdminBookingCreatedThisMonth,
 } from "@/features/admin/hooks/useAdminStats"
 import type { LlmUsageTotals } from "@/features/inbox/api/llm-usage.queries"
 
@@ -88,6 +96,10 @@ function OverviewTab({ tenantId }: TabProps) {
   const tokWeek = useAdminLlmUsageThisWeek(tenantId)
   const tokMonth = useAdminLlmUsageThisMonth(tenantId)
 
+  const bkCreatedToday = useAdminBookingCreatedToday(tenantId)
+  const bkCreatedWeek  = useAdminBookingCreatedThisWeek(tenantId)
+  const bkCreatedMonth = useAdminBookingCreatedThisMonth(tenantId)
+
   return (
     <div className="flex flex-col gap-8 mt-4">
       <div className="flex flex-col gap-3">
@@ -128,6 +140,24 @@ function OverviewTab({ tenantId }: TabProps) {
             description="Nuevos este mes"
             title={cusMonth.isLoading ? "—" : String(cusMonth.data?.total ?? 0)}
             channels={{ whatsapp: cusMonth.data?.whatsapp, instagram: cusMonth.data?.instagram }}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <SectionHeader title="Agendamientos" />
+        <div className="grid grid-cols-3 gap-4">
+          <StatsCard
+            description="Creados hoy"
+            title={bkCreatedToday.isLoading ? "—" : String(bkCreatedToday.data?.total ?? 0)}
+          />
+          <StatsCard
+            description="Creados esta semana"
+            title={bkCreatedWeek.isLoading ? "—" : String(bkCreatedWeek.data?.total ?? 0)}
+          />
+          <StatsCard
+            description="Creados este mes"
+            title={bkCreatedMonth.isLoading ? "—" : String(bkCreatedMonth.data?.total ?? 0)}
           />
         </div>
       </div>
@@ -267,6 +297,83 @@ function CustomersTab({ tenantId }: TabProps) {
   )
 }
 
+function defaultBookingsRange(): DateRange {
+  const from = new Date()
+  const to = new Date()
+  to.setDate(to.getDate() + 29)
+  return { from, to }
+}
+
+function BookingsTab({ tenantId }: TabProps) {
+  const today = useAdminBookingCountToday(tenantId)
+  const week  = useAdminBookingCountThisWeek(tenantId)
+  const month = useAdminBookingCountThisMonth(tenantId)
+
+  const createdToday = useAdminBookingCreatedToday(tenantId)
+  const createdWeek  = useAdminBookingCreatedThisWeek(tenantId)
+  const createdMonth = useAdminBookingCreatedThisMonth(tenantId)
+
+  const [range, setRange] = useState<DateRange | undefined>(defaultBookingsRange)
+  const { data: rangeData, isLoading: rangeLoading } = useAdminBookingCountByRange(
+    tenantId,
+    range?.from ?? new Date(),
+    range?.to ?? new Date(),
+  )
+
+  const rangeTotal = rangeData.reduce((sum, d) => sum + d.total, 0)
+
+  return (
+    <div className="flex flex-col gap-6 mt-4">
+      <div className="flex flex-col gap-3">
+        <SectionHeader title="Próximos" />
+        <div className="grid grid-cols-3 gap-4">
+          <StatsCard
+            description="Agendamientos hoy"
+            title={today.isLoading ? "—" : String(today.data?.total ?? 0)}
+          />
+          <StatsCard
+            description="Restantes esta semana"
+            title={week.isLoading ? "—" : String(week.data?.total ?? 0)}
+          />
+          <StatsCard
+            description="Restantes este mes"
+            title={month.isLoading ? "—" : String(month.data?.total ?? 0)}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <SectionHeader title="Creados" />
+        <div className="grid grid-cols-3 gap-4">
+          <StatsCard
+            description="Creados hoy"
+            title={createdToday.isLoading ? "—" : String(createdToday.data?.total ?? 0)}
+          />
+          <StatsCard
+            description="Creados esta semana"
+            title={createdWeek.isLoading ? "—" : String(createdWeek.data?.total ?? 0)}
+          />
+          <StatsCard
+            description="Creados este mes"
+            title={createdMonth.isLoading ? "—" : String(createdMonth.data?.total ?? 0)}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col gap-4">
+        <DateRangePicker className="bg-white" value={range} onChange={setRange} />
+        <div className="grid grid-cols-4 gap-4">
+          <StatsCard
+            description="Total en el rango"
+            title={rangeLoading ? "—" : String(rangeTotal)}
+          />
+          <div className="col-span-3">
+            <AdminBookingsChart tenantId={tenantId} range={range} />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function TokensTab({ tenantId }: TabProps) {
   const totals = useAdminLlmUsageTotals(tenantId)
   const today = useAdminLlmUsageToday(tenantId)
@@ -358,6 +465,7 @@ export function AdminStatisticsPage() {
             <TabsTrigger value="overview">Resumen</TabsTrigger>
             <TabsTrigger value="messages">Mensajes</TabsTrigger>
             <TabsTrigger value="customers">Clientes</TabsTrigger>
+            <TabsTrigger value="bookings">Agendamientos</TabsTrigger>
             <TabsTrigger value="tokens">Tokens</TabsTrigger>
           </TabsList>
 
@@ -371,6 +479,10 @@ export function AdminStatisticsPage() {
 
           <TabsContent value="customers">
             <CustomersTab tenantId={selectedTenantId} />
+          </TabsContent>
+
+          <TabsContent value="bookings">
+            <BookingsTab tenantId={selectedTenantId} />
           </TabsContent>
 
           <TabsContent value="tokens">
