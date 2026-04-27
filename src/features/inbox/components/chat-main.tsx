@@ -120,9 +120,10 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false, m
     }
 
     // INBOUND: fire-and-forget fetch; ImageViewer's retry is the fallback if this fails
-    if (lastMsg.direction === "INBOUND" && !fetchedInboundIds.current.has(lastMsg.id)) {
+    const whatsappMediaId = lastMsg.media?.whatsappMediaId
+    if (lastMsg.direction === "INBOUND" && whatsappMediaId && !fetchedInboundIds.current.has(lastMsg.id)) {
       fetchedInboundIds.current.add(lastMsg.id)
-      const url = getFileUrl(lastMsg.channel, "IMAGE", lastMsg.id)
+      const url = getFileUrl(lastMsg.channel, "IMAGE", whatsappMediaId)
       fetch(url, { credentials: "include" })
         .then((res) => { if (!res.ok) throw new Error(); return res.blob() })
         .then((blob) => setBlobUrlById((prev) => new Map(prev).set(lastMsg.id, URL.createObjectURL(blob))))

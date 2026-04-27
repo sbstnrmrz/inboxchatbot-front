@@ -54,7 +54,7 @@ export const MessageBubble = ({ message, customerId, searchQuery, isCurrentMatch
         } ${isCurrentMatch ? "ring-2 ring-blue-400 dark:ring-blue-500" : ""}`}
       >
         <ReferralLabel referral={message.referral}/>
-        <MessageContent body={body} messageType={messageType} media={message.media} channel={message.channel} messageId={message.id} searchQuery={searchQuery} localBlobUrl={localBlobUrl} />
+        <MessageContent body={body} messageType={messageType} media={message.media} channel={message.channel} searchQuery={searchQuery} localBlobUrl={localBlobUrl} />
         <MessageTimestamp sentAt={sentAt} />
       </div>
     </div>
@@ -82,7 +82,6 @@ function MessageContent({
   messageType,
   media,
   channel,
-  messageId,
   searchQuery,
   localBlobUrl,
 }: {
@@ -90,16 +89,15 @@ function MessageContent({
   messageType: CachedMessage["messageType"]
   media?: MessageMedia
   channel: MessageChannel
-  messageId: string
   searchQuery?: string
   localBlobUrl?: string
 }) {
-  if (messageType === "AUDIO" && messageId) {
-    return <AudioPlayer channel={channel} mediaId={messageId} />
+  if (messageType === "AUDIO" && media?.whatsappMediaId) {
+    return <AudioPlayer channel={channel} mediaId={media.whatsappMediaId} />
   }
 
-  if (messageType === "IMAGE" && messageId) {
-    return <ImageViewer channel={channel} mediaId={messageId} caption={media?.caption} localBlobUrl={localBlobUrl} />
+  if (messageType === "IMAGE" && media?.whatsappMediaId) {
+    return <ImageViewer channel={channel} mediaId={media.whatsappMediaId} caption={media.caption} localBlobUrl={localBlobUrl} />
   }
 
   if (body) {
