@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
@@ -179,18 +179,32 @@ function ChatItemLastMessage({
 
 function ScrollableTags({ tags }: { tags: Array<{ _id: string; name: string; color: string }> }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [hasOverflow, setHasOverflow] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      setHasOverflow(el.scrollWidth > el.clientWidth);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [tags]);
+
   const scroll = (direction: "left" | "right") => {
     scrollRef.current?.scrollBy({ left: direction === "left" ? -80 : 80, behavior: "smooth" });
   };
 
   return (
     <div className="flex items-center gap-0.5 min-w-0 flex-1">
-      <button
-        onClick={(e) => { e.stopPropagation(); scroll("left"); }}
-        className="shrink-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-      >
-        <ChevronLeft className="w-3 h-3" />
-      </button>
+      {hasOverflow && (
+        <button
+          onClick={(e) => { e.stopPropagation(); scroll("left"); }}
+          className="shrink-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        >
+          <ChevronLeft className="w-3 h-3" />
+        </button>
+      )}
       <div
         ref={scrollRef}
         className="flex gap-1 text-xs font-semibold overflow-x-auto min-w-0 flex-1 [&::-webkit-scrollbar]:hidden"
@@ -206,12 +220,14 @@ function ScrollableTags({ tags }: { tags: Array<{ _id: string; name: string; col
           </div>
         ))}
       </div>
-      <button
-        onClick={(e) => { e.stopPropagation(); scroll("right"); }}
-        className="shrink-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-      >
-        <ChevronRight className="w-3 h-3" />
-      </button>
+      {hasOverflow && (
+        <button
+          onClick={(e) => { e.stopPropagation(); scroll("right"); }}
+          className="shrink-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        >
+          <ChevronRight className="w-3 h-3" />
+        </button>
+      )}
     </div>
   );
 }
