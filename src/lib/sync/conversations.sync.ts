@@ -24,28 +24,16 @@ import { db } from "@/lib/db/database"
  * Also persists the populated lastMessage of each conversation so the
  * inbox list can show message previews without a separate messages fetch.
  *
- * Stale conversations (present in IndexedDB but absent from the server
- * response) are removed together with their orphaned messages, so deleted
- * records on the server are reflected locally on the next sync.
+ * Stale removal is intentionally omitted here — server-side deletions are
+ * handled in real time via the conversation_deleted socket event, which calls
+ * removeConversation(). Deleting based on a partial first page would wrongly
+ * evict conversations loaded on page 2+ (and their messages) whenever the
+ * conversations list is refetched.
  */
 export async function syncConversations(conversations: Conversation[]): Promise<void> {
-  const incomingIds = new Set(conversations.map((c) => c._id))
-
-  // Determine which locally-cached conversations no longer exist on the server
-  const existingRows = await db.conversations.toArray()
-  const staleIds = existingRows.map((r) => r.id).filter((id) => !incomingIds.has(id))
+  if (conversations.length === 0) return
 
   await db.transaction("rw", db.conversations, db.messages, async () => {
-    // Remove stale conversations and their associated messages in one transaction
-    if (staleIds.length > 0) {
-      await db.conversations.bulkDelete(staleIds)
-      for (const staleId of staleIds) {
-        await db.messages.where("conversationId").equals(staleId).delete()
-      }
-    }
-
-    if (conversations.length === 0) return
-
     const cachedConversations = mapConversationsToCache(conversations)
     await db.conversations.bulkPut(cachedConversations)
 
@@ -66,12 +54,9 @@ export async function syncConversations(conversations: Conversation[]): Promise<
 }
 
 /**
- * Persist a page of conversations (pagination — NOT the first page).
+ * Persist a page of conversations (pagination — subsequent pages).
  * Only upserts — never removes stale rows, so previously loaded pages
  * are preserved in the local cache.
- *
- * Call this for all pages after the first; use `syncConversations` for
- * the initial page which handles stale-deletion.
  */
 export async function syncConversationsPage(conversations: Conversation[]): Promise<void> {
   if (conversations.length === 0) return
