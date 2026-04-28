@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
@@ -6,7 +7,7 @@ import type { CachedConversation, CachedMessage } from "@/lib/db";
 import { messagesRepository } from "@/lib/db/repositories/messages.repository";
 import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer";
 import type { MessageType } from "@/types/message.type";
-import { MicIcon, ImageIcon, VideoIcon, FileIcon, MapPinIcon, SmileIcon, HandIcon, BanIcon, UserIcon } from "lucide-react";
+import { MicIcon, ImageIcon, VideoIcon, FileIcon, MapPinIcon, SmileIcon, HandIcon, BanIcon, UserIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { getAvatarBackgroundColor } from "@/utils/colors";
 import { useTags } from "@/features/inbox/hooks/useTags";
 import { ConversationTagsDropdown } from "./conversation-tags-dropdown";
@@ -58,22 +59,14 @@ export function ChatListItem({ conversation, isSelected, onClick }: ChatListItem
         </div>
       </div>
       <div className="flex text-sm text-white mt-1 justify-between items-center">
-        <div className="flex gap-1 items-center justify-between min-w-0 overflow-hidden flex-1">
-          <div className="flex gap-1 text-xs font-semibold overflow-x-auto min-w-0">
-            {conversationTags.map((tag) => (
-              <div
-                key={tag._id}
-                className="py-1 px-2 rounded-full shrink-0"
-                style={{ backgroundColor: tag.color }}
-              >
-                {tag.name}
-              </div>
-            ))}
+        <div className="flex items-center min-w-0 overflow-hidden flex-1">
+          {conversationTags.length > 0 && <ScrollableTags tags={conversationTags} />}
+          <div className="ml-auto shrink-0">
+            <ConversationTagsDropdown
+              conversationId={id}
+              activeTags={conversationTagIds}
+            />
           </div>
-          <ConversationTagsDropdown
-            conversationId={id}
-            activeTags={conversationTagIds}
-          />
         </div>
         <ChatStatuses
           requestingAgent={conversation.requestingAgent}
@@ -180,6 +173,45 @@ function ChatItemLastMessage({
           {unreadCount > 99 ? "99+" : unreadCount}
         </span>
       )}
+    </div>
+  );
+}
+
+function ScrollableTags({ tags }: { tags: Array<{ _id: string; name: string; color: string }> }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scroll = (direction: "left" | "right") => {
+    scrollRef.current?.scrollBy({ left: direction === "left" ? -80 : 80, behavior: "smooth" });
+  };
+
+  return (
+    <div className="flex items-center gap-0.5 min-w-0 flex-1">
+      <button
+        onClick={(e) => { e.stopPropagation(); scroll("left"); }}
+        className="shrink-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+      >
+        <ChevronLeft className="w-3 h-3" />
+      </button>
+      <div
+        ref={scrollRef}
+        className="flex gap-1 text-xs font-semibold overflow-x-auto min-w-0 flex-1 [&::-webkit-scrollbar]:hidden"
+        style={{ scrollbarWidth: "none" }}
+      >
+        {tags.map((tag) => (
+          <div
+            key={tag._id}
+            className="py-1 px-2 rounded-full shrink-0 text-white"
+            style={{ backgroundColor: tag.color }}
+          >
+            {tag.name}
+          </div>
+        ))}
+      </div>
+      <button
+        onClick={(e) => { e.stopPropagation(); scroll("right"); }}
+        className="shrink-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+      >
+        <ChevronRight className="w-3 h-3" />
+      </button>
     </div>
   );
 }
