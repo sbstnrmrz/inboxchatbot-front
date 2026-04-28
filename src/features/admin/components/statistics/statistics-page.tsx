@@ -40,7 +40,7 @@ import {
 import type { LlmUsageTotals } from "@/features/inbox/api/llm-usage.queries"
 
 const PRICING: Record<string, { input: number; output: number }> = {
-  openai: { input: 1.75, output: 14 },
+  openai: { input: 1.25, output: 10 },
   gemini: { input: 0.5, output: 3 },
 }
 
