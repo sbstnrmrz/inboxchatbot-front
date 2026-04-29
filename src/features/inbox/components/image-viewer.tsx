@@ -9,9 +9,10 @@ interface ImageViewerProps {
   mediaId: string
   caption?: string
   localBlobUrl?: string
+  directUrl?: string
 }
 
-export function ImageViewer({ channel, mediaId, caption, localBlobUrl }: ImageViewerProps) {
+export function ImageViewer({ channel, mediaId, caption, localBlobUrl, directUrl }: ImageViewerProps) {
   const blobUrlRef = useRef<string | null>(null)
 
   const [blobUrl, setBlobUrl] = useState<string | null>(localBlobUrl ?? null)
@@ -35,7 +36,7 @@ export function ImageViewer({ channel, mediaId, caption, localBlobUrl }: ImageVi
   useEffect(() => {
     if (localBlobUrl) return
     let cancelled = false
-    const url = getFileUrl(channel, "IMAGE", mediaId)
+    const url = directUrl ?? getFileUrl(channel, "IMAGE", mediaId)
     const MAX_RETRIES = 4
     const BASE_DELAY_MS = 1500
 
@@ -75,7 +76,7 @@ export function ImageViewer({ channel, mediaId, caption, localBlobUrl }: ImageVi
         setTimeout(() => URL.revokeObjectURL(urlToRevoke), 0)
       }
     }
-  }, [channel, mediaId, localBlobUrl])
+  }, [channel, mediaId, localBlobUrl, directUrl])
 
   // Close lightbox on Escape key
   useEffect(() => {

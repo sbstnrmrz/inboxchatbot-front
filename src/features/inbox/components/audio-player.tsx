@@ -6,6 +6,7 @@ import type { MessageChannel } from "@/types/message.type"
 interface AudioPlayerProps {
   channel: MessageChannel
   mediaId: string
+  directUrl?: string
 }
 
 // Decorative waveform bar heights (static, mimics WhatsApp style)
@@ -18,7 +19,7 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`
 }
 
-export function AudioPlayer({ channel, mediaId }: AudioPlayerProps) {
+export function AudioPlayer({ channel, mediaId, directUrl }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const blobUrlRef = useRef<string | null>(null)
 
@@ -33,7 +34,7 @@ export function AudioPlayer({ channel, mediaId }: AudioPlayerProps) {
   // from WhatsApp/Instagram when the socket event arrives.
   useEffect(() => {
     let cancelled = false
-    const url = getFileUrl(channel, "AUDIO", mediaId)
+    const url = directUrl ?? getFileUrl(channel, "AUDIO", mediaId)
     const MAX_RETRIES = 4
     const BASE_DELAY_MS = 1500
 
@@ -95,7 +96,7 @@ export function AudioPlayer({ channel, mediaId }: AudioPlayerProps) {
         blobUrlRef.current = null
       }
     }
-  }, [channel, mediaId])
+  }, [channel, mediaId, directUrl])
 
   function togglePlay() {
     const audio = audioRef.current
