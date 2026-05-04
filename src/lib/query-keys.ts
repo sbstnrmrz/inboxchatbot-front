@@ -48,6 +48,11 @@ export const queryKeys = {
       ["customerStats", "count", params ?? {}] as const,
   },
 
+  conversationStats: {
+    count: (params?: { date?: string; from?: string; to?: string }) =>
+      ["conversationStats", "count", params ?? {}] as const,
+  },
+
   llmUsage: {
     totals: (params?: { date?: string; from?: string; to?: string }) =>
       ["llmUsage", "totals", params ?? {}] as const,

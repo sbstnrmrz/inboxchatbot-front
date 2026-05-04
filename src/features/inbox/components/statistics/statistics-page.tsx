@@ -36,6 +36,11 @@ import {
   useBookingCreatedThisWeek,
   useBookingCreatedThisMonth,
 } from "@/features/inbox/hooks/useBookingStats";
+import {
+  useConversationCountToday,
+  useConversationCountThisWeek,
+  useConversationCountThisMonth,
+} from "@/features/inbox/hooks/useConversationStats";
 
 const PRICING: Record<string, { input: number; output: number }> = {
   openai: { input: 1.75, output: 14 },
@@ -71,6 +76,12 @@ function formatTokens(n: number) {
 
 function formatCost(usd: number) {
   return usd.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 4 })
+}
+
+function conversionRate(bookings: number | undefined, conversations: number | undefined): string {
+  if (bookings === undefined || conversations === undefined) return "—"
+  if (conversations === 0) return "0%"
+  return `${((bookings / conversations) * 100).toFixed(1)}%`
 }
 
 function SectionHeader({ title }: { title: string }) {
@@ -361,6 +372,10 @@ function BookingsTab() {
   const createdWeek  = useBookingCreatedThisWeek()
   const createdMonth = useBookingCreatedThisMonth()
 
+  const convToday = useConversationCountToday()
+  const convWeek  = useConversationCountThisWeek()
+  const convMonth = useConversationCountThisMonth()
+
   const [range, setRange] = useState<DateRange | undefined>(defaultBookingsRange)
   const { data: rangeData, isLoading: rangeLoading } = useBookingCountByRange(
     range?.from ?? new Date(),
@@ -402,6 +417,26 @@ function BookingsTab() {
           <StatsCard
             description="Creados este mes"
             title={createdMonth.isLoading ? "—" : String(createdMonth.data?.total ?? 0)}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <SectionHeader title="Tasa de Conversión de Conversacion a Cita" />
+        <div className="grid grid-cols-3 gap-4">
+          <StatsCard
+            description="Tasa hoy"
+            title={createdToday.isLoading || convToday.isLoading ? "—" : conversionRate(createdToday.data?.total, convToday.data?.total)}
+            footer={createdToday.isLoading || convToday.isLoading ? undefined : `${createdToday.data?.total ?? 0} de ${convToday.data?.total ?? 0} conversaciones`}
+          />
+          <StatsCard
+            description="Tasa esta semana"
+            title={createdWeek.isLoading || convWeek.isLoading ? "—" : conversionRate(createdWeek.data?.total, convWeek.data?.total)}
+            footer={createdWeek.isLoading || convWeek.isLoading ? undefined : `${createdWeek.data?.total ?? 0} de ${convWeek.data?.total ?? 0} conversaciones`}
+          />
+          <StatsCard
+            description="Tasa este mes"
+            title={createdMonth.isLoading || convMonth.isLoading ? "—" : conversionRate(createdMonth.data?.total, convMonth.data?.total)}
+            footer={createdMonth.isLoading || convMonth.isLoading ? undefined : `${createdMonth.data?.total ?? 0} de ${convMonth.data?.total ?? 0} conversaciones`}
           />
         </div>
       </div>
