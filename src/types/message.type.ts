@@ -32,6 +32,8 @@ export interface MessageSender {
 }
 
 export interface MessageMedia {
+  /** Canonical local file identifier — the filename stem used by GET /files/{channel}/{type}/{id} */
+  id?: string
   whatsappMediaId?: string
   url?: string
   mimeType?: string

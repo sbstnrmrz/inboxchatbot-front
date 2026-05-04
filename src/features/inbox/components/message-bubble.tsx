@@ -92,12 +92,12 @@ function MessageContent({
   searchQuery?: string
   localBlobUrl?: string
 }) {
-  if (messageType === "AUDIO" && (media?.whatsappMediaId || media?.url)) {
-    return <AudioPlayer channel={channel} mediaId={media.whatsappMediaId ?? ""} directUrl={media.url} />
+  if (messageType === "AUDIO" && (media?.id || media?.whatsappMediaId || media?.url)) {
+    return <AudioPlayer channel={channel} mediaId={media.id ?? media.whatsappMediaId ?? ""} directUrl={media.url} />
   }
 
-  if (messageType === "IMAGE" && (media?.whatsappMediaId || media?.url)) {
-    return <ImageViewer channel={channel} mediaId={media.whatsappMediaId ?? ""} directUrl={media.url} caption={media.caption} localBlobUrl={localBlobUrl} />
+  if (messageType === "IMAGE" && (media?.id || media?.whatsappMediaId || media?.url)) {
+    return <ImageViewer channel={channel} mediaId={media.id ?? media.whatsappMediaId ?? ""} directUrl={media.url} caption={media.caption} localBlobUrl={localBlobUrl} />
   }
 
   if (body) {

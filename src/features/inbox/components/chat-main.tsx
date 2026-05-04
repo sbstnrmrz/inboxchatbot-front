@@ -6,7 +6,6 @@ import { useLiveConversations } from "@/features/inbox/hooks/useLiveConversation
 import { useSendMessage } from "@/features/inbox/hooks/useSendMessage"
 import { useUploadFile } from "@/features/inbox/hooks/useUploadFile"
 import { getFileUrl } from "@/lib/api/files"
-import { patchMessageMediaUrl } from "@/lib/sync/messages.sync"
 import { useLiveCustomer } from "@/features/inbox/hooks/useLiveCustomer"
 import { useAuth } from "@/features/auth/context"
 import { MessageBubble } from "./message-bubble"
@@ -77,7 +76,6 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false, m
   const { mutate: uploadFile, isPending: isUploading } = useUploadFile()
   const [uploadingFile, setUploadingFile] = useState<File | null>(null)
   const pendingBlobRef = useRef<string | null>(null)
-  const pendingUploadUrlRef = useRef<string | null>(null)
   const fetchedInboundIds = useRef<Set<string>>(new Set())
   const [blobUrlById, setBlobUrlById] = useState<Map<string, string>>(new Map())
 
@@ -97,16 +95,12 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false, m
     pendingBlobRef.current = URL.createObjectURL(file)
     setUploadingFile(file)
     uploadFile({ file, conversationId }, {
-      onSuccess: (data) => {
-        pendingUploadUrlRef.current = data.url
-      },
       onSettled: () => setUploadingFile(null),
       onError: () => {
         if (pendingBlobRef.current) {
           URL.revokeObjectURL(pendingBlobRef.current)
           pendingBlobRef.current = null
         }
-        pendingUploadUrlRef.current = null
       },
     })
   }
@@ -117,24 +111,19 @@ export const ChatMain = ({ conversationId, socket, showContactDetails = false, m
     const lastMsg = messages[messages.length - 1]
     if (!lastMsg || lastMsg.messageType !== "IMAGE") return
 
-    // OUTBOUND: claim the blob URL and upload URL captured at upload time
+    // OUTBOUND: claim the blob URL captured at upload time
     if (lastMsg.direction === "OUTBOUND" && pendingBlobRef.current) {
       const blobUrl = pendingBlobRef.current
-      const uploadUrl = pendingUploadUrlRef.current
       pendingBlobRef.current = null
-      pendingUploadUrlRef.current = null
       setBlobUrlById((prev) => new Map(prev).set(lastMsg.id, blobUrl))
-      if (uploadUrl) {
-        patchMessageMediaUrl(lastMsg.id, uploadUrl).catch(() => {})
-      }
       return
     }
 
     // INBOUND: fire-and-forget fetch; ImageViewer's retry is the fallback if this fails
-    const whatsappMediaId = lastMsg.media?.whatsappMediaId
-    if (lastMsg.direction === "INBOUND" && whatsappMediaId && !fetchedInboundIds.current.has(lastMsg.id)) {
+    const mediaId = lastMsg.media?.id ?? lastMsg.media?.whatsappMediaId
+    if (lastMsg.direction === "INBOUND" && mediaId && !fetchedInboundIds.current.has(lastMsg.id)) {
       fetchedInboundIds.current.add(lastMsg.id)
-      const url = getFileUrl(lastMsg.channel, "IMAGE", whatsappMediaId)
+      const url = getFileUrl(lastMsg.channel, "IMAGE", mediaId)
       fetch(url, { credentials: "include" })
         .then((res) => { if (!res.ok) throw new Error(); return res.blob() })
         .then((blob) => setBlobUrlById((prev) => new Map(prev).set(lastMsg.id, URL.createObjectURL(blob))))
