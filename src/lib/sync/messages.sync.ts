@@ -53,3 +53,11 @@ export async function updateMessageStatus(
 export async function clearConversationMessages(conversationId: string): Promise<void> {
   await messagesRepository.clearByConversation(conversationId)
 }
+
+/**
+ * Persist the backend storage URL on an outbound media message so future
+ * renders can fetch it without relying on the transient WhatsApp media ID.
+ */
+export async function patchMessageMediaUrl(id: string, url: string): Promise<void> {
+  await messagesRepository.patchMedia(id, { url })
+}

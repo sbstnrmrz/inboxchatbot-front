@@ -111,6 +111,13 @@ export const messagesRepository = {
   clearByTenant(tenantId: string): Promise<number> {
     return db.messages.where("tenantId").equals(tenantId).delete()
   },
+
+  /** Merge partial fields into a message's media object. */
+  async patchMedia(id: string, mediaUpdate: Partial<NonNullable<CachedMessage["media"]>>): Promise<void> {
+    const msg = await db.messages.get(id)
+    if (!msg) return
+    await db.messages.update(id, { media: { ...msg.media, ...mediaUpdate } })
+  },
 }
 
 
